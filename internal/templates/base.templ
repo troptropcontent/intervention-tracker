@@ -1,0 +1,42 @@
+package templates
+
+templ Base(title string) {
+	<!DOCTYPE html>
+	<html lang="fr">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>{ title } - Maintenance Portails</title>
+		<script src="/static/htmx.min.js"></script>
+		<link rel="stylesheet" href="/static/css/output.css"/>
+		<style>
+			.htmx-indicator {
+				opacity: 0;
+				transition: opacity 200ms ease-in;
+			}
+			.htmx-request .htmx-indicator {
+				opacity: 1;
+			}
+			.htmx-request.htmx-indicator {
+				opacity: 1;
+			}
+		</style>
+	</head>
+	<body class="bg-gray-50 min-h-screen">
+		<nav class="bg-blue-600 text-white p-4">
+			<div class="container mx-auto flex justify-between items-center">
+				<h1 class="text-xl font-bold">
+					<a href="/" class="hover:text-blue-200">Maintenance Portails</a>
+				</h1>
+				<div class="space-x-4">
+					<a href="/portals" class="hover:text-blue-200">Portails</a>
+					<a href="/interventions" class="hover:text-blue-200">Interventions</a>
+				</div>
+			</div>
+		</nav>
+		<main class="container mx-auto px-4 py-8">
+			{ children... }
+		</main>
+	</body>
+	</html>
+}
