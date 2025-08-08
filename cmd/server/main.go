@@ -33,6 +33,9 @@ func main() {
 	// Routes
 	e.GET("/portals/:id", h.GetPortal)
 	
+	// 404 handler
+	e.RouteNotFound("/*", h.NotFound)
+	
 	// Start server
 	log.Println("Server starting on :8080")
 	if err := e.Start(":8080"); err != nil {
