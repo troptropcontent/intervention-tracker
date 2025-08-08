@@ -17,3 +17,11 @@ tailwind-build:
 # Start the server
 server:
 	templ generate && go run cmd/server/main.go
+
+# Run tests (clean output)
+test:
+	go test ./... | grep -v "\[no test files\]"
+
+# Run tests with verbose output (clean)
+test-verbose:
+	go test ./... -v | grep -v "\[no test files\]"
