@@ -23,3 +23,7 @@ func (h *Handlers) GetPortal(c echo.Context) error {
 
 	return templates.PortalShow(portal).Render(c.Request().Context(), c.Response().Writer)
 }
+
+func (h *Handlers) NotFound(c echo.Context) error {
+	return templates.NotFound().Render(c.Request().Context(), c.Response().Writer)
+}
