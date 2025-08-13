@@ -14,9 +14,10 @@ type Handlers struct {
 }
 
 func (h *Handlers) GetPortal(c echo.Context) error {
-	id := c.Param("id")
+	uuid := c.Param("uuid")
+
 	var portal models.Portal
-	err := h.DB.Get(&portal, "SELECT * FROM portals WHERE id = $1", id)
+	err := h.DB.Get(&portal, "SELECT * FROM portals WHERE uuid = $1", uuid)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "Portal not found")
 	}
@@ -26,4 +27,8 @@ func (h *Handlers) GetPortal(c echo.Context) error {
 
 func (h *Handlers) NotFound(c echo.Context) error {
 	return templates.NotFound().Render(c.Request().Context(), c.Response().Writer)
+}
+
+func (h *Handlers) GetAdminPortalsScan(c echo.Context) error {
+	return templates.AdminPortalsScan().Render(c.Request().Context(), c.Response().Writer)
 }

@@ -21,21 +21,23 @@ func main() {
 	h := &handlers.Handlers{DB: db}
 
 	e := echo.New()
-	
+
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
-	
+
 	// Static files
 	e.Static("/static", "static")
-	
+
 	// Routes
-	e.GET("/portals/:id", h.GetPortal)
-	
+	e.GET("/portals/:uuid", h.GetPortal)
+	admin_routes := e.Group("/admin")
+	admin_routes.GET("/portals/scan", h.GetAdminPortalsScan)
+
 	// 404 handler
 	e.RouteNotFound("/*", h.NotFound)
-	
+
 	// Start server
 	log.Println("Server starting on :8080")
 	if err := e.Start(":8080"); err != nil {
