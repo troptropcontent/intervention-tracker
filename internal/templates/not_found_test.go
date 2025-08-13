@@ -20,21 +20,21 @@ func TestNotFound_Template(t *testing.T) {
 
 	// Assert
 	require.NoError(t, err)
-	
+
 	html := buf.String()
-	
+
 	// Check structure
 	assert.Contains(t, html, "<!doctype html>")
 	assert.Contains(t, html, "<html lang=\"fr\">")
 	assert.Contains(t, html, "</html>")
-	
+
 	// Check title in head
 	assert.Contains(t, html, "<title>Page non trouvée - Maintenance Portails</title>")
-	
+
 	// Check CSS and JS includes
 	assert.Contains(t, html, `href="/static/css/output.css"`)
 	assert.Contains(t, html, `src="/static/htmx.min.js"`)
-	
+
 	// Check navigation
 	assert.Contains(t, html, "Maintenance Portails")
 	assert.Contains(t, html, `href="/portals"`)
@@ -49,17 +49,17 @@ func TestNotFound_Content(t *testing.T) {
 	// Execute
 	err := NotFound().Render(ctx, &buf)
 	require.NoError(t, err)
-	
+
 	html := buf.String()
-	
+
 	// Check 404 specific content
 	assert.Contains(t, html, "404 - Page non trouvée")
 	assert.Contains(t, html, "La page que vous recherchez n'existe pas ou a été déplacée")
 	assert.Contains(t, html, "Retour à l'accueil")
-	
+
 	// Check home link
 	assert.Contains(t, html, `href="/"`)
-	
+
 	// Check CSS classes for styling
 	assert.Contains(t, html, "text-center")
 	assert.Contains(t, html, "text-3xl")
@@ -75,21 +75,21 @@ func TestNotFound_Accessibility(t *testing.T) {
 	// Execute
 	err := NotFound().Render(ctx, &buf)
 	require.NoError(t, err)
-	
+
 	html := buf.String()
-	
+
 	// Check accessibility features
-	assert.Contains(t, html, `lang="fr"`) // Language specified
+	assert.Contains(t, html, `lang="fr"`)       // Language specified
 	assert.Contains(t, html, `charset="UTF-8"`) // Character encoding
 	assert.Contains(t, html, `name="viewport"`) // Responsive viewport
-	
+
 	// Check semantic HTML structure
 	assert.Contains(t, html, "<h1")
 	assert.Contains(t, html, "<nav")
 	assert.Contains(t, html, "<main")
-	
+
 	// Check that the home link has meaningful text (not just "click here")
-	homeButtonStart := strings.Index(html, `href="/"`) 
+	homeButtonStart := strings.Index(html, `href="/"`)
 	if homeButtonStart > 0 {
 		// Find the second href="/" which should be our button, not the nav link
 		secondHomeLink := strings.Index(html[homeButtonStart+10:], `href="/"`)

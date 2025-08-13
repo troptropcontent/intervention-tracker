@@ -25,13 +25,13 @@ func TestHandlers_NotFound(t *testing.T) {
 	// Assert
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
-	
+
 	body := rec.Body.String()
 	assert.Contains(t, body, "404 - Page non trouvée")
 	assert.Contains(t, body, "La page que vous recherchez n'existe pas")
 	assert.Contains(t, body, "Retour à l'accueil")
 	assert.Contains(t, body, `href="/"`)
-	
+
 	// Verify it's valid HTML
 	assert.Contains(t, body, "<!doctype html>")
 	assert.Contains(t, body, "<html")
@@ -81,21 +81,21 @@ func TestHandlers_GetAdminPortalsScan(t *testing.T) {
 	// Assert
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
-	
+
 	body := rec.Body.String()
 	assert.Contains(t, body, "Scanner un QR Code")
 	assert.Contains(t, body, "reader")
 	assert.Contains(t, body, "manual-input")
 	assert.Contains(t, body, "qr-scanner.js")
-	
+
 	// Verify it contains camera-related elements
 	assert.Contains(t, body, "Initialisation de la caméra")
 	assert.Contains(t, body, "Pointez votre caméra vers un QR code")
-	
+
 	// Verify manual fallback is present
 	assert.Contains(t, body, "Problème avec la caméra?")
 	assert.Contains(t, body, "Collez l'URL du QR code ici")
-	
+
 	// Verify instructions are present
 	assert.Contains(t, body, "Instructions:")
 	assert.Contains(t, body, "Assurez-vous que votre caméra est activée")

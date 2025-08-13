@@ -68,14 +68,14 @@ func runMigrations(db *sqlx.DB) error {
 	// Run unapplied migrations
 	for _, file := range files {
 		version := strings.TrimSuffix(filepath.Base(file), ".sql")
-		
+
 		if applied[version] {
 			log.Printf("Migration %s already applied, skipping", version)
 			continue
 		}
 
 		log.Printf("Running migration %s", version)
-		
+
 		content, err := os.ReadFile(file)
 		if err != nil {
 			return fmt.Errorf("failed to read migration file %s: %w", file, err)

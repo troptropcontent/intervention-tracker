@@ -22,14 +22,14 @@ func main() {
 
 	installDate, _ := time.Parse("2006-01-02", "2024-01-15")
 
-	_, err = db.Exec(query, 
-		"Portail Principal", 
-		"123 Rue de la Paix", 
-		"75001", 
-		"Paris", 
-		"TechnoPorte SARL", 
-		"01.23.45.67.89", 
-		"contact@technoporte.fr", 
+	_, err = db.Exec(query,
+		"Portail Principal",
+		"123 Rue de la Paix",
+		"75001",
+		"Paris",
+		"TechnoPorte SARL",
+		"01.23.45.67.89",
+		"contact@technoporte.fr",
 		installDate)
 
 	if err != nil {

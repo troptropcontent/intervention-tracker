@@ -71,11 +71,11 @@ func TestServerRoutes_Integration(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			req := httptest.NewRequest(tt.method, tt.path, nil)
 			rec := httptest.NewRecorder()
-			
+
 			e.ServeHTTP(rec, req)
-			
+
 			assert.Equal(t, tt.expectedStatus, rec.Code)
-			
+
 			body := rec.Body.String()
 			for _, expectedContent := range tt.expectedBody {
 				assert.Contains(t, body, expectedContent)
@@ -123,9 +123,9 @@ func TestServerRoutes_StaticFiles(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, tt.path, nil)
 			rec := httptest.NewRecorder()
-			
+
 			e.ServeHTTP(rec, req)
-			
+
 			assert.Equal(t, tt.expectedStatus, rec.Code)
 		})
 	}
@@ -142,18 +142,18 @@ func TestServerRoutes_QRScannerPage_Elements(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodGet, "/admin/portals/scan", nil)
 	rec := httptest.NewRecorder()
-	
+
 	e.ServeHTTP(rec, req)
-	
+
 	require.Equal(t, http.StatusOK, rec.Code)
-	
+
 	body := rec.Body.String()
-	
+
 	// Verify HTML structure
 	assert.Contains(t, body, "<!doctype html>")
 	assert.Contains(t, body, "<html")
 	assert.Contains(t, body, "</html>")
-	
+
 	// Verify essential QR scanner elements
 	assert.Contains(t, body, `id="reader"`)
 	assert.Contains(t, body, `id="loading"`)
@@ -162,18 +162,18 @@ func TestServerRoutes_QRScannerPage_Elements(t *testing.T) {
 	assert.Contains(t, body, `id="success"`)
 	assert.Contains(t, body, `id="manual-input"`)
 	assert.Contains(t, body, `id="manual-submit"`)
-	
+
 	// Verify JavaScript includes
 	assert.Contains(t, body, "html5-qrcode.min.js")
 	assert.Contains(t, body, "qr-scanner.js")
 	assert.Contains(t, body, "initQRScanner()")
 	assert.Contains(t, body, "setupManualInput()")
-	
+
 	// Verify CSS and styling
 	assert.Contains(t, body, "bg-gray-50")
 	assert.Contains(t, body, "bg-blue-600")
 	assert.Contains(t, body, "rounded-lg")
-	
+
 	// Verify French content
 	assert.Contains(t, body, "Scanner un QR Code")
 	assert.Contains(t, body, "Pointez votre caméra vers un QR code")
@@ -188,7 +188,7 @@ func TestServerRoutes_ContentTypes(t *testing.T) {
 
 	e := echo.New()
 	h := &handlers.Handlers{}
-	
+
 	e.GET("/admin/portals/scan", h.GetAdminPortalsScan)
 	e.RouteNotFound("/*", h.NotFound)
 
@@ -213,9 +213,9 @@ func TestServerRoutes_ContentTypes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, tt.path, nil)
 			rec := httptest.NewRecorder()
-			
+
 			e.ServeHTTP(rec, req)
-			
+
 			contentType := rec.Header().Get("Content-Type")
 			assert.Contains(t, contentType, tt.expectedType)
 		})

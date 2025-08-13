@@ -210,7 +210,7 @@ func TestHandlers_Portal_CRUD_Operations(t *testing.T) {
 	t.Run("Read_Portal", func(t *testing.T) {
 		var portal models.Portal
 		err := db.Get(&portal, "SELECT * FROM portals WHERE uuid = $1", testUUID)
-		
+
 		assert.NoError(t, err)
 		assert.Equal(t, testUUID, portal.UUID)
 		assert.Equal(t, "CRUD Test Portal", portal.Name)
@@ -229,7 +229,7 @@ func TestHandlers_Portal_CRUD_Operations(t *testing.T) {
 		c.SetParamValues(testUUID)
 
 		err := h.GetPortal(c)
-		
+
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rec.Code)
 

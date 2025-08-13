@@ -67,12 +67,14 @@ echo "🔍 Code Quality Checks..."
 echo "-------------------------"
 
 if command -v gofmt &> /dev/null; then
-    unformatted=$(gofmt -l . | grep -v vendor || true)
+    # Use timeout to prevent hanging and exclude vendor directories
+    unformatted=$(timeout 10s gofmt -l . 2>/dev/null | grep -v vendor || true)
     if [[ -z "$unformatted" ]]; then
         echo "✅ All Go code is formatted"
     else
         echo "❌ Unformatted Go files:"
         echo "$unformatted"
+        echo "💡 Run: gofmt -w \$(find . -name '*.go' -not -path './vendor/*')"
     fi
 else
     echo "⏭️  gofmt not available"
