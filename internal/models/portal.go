@@ -6,6 +6,7 @@ import (
 
 type Portal struct {
 	ID                int       `json:"id" db:"id"`
+	UUID              string    `json:"uuid" db:"uuid"`
 	Name              string    `json:"name" db:"name"`
 	AddressStreet     string    `json:"address_street" db:"address_street"`
 	AddressZipcode    string    `json:"address_zipcode" db:"address_zipcode"`
