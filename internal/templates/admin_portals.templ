@@ -1,0 +1,65 @@
+package templates
+
+import (
+	"strconv"
+	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+)
+
+templ AdminPortals(portals []models.Portal) {
+	@Base("Admin - Portails") {
+		<div class="max-w-7xl mx-auto">
+			<div class="flex justify-between items-center mb-6">
+				<h1 class="text-3xl font-bold text-gray-900">Administration - Portails</h1>
+				<a href="/admin/portals/scan" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+					Scanner QR Code
+				</a>
+			</div>
+
+			if len(portals) == 0 {
+				<div class="text-center py-12">
+					<div class="text-gray-500 text-lg">Aucun portail trouvé</div>
+					<p class="text-gray-400 mt-2">Commencez par ajouter des portails au système</p>
+				</div>
+			} else {
+				<div class="bg-white shadow-sm rounded-lg overflow-hidden">
+					<table class="min-w-full divide-y divide-gray-200">
+						<thead class="bg-gray-50">
+							<tr>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Adresse</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entrepreneur</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+							</tr>
+						</thead>
+						<tbody class="bg-white divide-y divide-gray-200">
+							for _, portal := range portals {
+								<tr class="hover:bg-gray-50">
+									<td class="px-6 py-4 whitespace-nowrap">
+										<div class="text-sm font-medium text-gray-900">{ portal.Name }</div>
+									</td>
+									<td class="px-6 py-4">
+										<div class="text-sm text-gray-900">{ portal.AddressStreet }</div>
+										<div class="text-sm text-gray-500">{ portal.AddressZipcode } { portal.AddressCity }</div>
+									</td>
+									<td class="px-6 py-4 whitespace-nowrap">
+										<div class="text-sm text-gray-900">{ portal.ContractorCompany }</div>
+									</td>
+									<td class="px-6 py-4">
+										<div class="text-sm text-gray-900">{ portal.ContactPhone }</div>
+										<div class="text-sm text-gray-500">{ portal.ContactEmail }</div>
+									</td>
+									<td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+										<a href={ templ.URL("/admin/portals/" + strconv.Itoa(portal.ID)) } class="text-blue-600 hover:text-blue-900 mr-4">
+											Voir
+										</a>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			}
+		</div>
+	}
+}

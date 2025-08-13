@@ -33,6 +33,8 @@ func main() {
 	// Routes
 	e.GET("/portals/:uuid", h.GetPortal)
 	admin_routes := e.Group("/admin")
+	admin_routes.GET("/portals", h.GetAdminPortals)
+	admin_routes.GET("/portals/:id", h.GetAdminPortal)
 	admin_routes.GET("/portals/scan", h.GetAdminPortalsScan)
 
 	// 404 handler

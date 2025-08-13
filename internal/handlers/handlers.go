@@ -32,3 +32,25 @@ func (h *Handlers) NotFound(c echo.Context) error {
 func (h *Handlers) GetAdminPortalsScan(c echo.Context) error {
 	return templates.AdminPortalsScan().Render(c.Request().Context(), c.Response().Writer)
 }
+
+func (h *Handlers) GetAdminPortals(c echo.Context) error {
+	var portals []models.Portal
+	err := h.DB.Select(&portals, "SELECT * FROM portals ORDER BY name")
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to fetch portals")
+	}
+
+	return templates.AdminPortals(portals).Render(c.Request().Context(), c.Response().Writer)
+}
+
+func (h *Handlers) GetAdminPortal(c echo.Context) error {
+	id := c.Param("id")
+
+	var portal models.Portal
+	err := h.DB.Get(&portal, "SELECT * FROM portals WHERE id = $1", id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "Portal not found")
+	}
+
+	return templates.AdminPortal(portal).Render(c.Request().Context(), c.Response().Writer)
+}
