@@ -2,19 +2,29 @@ package models
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Portal struct {
-	ID                int       `json:"id" db:"id"`
-	UUID              string    `json:"uuid" db:"uuid"`
-	Name              string    `json:"name" db:"name"`
-	AddressStreet     string    `json:"address_street" db:"address_street"`
-	AddressZipcode    string    `json:"address_zipcode" db:"address_zipcode"`
-	AddressCity       string    `json:"address_city" db:"address_city"`
-	ContractorCompany string    `json:"contractor_company" db:"contractor_company"`
-	ContactPhone      string    `json:"contact_phone" db:"contact_phone"`
-	ContactEmail      string    `json:"contact_email" db:"contact_email"`
-	InstallationDate  time.Time `json:"installation_date" db:"installation_date"`
-	CreatedAt         time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt         time.Time `json:"updated_at" db:"updated_at"`
+	ID                uint           `json:"id" gorm:"primaryKey"`
+	UUID              string         `json:"uuid" gorm:"type:uuid;unique;not null"`
+	Name              string         `json:"name" gorm:"not null"`
+	AddressStreet     string         `json:"address_street" gorm:"not null"`
+	AddressZipcode    string         `json:"address_zipcode" gorm:"size:10;not null"`
+	AddressCity       string         `json:"address_city" gorm:"size:100;not null"`
+	ContractorCompany string         `json:"contractor_company" gorm:"not null"`
+	ContactPhone      string         `json:"contact_phone" gorm:"size:20;not null"`
+	ContactEmail      string         `json:"contact_email"`
+	InstallationDate  time.Time      `json:"installation_date" gorm:"not null"`
+	CreatedAt         time.Time      `json:"created_at"`
+	UpdatedAt         time.Time      `json:"updated_at"`
+	DeletedAt         gorm.DeletedAt `json:"-" gorm:"index"`
+
+	// Relationships
+	QRCodes []QRCode `json:"qr_codes,omitempty" gorm:"foreignKey:PortalID"`
+}
+
+func (Portal) TableName() string {
+	return "portals"
 }

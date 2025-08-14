@@ -10,12 +10,23 @@ import (
 )
 
 func main() {
-	// Connect to database
-	db, err := database.Connect()
+	// Connect to database with GORM
+	db, err := database.ConnectGORM()
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	defer db.Close()
+
+	// Run auto migrations
+	if err := database.AutoMigrate(db); err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
+
+	// Get underlying sql.DB for connection management
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatalf("Failed to get underlying sql.DB: %v", err)
+	}
+	defer sqlDB.Close()
 
 	// Initialize handlers
 	h := &handlers.Handlers{DB: db}
@@ -31,10 +42,13 @@ func main() {
 	e.Static("/static", "static")
 
 	// Routes
-	e.GET("/portals/:uuid", h.GetPortal)
+	e.GET("/portals/:id", h.GetPortal)
+	e.GET("/qr_codes/:uuid", h.QRRedirect)
 	admin_routes := e.Group("/admin")
 	admin_routes.GET("/portals", h.GetAdminPortals)
 	admin_routes.GET("/portals/:id", h.GetAdminPortal)
+	admin_routes.POST("/portals/:id/qr-code/associate", h.AssociateQRCode)
+	admin_routes.POST("/portals/:id/qr-code/remove", h.RemoveQRCode)
 	admin_routes.GET("/portals/scan", h.GetAdminPortalsScan)
 
 	// 404 handler

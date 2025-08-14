@@ -157,9 +157,9 @@ func AdminPortals(portals []models.Portal) templ.Component {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var10 templ.SafeURL
-					templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/admin/portals/" + strconv.Itoa(portal.ID)))
+					templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID))))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portals.templ`, Line: 53, Col: 74}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portals.templ`, Line: 53, Col: 79}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 					if templ_7745c5c3_Err != nil {

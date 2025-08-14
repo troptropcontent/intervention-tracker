@@ -50,7 +50,7 @@ templ AdminPortals(portals []models.Portal) {
 										<div class="text-sm text-gray-500">{ portal.ContactEmail }</div>
 									</td>
 									<td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-										<a href={ templ.URL("/admin/portals/" + strconv.Itoa(portal.ID)) } class="text-blue-600 hover:text-blue-900 mr-4">
+										<a href={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID))) } class="text-blue-600 hover:text-blue-900 mr-4">
 											Voir
 										</a>
 									</td>
