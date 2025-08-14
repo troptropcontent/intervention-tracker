@@ -6,7 +6,8 @@ FROM mcr.microsoft.com/devcontainers/go:1-1.24-bookworm
 
 # [Optional] Uncomment the next lines to use go get to install anything else you need
 # USER vscode
-# RUN go get -x <your-dependency-or-tool>
+RUN go install github.com/a-h/templ/cmd/templ@latest
+
 # USER root
 
 # [Optional] Uncomment this line to install global node packages.
