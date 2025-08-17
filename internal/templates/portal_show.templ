@@ -3,7 +3,7 @@ package templates
 import "github.com/troptropcontent/qr_code_maintenance/internal/models"
 
 templ PortalShow(portal models.Portal) {
-	@Base("Portail - " + portal.Name) {
+	@Base(BaseConfig{Title: "Portail - " + portal.Name}) {
 		<div class="max-w-4xl mx-auto">
 			<div class="bg-white shadow rounded-lg p-6">
 				<div class="flex justify-between items-start mb-6">

@@ -6,7 +6,7 @@ import (
 )
 
 templ AdminPortals(portals []models.Portal) {
-	@Base("Admin - Portails") {
+	@Base(BaseConfig{Title: "Admin - Portails"}) {
 		<div class="max-w-7xl mx-auto">
 			<div class="flex justify-between items-center mb-6">
 				<h1 class="text-3xl font-bold text-gray-900">Administration - Portails</h1>

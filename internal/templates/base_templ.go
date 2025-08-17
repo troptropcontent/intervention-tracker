@@ -8,7 +8,12 @@ package templates
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func Base(title string) templ.Component {
+type BaseConfig struct {
+	Title      string
+	Controller string
+}
+
+func Base(config BaseConfig) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -34,15 +39,38 @@ func Base(title string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(config.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 9, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 14, Col: 23}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " - Maintenance Portails</title><script src=\"/static/htmx.min.js\"></script><link rel=\"stylesheet\" href=\"/static/css/output.css\"><script src=\"https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js\"></script><style>\n\t\t\t.htmx-indicator {\n\t\t\t\topacity: 0;\n\t\t\t\ttransition: opacity 200ms ease-in;\n\t\t\t}\n\t\t\t.htmx-request .htmx-indicator {\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t\t.htmx-request.htmx-indicator {\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t</style></head><body class=\"bg-gray-50 min-h-screen\"><nav class=\"bg-blue-600 text-white p-4\"><div class=\"container mx-auto flex justify-between items-center\"><h1 class=\"text-xl font-bold\"><a href=\"/\" class=\"hover:text-blue-200\">Maintenance Portails</a></h1><div class=\"space-x-4\"><a href=\"/portals\" class=\"hover:text-blue-200\">Portails</a> <a href=\"/interventions\" class=\"hover:text-blue-200\">Interventions</a> <a href=\"/admin/portals\" class=\"hover:text-blue-200\">Admin</a></div></div></nav><main class=\"container mx-auto px-4 py-8\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " - Maintenance Portails</title><link rel=\"stylesheet\" href=\"/static/css/output.css\"><script src=\"/static/js/html5-qrcode.min.js\"></script><script src=\"/static/js/application.js\" type=\"module\"></script><style>\n\t\t\t.htmx-indicator {\n\t\t\t\topacity: 0;\n\t\t\t\ttransition: opacity 200ms ease-in;\n\t\t\t}\n\t\t\t.htmx-request .htmx-indicator {\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t\t.htmx-request.htmx-indicator {\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t</style></head><body class=\"bg-gray-50 min-h-screen\"><nav class=\"bg-blue-600 text-white p-4\"><div class=\"container mx-auto flex justify-between items-center\"><h1 class=\"text-xl font-bold\"><a href=\"/\" class=\"hover:text-blue-200\">Maintenance Portails</a></h1><div class=\"space-x-4\"><a href=\"/portals\" class=\"hover:text-blue-200\">Portails</a> <a href=\"/interventions\" class=\"hover:text-blue-200\">Interventions</a> <a href=\"/admin/portals\" class=\"hover:text-blue-200\">Admin</a></div></div></nav><main class=\"container mx-auto px-4 py-8\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if config.Controller != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, " data-controller=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(config.Controller)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 44, Col: 108}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, ">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -50,7 +78,7 @@ func Base(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</main></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</main></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

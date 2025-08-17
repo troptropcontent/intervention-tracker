@@ -2,8 +2,12 @@
 let html5QrCode = null;
 let isScanning = false;
 let scannerModal = null;
+let currentPortalId = null;
 
-function openQRScanner() {
+function openQRScanner(buttonElement) {
+    // Get portal ID from the button's data attribute
+    currentPortalId = buttonElement.dataset.portalId;
+    
     const modal = document.getElementById('qr-scanner-modal');
     if (modal) {
         modal.style.display = 'block';
@@ -55,18 +59,11 @@ function initAdminQRScanner() {
             const uuid = extractQRCodeUUID(decodedText);
             
             if (uuid) {
-                // Fill the input field with the UUID
-                const uuidInput = document.getElementById('qr-code-uuid');
-                if (uuidInput) {
-                    uuidInput.value = uuid;
-                }
+                // Show processing message
+                showScannerSuccess(`QR Code détecté: ${uuid.substring(0, 8)}... Association en cours...`);
                 
-                // Show success message briefly then close modal
-                showScannerSuccess(`QR Code détecté: ${uuid.substring(0, 8)}...`);
-                
-                setTimeout(() => {
-                    closeQRScanner();
-                }, 1500);
+                // Call the backend API directly
+                associateQRCode(uuid);
             } else {
                 showScannerError("QR code invalide - impossible d'extraire l'UUID");
                 // Restart scanner after error
@@ -86,11 +83,12 @@ function initAdminQRScanner() {
 
     // Start scanner with preferred camera
     Html5Qrcode.getCameras().then(devices => {
+        
         if (loadingEl) loadingEl.style.display = 'none';
         
         if (devices && devices.length) {
             // Prefer back camera
-            let cameraId = devices[0].id;
+            let cameraId = devices.slice(-1)[0].id;
             const backCamera = devices.find(device => 
                 device.label.toLowerCase().includes('back') || 
                 device.label.toLowerCase().includes('rear') ||
