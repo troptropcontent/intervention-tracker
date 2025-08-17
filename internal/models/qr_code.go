@@ -19,7 +19,6 @@ type QRCode struct {
 	ID           uint           `json:"id" gorm:"primaryKey"`
 	UUID         string         `json:"uuid" gorm:"type:uuid;unique;not null"`
 	PortalID     *uint          `json:"portal_id" gorm:"index"`
-	BaseURL      string         `json:"base_url" gorm:"not null"`
 	Status       QRCodeStatus   `json:"status" gorm:"type:varchar(20);default:available"`
 	AssociatedAt *time.Time     `json:"associated_at"`
 	GeneratedAt  time.Time      `json:"generated_at" gorm:"autoCreateTime"`

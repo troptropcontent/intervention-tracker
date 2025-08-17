@@ -49,7 +49,9 @@ echo "📁 Checking Static Files..."
 echo "----------------------------"
 static_files=(
     "static/css/output.css"
-    "static/htmx.min.js"
+    "static/js/htmx.min.js"
+    "static/js/html5-qrcode.min.js"
+    "static/js/application.js"
     "static/js/qr-scanner.js"
 )
 

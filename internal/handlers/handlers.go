@@ -75,66 +75,67 @@ func (h *Handlers) AssociateQRCode(c echo.Context) error {
 	portalIDStr := c.Param("id")
 	qrCodeUUID := c.FormValue("qr_code_uuid")
 
-	if qrCodeUUID == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "QR Code UUID is required")
+	portalID, err := h.parseAndValidateInput(portalIDStr, qrCodeUUID)
+	if err != nil {
+		return err
 	}
 
-	// Convert portal ID to uint
-	portalID, err := strconv.ParseUint(portalIDStr, 10, 32)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Invalid portal ID")
+	if err := h.validateAssociation(portalID, qrCodeUUID); err != nil {
+		return err
 	}
 
-	// Use GORM transaction
-	err = h.DB.Transaction(func(tx *gorm.DB) error {
-		// Check if QR code exists and is available
-		var qrCode models.QRCode
-		result := tx.Where("uuid = ?", qrCodeUUID).First(&qrCode)
-		if result.Error != nil {
-			if result.Error == gorm.ErrRecordNotFound {
-				return echo.NewHTTPError(http.StatusNotFound, "QR Code not found")
-			}
-			return result.Error
-		}
-
-		if qrCode.Status != models.QRCodeStatusAvailable {
-			return echo.NewHTTPError(http.StatusBadRequest, "QR Code is not available")
-		}
-
-		// Check if portal already has a QR code
-		var existingCount int64
-		result = tx.Model(&models.QRCode{}).Where("portal_id = ? AND status = ?", portalID, models.QRCodeStatusAssociated).Count(&existingCount)
-		if result.Error != nil {
-			return result.Error
-		}
-		if existingCount > 0 {
-			return echo.NewHTTPError(http.StatusBadRequest, "Portal already has an associated QR code")
-		}
-
-		// Associate the QR code with the portal
-		portalIDUint := uint(portalID)
-		now := time.Now()
-		result = tx.Model(&qrCode).Updates(models.QRCode{
-			PortalID:     &portalIDUint,
-			Status:       models.QRCodeStatusAssociated,
-			AssociatedAt: &now,
-		})
-		if result.Error != nil {
-			return result.Error
-		}
-
-		return nil
-	})
-
-	if err != nil {
-		if echoErr, ok := err.(*echo.HTTPError); ok {
-			return echoErr
-		}
+	if err := h.performAssociation(portalID, qrCodeUUID); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to associate QR code")
 	}
 
-	// Redirect back to portal page
 	return c.Redirect(http.StatusSeeOther, "/admin/portals/"+portalIDStr)
+}
+
+func (h *Handlers) parseAndValidateInput(portalIDStr, qrCodeUUID string) (uint, error) {
+	if qrCodeUUID == "" {
+		return 0, echo.NewHTTPError(http.StatusBadRequest, "QR Code UUID is required")
+	}
+
+	portalID, err := strconv.ParseUint(portalIDStr, 10, 32)
+	if err != nil {
+		return 0, echo.NewHTTPError(http.StatusBadRequest, "Invalid portal ID")
+	}
+
+	return uint(portalID), nil
+}
+
+func (h *Handlers) validateAssociation(portalID uint, qrCodeUUID string) error {
+	// Check QR code exists and is available
+	var qrCode models.QRCode
+	result := h.DB.Where("uuid = ? AND status = ?", qrCodeUUID, models.QRCodeStatusAvailable).First(&qrCode)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return echo.NewHTTPError(http.StatusBadRequest, "QR Code not found or not available")
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
+	}
+
+	// Check portal doesn't already have a QR code
+	var count int64
+	result = h.DB.Model(&models.QRCode{}).Where("portal_id = ? AND status = ?", portalID, models.QRCodeStatusAssociated).Count(&count)
+	if result.Error != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
+	}
+	if count > 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "Portal already has an associated QR code")
+	}
+
+	return nil
+}
+
+func (h *Handlers) performAssociation(portalID uint, qrCodeUUID string) error {
+	now := time.Now()
+	result := h.DB.Model(&models.QRCode{}).Where("uuid = ?", qrCodeUUID).Updates(models.QRCode{
+		PortalID:     &portalID,
+		Status:       models.QRCodeStatusAssociated,
+		AssociatedAt: &now,
+	})
+	return result.Error
 }
 
 func (h *Handlers) RemoveQRCode(c echo.Context) error {

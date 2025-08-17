@@ -104,7 +104,7 @@ func TestServerRoutes_StaticFiles(t *testing.T) {
 		},
 		{
 			name:           "HTMX file",
-			path:           "/static/htmx.min.js",
+			path:           "/static/js/htmx.min.js",
 			expectedStatus: http.StatusOK,
 		},
 		{

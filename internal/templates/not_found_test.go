@@ -33,7 +33,7 @@ func TestNotFound_Template(t *testing.T) {
 
 	// Check CSS and JS includes
 	assert.Contains(t, html, `href="/static/css/output.css"`)
-	assert.Contains(t, html, `src="/static/htmx.min.js"`)
+	assert.Contains(t, html, `src="/static/js/htmx.min.js"`)
 
 	// Check navigation
 	assert.Contains(t, html, "Maintenance Portails")

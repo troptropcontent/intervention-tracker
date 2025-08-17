@@ -86,9 +86,8 @@ func main() {
 
 		// Create database record
 		qrCode := models.QRCode{
-			UUID:    qrUUID,
-			BaseURL: *baseURL,
-			Status:  models.QRCodeStatusAvailable,
+			UUID:   qrUUID,
+			Status: models.QRCodeStatusAvailable,
 		}
 
 		generatedCodes = append(generatedCodes, qrCode)
