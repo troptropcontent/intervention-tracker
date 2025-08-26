@@ -305,7 +305,7 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = Base(BaseConfig{Title: "Admin - " + portal.Name, Controller: "qr-code-scanner"}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Base(BaseConfig{Title: "Admin - " + portal.Name, Controller: "qr-code-scanner", Attributes: templ.Attributes{"data-qr-code-scanner-portal-id-value": portal.ID}}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

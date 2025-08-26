@@ -2,7 +2,7 @@ import { Controller } from "../stimulus.js"
 
 export default class extends Controller {
     static targets = ["modal", "loading", "status", "error", "reader", "errorMessage"]
-    static values = { apiUrl: String }
+    static values = { portalId: String }
 
     connect() {
         this.scanner = null
@@ -111,7 +111,19 @@ export default class extends Controller {
 
     async processQRCode(qrCodeId) {
         try {
-            const response = {ok: true}
+            if (!this.portalIdValue) {
+                throw new Error("ID du portail non trouvé")
+            }
+
+            const response = await fetch(`/admin/portals/${this.portalIdValue}/qr-code/associate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    qr_code_uuid: qrCodeId
+                })
+            })
             
             if (response.ok) {
                 this.showStatus("Association réussie!", "text-green-600")
@@ -119,7 +131,8 @@ export default class extends Controller {
                     this.closeQRScanner()
                 }, 1500)
             } else {
-                throw new Error("Erreur lors de l'association du QR code")
+                const errorData = await response.text()
+                throw new Error(errorData || "Erreur lors de l'association du QR code")
             }
             
         } catch (error) {

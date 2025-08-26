@@ -6,7 +6,7 @@ import (
 )
 
 templ AdminPortal(portal models.Portal, qrCode *models.QRCode) {
-	@Base(BaseConfig{Title: "Admin - " + portal.Name, Controller: "qr-code-scanner"}) {
+	@Base(BaseConfig{Title: "Admin - " + portal.Name, Controller: "qr-code-scanner", Attributes: templ.Attributes{"data-qr-code-scanner-portal-id-value": portal.ID}}) {
 		<div class="max-w-4xl mx-auto">
 			<div class="flex justify-between items-center mb-6">
 				<div>

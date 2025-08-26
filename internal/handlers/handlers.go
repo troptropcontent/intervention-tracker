@@ -73,7 +73,15 @@ func (h *Handlers) GetAdminPortal(c echo.Context) error {
 
 func (h *Handlers) AssociateQRCode(c echo.Context) error {
 	portalIDStr := c.Param("id")
-	qrCodeUUID := c.FormValue("qr_code_uuid")
+
+	// Parse JSON body instead of form values
+	var requestBody struct {
+		QRCodeUUID string `json:"qr_code_uuid"`
+	}
+	if err := c.Bind(&requestBody); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid JSON body")
+	}
+	qrCodeUUID := requestBody.QRCodeUUID
 
 	portalID, err := h.parseAndValidateInput(portalIDStr, qrCodeUUID)
 	if err != nil {

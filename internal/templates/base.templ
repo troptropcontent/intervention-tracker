@@ -1,8 +1,9 @@
 package templates
 
 type BaseConfig struct {
-	Title      string
-	Controller string
+	Title           string
+	Controller      string
+	Attributes templ.Attributes
 }
 
 templ Base(config BaseConfig) {
@@ -42,7 +43,14 @@ templ Base(config BaseConfig) {
 				</div>
 			</div>
 		</nav>
-		<main class="container mx-auto px-4 py-8" if config.Controller != "" { data-controller={ config.Controller } }>
+		<main 
+			class="container mx-auto px-4 py-8"
+			if config.Controller != "" {
+				data-controller={ config.Controller }
+			}
+			
+			{ config.Attributes... }
+		>
 			{ children... }
 		</main>
 	</body>
