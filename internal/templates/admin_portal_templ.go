@@ -10,7 +10,6 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
-	"strconv"
 )
 
 func AdminPortal(portal models.Portal, qrCode *models.QRCode) templ.Component {
@@ -53,7 +52,7 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(portal.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 16, Col: 63}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 15, Col: 63}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -66,7 +65,7 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(portal.UUID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 34, Col: 65}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 33, Col: 65}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -79,7 +78,7 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(portal.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 38, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 37, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -92,7 +91,7 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(portal.InstallationDate.Format("02/01/2006"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 42, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 41, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -105,7 +104,7 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(portal.AddressStreet)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 52, Col: 56}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 51, Col: 56}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -118,7 +117,7 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(portal.AddressZipcode)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 57, Col: 58}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 56, Col: 58}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -131,7 +130,7 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode) templ.Component {
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(portal.AddressCity)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 61, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 60, Col: 55}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
@@ -144,7 +143,7 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(portal.ContractorCompany)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 72, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 71, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -162,7 +161,7 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode) templ.Component {
 				var templ_7745c5c3_Var11 templ.SafeURL
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("tel:" + portal.ContactPhone))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 84, Col: 58}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 83, Col: 58}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -175,7 +174,7 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode) templ.Component {
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(portal.ContactPhone)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 85, Col: 31}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 84, Col: 31}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
@@ -203,7 +202,7 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode) templ.Component {
 				var templ_7745c5c3_Var13 templ.SafeURL
 				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("mailto:" + portal.ContactEmail))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 96, Col: 61}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 95, Col: 61}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
@@ -216,7 +215,7 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode) templ.Component {
 				var templ_7745c5c3_Var14 string
 				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(portal.ContactEmail)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 97, Col: 31}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 96, Col: 31}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 				if templ_7745c5c3_Err != nil {
@@ -232,74 +231,22 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div></div></div></div><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">QR Code</h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div></div></div></div><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">QR Code</h2><div class=\"space-y-4\" id=\"qr_code_association_section\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if qrCode != nil {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<div class=\"space-y-4\"><div class=\"flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200\"><div class=\"flex items-center space-x-3\"><div class=\"w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center\"><svg class=\"w-6 h-6 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg></div><div><div class=\"font-medium text-green-900\">QR Code associé</div><div class=\"text-sm text-green-700 font-mono\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var15 string
-				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(qrCode.UUID)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 120, Col: 69}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div></div></div><form method=\"POST\" action=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var16 templ.SafeURL
-				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID)) + "/qr-code/remove"))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 123, Col: 116}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" style=\"display: inline;\"><button type=\"submit\" class=\"bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm\">Supprimer</button></form></div><div class=\"text-xs text-gray-500\">Associé le ")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var17 string
-				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(qrCode.AssociatedAt.Format("02/01/2006 à 15:04"))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 130, Col: 71}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div></div>")
+				templ_7745c5c3_Err = AdminQrCodeAssociated(&portal, qrCode).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div class=\"space-y-4\"><div class=\"p-4 bg-gray-50 rounded-lg border border-gray-200\"><div class=\"flex items-center space-x-3\"><div class=\"w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center\"><svg class=\"w-6 h-6 text-gray-400\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4v16m8-8H4\"></path></svg></div><div><div class=\"font-medium text-gray-900\">Aucun QR Code associé</div><div class=\"text-sm text-gray-500\">Associez un QR Code pré-imprimé à ce portail</div></div></div></div><form method=\"POST\" action=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var18 templ.SafeURL
-				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID)) + "/qr-code/associate"))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 148, Col: 118}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\" class=\"space-y-3\"><div><label for=\"qr-code-uuid\" class=\"block text-sm font-medium text-gray-700 mb-1\">UUID du QR Code</label><div class=\"flex gap-2\"><button type=\"button\" data-action=\"qr-code-scanner#openQRScanner\" class=\"bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z\"></path></svg> Scanner</button></div></div></form></div>")
+				templ_7745c5c3_Err = AdminQrCodeUnassociated(&portal).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div></div><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">Historique des interventions</h2><div class=\"text-center py-8\"><div class=\"text-gray-500\">Aucune intervention enregistrée</div><p class=\"text-gray-400 mt-2\">Les interventions apparaîtront ici une fois créées</p></div></div></div><!-- QR Scanner Modal --> <div id=\"qr-scanner-modal\" data-qr-code-scanner-target=\"modal\" style=\"display: none;\" class=\"fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4\"><div class=\"bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto\"><div class=\"flex justify-between items-center mb-4\"><h3 class=\"text-lg font-semibold text-gray-900\">Scanner QR Code</h3><button type=\"button\" data-action=\"qr-code-scanner#closeQRScanner\" class=\"text-gray-400 hover:text-gray-600\"><svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div><div id=\"scanner-loading\" data-qr-code-scanner-target=\"loading\" class=\"text-center py-4\"><div class=\"animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto\"></div><p class=\"text-gray-600 mt-2\">Démarrage de la caméra...</p></div><div id=\"admin-qr-reader\" data-qr-code-scanner-target=\"reader\" class=\"w-full\"></div><div id=\"scanner-status\" data-qr-code-scanner-target=\"status\" class=\"mt-4 text-center\" style=\"display: none;\"></div><div id=\"scanner-error\" data-qr-code-scanner-target=\"error\" class=\"mt-4 p-3 bg-red-50 border border-red-200 rounded-md\" style=\"display: none;\"><div class=\"flex\"><svg class=\"w-5 h-5 text-red-400 mt-0.5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg><div class=\"ml-3\"><p data-qr-code-scanner-target=\"errorMessage\" class=\"text-red-800 text-sm\"></p></div></div></div><div class=\"mt-4 text-center\"><button type=\"button\" data-action=\"qr-code-scanner#closeQRScanner\" class=\"bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md text-sm font-medium\">Fermer</button></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div></div></div><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">Historique des interventions</h2><div class=\"text-center py-8\"><div class=\"text-gray-500\">Aucune intervention enregistrée</div><p class=\"text-gray-400 mt-2\">Les interventions apparaîtront ici une fois créées</p></div></div></div><!-- QR Scanner Modal --> <div id=\"qr-scanner-modal\" data-qr-code-scanner-target=\"modal\" style=\"display: none;\" class=\"fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4\"><div class=\"bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto\"><div class=\"flex justify-between items-center mb-4\"><h3 class=\"text-lg font-semibold text-gray-900\">Scanner QR Code</h3><button type=\"button\" data-action=\"qr-code-scanner#closeQRScanner\" class=\"text-gray-400 hover:text-gray-600\"><svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div><div id=\"scanner-loading\" data-qr-code-scanner-target=\"loading\" class=\"text-center py-4\"><div class=\"animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto\"></div><p class=\"text-gray-600 mt-2\">Démarrage de la caméra...</p></div><div id=\"admin-qr-reader\" data-qr-code-scanner-target=\"reader\" class=\"w-full\"></div><div id=\"scanner-status\" data-qr-code-scanner-target=\"status\" class=\"mt-4 text-center\" style=\"display: none;\"></div><div id=\"scanner-error\" data-qr-code-scanner-target=\"error\" class=\"mt-4 p-3 bg-red-50 border border-red-200 rounded-md\" style=\"display: none;\"><div class=\"flex\"><svg class=\"w-5 h-5 text-red-400 mt-0.5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg><div class=\"ml-3\"><p data-qr-code-scanner-target=\"errorMessage\" class=\"text-red-800 text-sm\"></p></div></div></div><div class=\"mt-4 text-center\"><button type=\"button\" data-action=\"qr-code-scanner#closeQRScanner\" class=\"bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md text-sm font-medium\">Fermer</button></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

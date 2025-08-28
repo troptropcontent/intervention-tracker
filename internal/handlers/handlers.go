@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -96,7 +97,19 @@ func (h *Handlers) AssociateQRCode(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to associate QR code")
 	}
 
-	return c.Redirect(http.StatusSeeOther, "/admin/portals/"+portalIDStr)
+	var portal models.Portal
+	result := h.DB.First(&portal, portalID)
+	if result.Error != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to find portal")
+	}
+
+	var qrCode models.QRCode
+	result = h.DB.Where("portal_id = ?", portal.ID).First(&qrCode)
+	if result.Error != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to find qr code")
+	}
+
+	return templates.AdminQrCodeAssociated(&portal, &qrCode).Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *Handlers) parseAndValidateInput(portalIDStr, qrCodeUUID string) (uint, error) {
@@ -155,18 +168,28 @@ func (h *Handlers) RemoveQRCode(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid portal ID")
 	}
 
-	// Update QR code to available status
-	result := h.DB.Model(&models.QRCode{}).Where("portal_id = ? AND status = ?", portalIDUint, models.QRCodeStatusAssociated).Updates(models.QRCode{
-		PortalID:     nil,
-		Status:       models.QRCodeStatusAvailable,
-		AssociatedAt: nil,
-	})
+	var portal models.Portal
+	result := h.DB.First(&portal, portalIDUint)
 	if result.Error != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to remove QR code association")
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to find portal")
 	}
 
-	// Redirect back to portal page
-	return c.Redirect(http.StatusSeeOther, "/admin/portals/"+portalID)
+	var qrCode models.QRCode
+	result = h.DB.Where("portal_id = ?", portal.ID).First(&qrCode)
+	if result.Error != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to find qr code")
+	}
+
+	qrCode.PortalID = nil
+	qrCode.Status = models.QRCodeStatusLost
+
+	result = h.DB.Save(&qrCode)
+	if result.Error != nil {
+		fmt.Printf("DEBUG: Database error: %v\n", result.Error)
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to updte QR code")
+	}
+
+	return templates.AdminQrCodeUnassociated(&portal).Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *Handlers) QRRedirect(c echo.Context) error {

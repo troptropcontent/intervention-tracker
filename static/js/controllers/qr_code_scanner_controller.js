@@ -126,6 +126,11 @@ export default class extends Controller {
             })
             
             if (response.ok) {
+                const htmlContent = await response.text()
+                const targetElement = document.getElementById('qr_code_association_section')
+                if (targetElement) {
+                    targetElement.innerHTML = htmlContent
+                }
                 this.showStatus("Association réussie!", "text-green-600")
                 setTimeout(() => {
                     this.closeQRScanner()

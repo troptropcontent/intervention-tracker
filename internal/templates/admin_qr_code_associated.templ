@@ -1,0 +1,33 @@
+package templates
+
+import (
+	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"strconv"
+)
+
+templ AdminQrCodeAssociated(portal *models.Portal, qrCode *models.QRCode) {
+    <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+        <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <div>
+                <div class="font-medium text-green-900">QR Code associé</div>
+                <div class="text-sm text-green-700 font-mono">{ qrCode.UUID }</div>
+            </div>
+        </div>
+        <form 
+            hx-post={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID)) + "/qr-code/remove") } 
+            hx-target="#qr_code_association_section"
+            style="display: inline;">
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
+                Supprimer
+            </button>
+        </form>
+    </div>
+    <div class="text-xs text-gray-500">
+        Associé le { qrCode.AssociatedAt.Format("02/01/2006 à 15:04") }
+    </div>
+}
