@@ -72,6 +72,21 @@ func (h *Handlers) GetAdminPortal(c echo.Context) error {
 	return templates.AdminPortal(portal, qrCodePtr).Render(c.Request().Context(), c.Response().Writer)
 }
 
+func (h *Handlers) GetAdminPortalEdit(c echo.Context) error {
+	id := c.Param("id")
+
+	var portal models.Portal
+	result := h.DB.First(&portal, id)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, "Portal not found")
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
+	}
+
+	return templates.AdminPortalEdit(portal).Render(c.Request().Context(), c.Response().Writer)
+}
+
 func (h *Handlers) AssociateQRCode(c echo.Context) error {
 	portalIDStr := c.Param("id")
 
@@ -190,6 +205,72 @@ func (h *Handlers) RemoveQRCode(c echo.Context) error {
 	}
 
 	return templates.AdminQrCodeUnassociated(&portal).Render(c.Request().Context(), c.Response().Writer)
+}
+
+func (h *Handlers) UpdatePortal(c echo.Context) error {
+	id := c.Param("id")
+
+	var portal models.Portal
+	result := h.DB.First(&portal, id)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, "Portal not found")
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
+	}
+
+	var updateData struct {
+		Name              string `json:"name" form:"name"`
+		AddressStreet     string `json:"address_street" form:"address_street"`
+		AddressZipcode    string `json:"address_zipcode" form:"address_zipcode"`
+		AddressCity       string `json:"address_city" form:"address_city"`
+		ContractorCompany string `json:"contractor_company" form:"contractor_company"`
+		ContactPhone      string `json:"contact_phone" form:"contact_phone"`
+		ContactEmail      string `json:"contact_email" form:"contact_email"`
+		InstallationDate  string `json:"installation_date" form:"installation_date"`
+	}
+
+	if err := c.Bind(&updateData); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid form data")
+	}
+
+	// Parse installation date if provided
+	if updateData.InstallationDate != "" {
+		installationDate, err := time.Parse("2006-01-02", updateData.InstallationDate)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, "Invalid installation date format")
+		}
+		portal.InstallationDate = installationDate
+	}
+
+	// Update portal fields
+	if updateData.Name != "" {
+		portal.Name = updateData.Name
+	}
+	if updateData.AddressStreet != "" {
+		portal.AddressStreet = updateData.AddressStreet
+	}
+	if updateData.AddressZipcode != "" {
+		portal.AddressZipcode = updateData.AddressZipcode
+	}
+	if updateData.AddressCity != "" {
+		portal.AddressCity = updateData.AddressCity
+	}
+	if updateData.ContractorCompany != "" {
+		portal.ContractorCompany = updateData.ContractorCompany
+	}
+	if updateData.ContactPhone != "" {
+		portal.ContactPhone = updateData.ContactPhone
+	}
+	portal.ContactEmail = updateData.ContactEmail
+
+	result = h.DB.Save(&portal)
+	if result.Error != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to update portal")
+	}
+
+	// Return to admin portal view
+	return c.Redirect(http.StatusSeeOther, "/admin/portals/"+id)
 }
 
 func (h *Handlers) QRRedirect(c echo.Context) error {

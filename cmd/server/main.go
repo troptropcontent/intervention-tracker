@@ -47,6 +47,8 @@ func main() {
 	admin_routes := e.Group("/admin")
 	admin_routes.GET("/portals", h.GetAdminPortals)
 	admin_routes.GET("/portals/:id", h.GetAdminPortal)
+	admin_routes.GET("/portals/:id/edit", h.GetAdminPortalEdit)
+	admin_routes.POST("/portals/:id", h.UpdatePortal)
 	admin_routes.POST("/portals/:id/qr-code/associate", h.AssociateQRCode)
 	admin_routes.POST("/portals/:id/qr-code/remove", h.RemoveQRCode)
 	admin_routes.GET("/portals/scan", h.GetAdminPortalsScan)

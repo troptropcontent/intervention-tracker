@@ -1,6 +1,7 @@
 package templates
 
 import (
+	"strconv"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 )
 
@@ -15,9 +16,9 @@ templ AdminPortal(portal models.Portal, qrCode *models.QRCode) {
 					<h1 class="text-3xl font-bold text-gray-900">{ portal.Name }</h1>
 				</div>
 				<div class="space-x-2">
-					<button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+					<a href={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID)) + "/edit") } class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg inline-block">
 						Modifier
-					</button>
+					</a>
 					<button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
 						Nouvelle intervention
 					</button>
