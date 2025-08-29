@@ -292,5 +292,5 @@ func (h *Handlers) QRRedirect(c echo.Context) error {
 	}
 
 	// Redirect to the portal page using its UUID
-	return c.Redirect(http.StatusSeeOther, "/portals/"+qrCode.Portal.UUID)
+	return c.Redirect(http.StatusSeeOther, "/portals/"+strconv.Itoa(int(qrCode.Portal.ID)))
 }
