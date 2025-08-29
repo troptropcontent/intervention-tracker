@@ -48,7 +48,7 @@ func Base(config BaseConfig) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " - Maintenance Portails</title><link rel=\"stylesheet\" href=\"/static/css/output.css\"><script src=\"/static/js/htmx.min.js\"></script><script src=\"/static/js/html5-qrcode.min.js\"></script><script src=\"/static/js/application.js\" type=\"module\"></script><style>\n\t\t\t.htmx-indicator {\n\t\t\t\topacity: 0;\n\t\t\t\ttransition: opacity 200ms ease-in;\n\t\t\t}\n\t\t\t.htmx-request .htmx-indicator {\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t\t.htmx-request.htmx-indicator {\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t</style></head><body class=\"bg-gray-50 min-h-screen\"><nav class=\"bg-blue-600 text-white p-4\"><div class=\"container mx-auto flex justify-between items-center\"><h1 class=\"text-xl font-bold\"><a href=\"/\" class=\"hover:text-blue-200\">Maintenance Portails</a></h1><div class=\"space-x-4\"><a href=\"/portals\" class=\"hover:text-blue-200\">Portails</a> <a href=\"/interventions\" class=\"hover:text-blue-200\">Interventions</a> <a href=\"/admin/portals\" class=\"hover:text-blue-200\">Admin</a></div></div></nav><main class=\"container mx-auto px-4 py-8\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " - Maintenance Portails</title><link rel=\"stylesheet\" href=\"/static/css/output.css\"><script src=\"/static/js/htmx.min.js\"></script><script src=\"/static/js/html5-qrcode.min.js\"></script><script src=\"/static/js/application.js\" type=\"module\"></script><style>\n\t\t\t.htmx-indicator {\n\t\t\t\topacity: 0;\n\t\t\t\ttransition: opacity 200ms ease-in;\n\t\t\t}\n\t\t\t.htmx-request .htmx-indicator {\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t\t.htmx-request.htmx-indicator {\n\t\t\t\topacity: 1;\n\t\t\t}\n\t\t</style></head><body class=\"bg-gray-50 min-h-screen\"><nav class=\"bg-blue-600 text-white p-4\"><div class=\"container mx-auto flex justify-between items-center\"><h1 class=\"text-xl font-bold\"><a href=\"/\" class=\"hover:text-blue-200\">Maintenance Portails</a></h1><div class=\"space-x-4\"><a href=\"/admin/portals\" class=\"hover:text-blue-200\">Accés Admin</a></div></div></nav><main class=\"container mx-auto px-4 py-8\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -60,7 +60,7 @@ func Base(config BaseConfig) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(config.Controller)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 49, Col: 39}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 47, Col: 39}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {

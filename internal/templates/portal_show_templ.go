@@ -196,7 +196,7 @@ func PortalShow(portal models.Portal) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</dl></div></div><div class=\"mt-8 pt-6 border-t border-gray-200\"><div class=\"flex justify-between items-center\"><h3 class=\"text-lg font-medium text-gray-900\">Interventions récentes</h3><button class=\"bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm\">Nouvelle intervention</button></div><div class=\"mt-4 text-center py-8 text-gray-500\"><p>Aucune intervention enregistrée</p></div></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</dl></div></div><div class=\"mt-8 pt-6 border-t border-gray-200\"><div class=\"flex justify-between items-center\"><h3 class=\"text-lg font-medium text-gray-900\">Interventions récentes</h3><button class=\"bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm\">Demander une intervention</button></div><div class=\"mt-4 text-center py-8 text-gray-500\"><p>Aucune intervention enregistrée</p></div></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
