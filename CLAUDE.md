@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a QR code maintenance project set up as a Go development environment with PostgreSQL database support. The repository is currently minimal, containing only development container configuration files.
+This is a QR code maintenance project - a full-stack Go web application for managing portals and QR codes with PostgreSQL database support.
 
 ## Development Environment
 
@@ -22,9 +22,26 @@ The dev container is configured with:
 - Network sharing between app and database containers
 - Environment variables loaded from `.devcontainer/.env`
 
+## Architecture & Technology Choices
+
+**Application Type**: Server-side rendered web application (not SPA/API)
+**Frontend**: Go templates (templ) with HTMX and STIMULUS for interactivity
+**Authentication Pattern**: Use cookie-based sessions (not JWT) - follows SSR best practices
+**Styling**: Tailwind CSS
+**Database**: PostgreSQL with GORM
+**Framework**: Echo v4
+
+## Development Principles
+
+- Prefer server-side rendering over client-side solutions
+- Follow traditional web app patterns (cookies, sessions, forms)
+- Keep JavaScript minimal (HTMX or STIMULUS for dynamic behavior)
+- Use existing Echo/GORM patterns established in codebase
+- Follow existing code conventions and file structure
+
 ## Current State
 
-The repository appears to be in early setup phase with only dev container configuration present. No source code, build scripts, or package files have been created yet.
+The application has a working foundation with portal and QR code management, admin interface, and database migrations.
 
 ## Next Steps for Development
 
