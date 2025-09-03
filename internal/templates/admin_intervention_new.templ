@@ -1,0 +1,206 @@
+package templates
+
+import (
+	"strconv"
+	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"github.com/labstack/echo/v4"
+	"time"
+)
+
+templ AdminInterventionNew(portal models.Portal, user models.User, context echo.Context) {
+	@MainLayout(MainLayoutConfig{Title: "Nouvelle intervention - " + portal.Name}, context) {
+		<div class="max-w-4xl mx-auto">
+			<div class="mb-6">
+				<a href={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID))) } class="text-blue-600 hover:text-blue-800 text-sm mb-2 inline-block">
+					← Retour au portail
+				</a>
+				<h1 class="text-3xl font-bold text-gray-900">Nouvelle intervention - { portal.Name }</h1>
+			</div>
+
+			<div class="bg-white shadow-sm rounded-lg p-6">
+				<form method="POST" action={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID)) + "/interventions") } class="space-y-8">
+					<!-- Intervention Details -->
+					<div>
+						<h3 class="text-lg font-medium text-gray-900 mb-4">Détails de l'intervention</h3>
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+							<div>
+								<label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date d'intervention</label>
+								<input 
+									type="date" 
+									id="date" 
+									name="date" 
+									class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+									value={time.Now().Format("2006-01-02")}
+									required
+								/>
+							</div>
+							<div>
+								<label for="user_name" class="block text-sm font-medium text-gray-700 mb-1">Nom de l'intervenant</label>
+								<input 
+									type="text" 
+									id="user_name" 
+									name="user_name" 
+									value={ user.FirstName + " " + user.LastName }
+									class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+									required
+								/>
+							</div>
+						</div>
+						<div class="mt-4">
+							<label for="summary" class="block text-sm font-medium text-gray-700 mb-1">Résumé (optionnel)</label>
+							<textarea 
+								id="summary" 
+								name="summary" 
+								rows="3"
+								class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+								placeholder="Description générale de l'intervention..."
+							></textarea>
+						</div>
+					</div>
+
+					<!-- Controls Tables -->
+					<div>
+						<h3 class="text-lg font-medium text-gray-900 mb-6">Contrôles d'intervention</h3>
+						
+						<!-- Security Controls Table -->
+						<div class="mb-8">
+							<h4 class="text-md font-medium text-gray-800 mb-3">Sécurité</h4>
+							<div class="print:break-inside-avoid">
+								<table class="w-full border-collapse border-none sm:border border-gray-300 text-sm">
+									<thead>
+										<tr class="bg-gray-100">
+											<th class="border border-gray-300 px-3 py-2 text-left font-medium w-1/2">Contrôle</th>
+											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
+												<span class="hidden sm:inline">Conforme</span>
+												<span class="sm:hidden text-green-500">C</span>
+											</th>
+											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
+												<span class="hidden sm:inline">Non conforme</span>
+												<span class="sm:hidden text-red-500">NC</span>
+											</th>
+											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
+												<span class="hidden sm:inline">Non contrôlé</span>
+												<span class="sm:hidden">NA</span>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										for i, controlType := range models.ControlTypesByKind[models.ControlKindSecurity] {
+											<tr class={ templ.KV("bg-gray-50", i%2 == 0) }>
+												<td class="border border-gray-300 px-3 py-2 font-medium" data-label="Contrôle">{ getControlTypeLabel(controlType) }</td>
+												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Conforme">
+													<input type="radio" name={ "control_" + controlType } value="true" class="h-4 w-4 text-green-600"/>
+												</td>
+												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non conforme">
+													<input type="radio" name={ "control_" + controlType } value="false" class="h-4 w-4 text-red-600"/>
+												</td>
+												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non contrôlé">
+													<input type="radio" name={ "control_" + controlType } value="" checked class="h-4 w-4 text-gray-400"/>
+												</td>
+											</tr>
+										}
+									</tbody>
+								</table>
+								<!-- Legend for small screens -->
+								<div class="sm:hidden mt-3 text-xs text-gray-600 space-y-1">
+									<div class="flex flex-wrap gap-x-4 gap-y-1">
+										<span><span class="text-green-500 font-medium">C</span> = Conforme</span>
+										<span><span class="text-red-500 font-medium">NC</span> = Non conforme</span>
+										<span><span class="font-medium">NA</span> = Non contrôlé</span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Other Controls Table -->
+						<div class="mb-8">
+							<h4 class="text-md font-medium text-gray-800 mb-3">Autres</h4>
+							<div class="print:break-inside-avoid">
+								<table class="w-full border-collapse border-none sm:border border-gray-300 text-sm">
+									<thead>
+										<tr class="bg-gray-100">
+											<th class="border border-gray-300 px-3 py-2 text-left font-medium w-1/2">Contrôle</th>
+											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
+												<span class="hidden sm:inline">Conforme</span>
+												<span class="sm:hidden text-green-500">C</span>
+											</th>
+											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
+												<span class="hidden sm:inline">Non conforme</span>
+												<span class="sm:hidden text-red-500">NC</span>
+											</th>
+											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
+												<span class="hidden sm:inline">Non contrôlé</span>
+												<span class="sm:hidden">NA</span>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										for i, controlType := range models.ControlTypesByKind[models.ControlKindOther] {
+											<tr class={ templ.KV("bg-gray-50", i%2 == 0) }>
+												<td class="border border-gray-300 px-3 py-2 font-medium" data-label="Contrôle">{ getControlTypeLabel(controlType) }</td>
+												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Conforme">
+													<input type="radio" name={ "control_" + controlType } value="true" class="h-4 w-4 text-green-600"/>
+												</td>
+												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non conforme">
+													<input type="radio" name={ "control_" + controlType } value="false" class="h-4 w-4 text-red-600"/>
+												</td>
+												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non contrôlé">
+													<input type="radio" name={ "control_" + controlType } value="" checked  class="h-4 w-4 text-gray-400"/>
+												</td>
+											</tr>
+										}
+									</tbody>
+								</table>
+								<!-- Legend for small screens -->
+								<div class="sm:hidden mt-3 text-xs text-gray-600 space-y-1">
+									<div class="flex flex-wrap gap-x-4 gap-y-1">
+										<span><span class="text-green-500 font-medium">C</span> = Conforme</span>
+										<span><span class="text-red-500 font-medium">NC</span> = Non conforme</span>
+										<span><span class="font-medium">NA</span> = Non contrôlé</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Form Actions -->
+					<div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+						<a href={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID))) } class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-md font-medium">
+							Annuler
+						</a>
+						<button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium">
+							Créer l'intervention
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	}
+}
+
+func getControlTypeLabel(controlType string) string {
+	labels := map[string]string{
+		"warning_lights":     "Feux d'avertissement",
+		"area_lighting":      "Éclairage de zone",
+		"safety_cells":       "Cellules de sécurité",
+		"pressure_bar":       "Barre de pression",
+		"floor_loop":         "Boucle de sol",
+		"force_limiter":      "Limiteur d'effort",
+		"safety_springs":     "Ressorts de sécurité",
+		"floor_markings":     "Marquage au sol",
+		"apron_condition":    "État du tablier",
+		"horizontal_rails":   "Rails horizontaux",
+		"vertical_rails":     "Rails verticaux",
+		"roller_condition":   "État des galets",
+		"drive_system":       "Système d'entraînement",
+		"limit_switches":     "Interrupteurs de fin de course",
+		"control_devices":    "Organes de commande",
+		"control_panel":      "Coffret de commande",
+		"manual_override":    "Manœuvre de secours",
+	}
+	
+	if label, exists := labels[controlType]; exists {
+		return label
+	}
+	return controlType
+}

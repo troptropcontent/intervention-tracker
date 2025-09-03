@@ -20,9 +20,9 @@ templ AdminPortal(portal models.Portal, qrCode *models.QRCode,  context echo.Con
 					<a href={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID)) + "/edit") } class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg inline-block">
 						Modifier
 					</a>
-					<button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+					<a href={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID)) + "/interventions/new") } class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
 						Nouvelle intervention
-					</button>
+					</a>
 				</div>
 			</div>
 

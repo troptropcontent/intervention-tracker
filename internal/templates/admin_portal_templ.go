@@ -73,180 +73,193 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode, context echo.Conte
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg inline-block\">Modifier</a> <button class=\"bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg\">Nouvelle intervention</button></div></div><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6 mb-8\"><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">Informations générales</h2><div class=\"space-y-3\"><div><label class=\"text-sm font-medium text-gray-500\">UUID</label><div class=\"text-gray-900 font-mono text-sm\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg inline-block\">Modifier</a> <a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var5 string
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(portal.UUID)
+			var templ_7745c5c3_Var5 templ.SafeURL
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID)) + "/interventions/new"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 35, Col: 65}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 23, Col: 97}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div></div><div><label class=\"text-sm font-medium text-gray-500\">Nom</label><div class=\"text-gray-900\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg\">Nouvelle intervention</a></div></div><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6 mb-8\"><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">Informations générales</h2><div class=\"space-y-3\"><div><label class=\"text-sm font-medium text-gray-500\">UUID</label><div class=\"text-gray-900 font-mono text-sm\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(portal.Name)
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(portal.UUID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 39, Col: 47}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 35, Col: 65}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></div><div><label class=\"text-sm font-medium text-gray-500\">Date d'installation</label><div class=\"text-gray-900\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></div><div><label class=\"text-sm font-medium text-gray-500\">Nom</label><div class=\"text-gray-900\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(portal.InstallationDate.Format("02/01/2006"))
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(portal.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 43, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 39, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div></div></div></div><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">Adresse</h2><div class=\"space-y-3\"><div><label class=\"text-sm font-medium text-gray-500\">Rue</label><div class=\"text-gray-900\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div></div><div><label class=\"text-sm font-medium text-gray-500\">Date d'installation</label><div class=\"text-gray-900\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var8 string
-			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(portal.AddressStreet)
+			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(portal.InstallationDate.Format("02/01/2006"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 53, Col: 56}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 43, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div></div><div class=\"grid grid-cols-2 gap-4\"><div><label class=\"text-sm font-medium text-gray-500\">Code postal</label><div class=\"text-gray-900\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div></div></div></div><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">Adresse</h2><div class=\"space-y-3\"><div><label class=\"text-sm font-medium text-gray-500\">Rue</label><div class=\"text-gray-900\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var9 string
-			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(portal.AddressZipcode)
+			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(portal.AddressStreet)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 58, Col: 58}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 53, Col: 56}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></div><div><label class=\"text-sm font-medium text-gray-500\">Ville</label><div class=\"text-gray-900\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></div><div class=\"grid grid-cols-2 gap-4\"><div><label class=\"text-sm font-medium text-gray-500\">Code postal</label><div class=\"text-gray-900\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var10 string
-			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(portal.AddressCity)
+			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(portal.AddressZipcode)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 62, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 58, Col: 58}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div></div></div></div><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">Entrepreneur</h2><div class=\"space-y-3\"><div><label class=\"text-sm font-medium text-gray-500\">Société</label><div class=\"text-gray-900\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div><div><label class=\"text-sm font-medium text-gray-500\">Ville</label><div class=\"text-gray-900\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var11 string
-			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(portal.ContractorCompany)
+			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(portal.AddressCity)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 73, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 62, Col: 55}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div></div></div><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">Contact</h2><div class=\"space-y-3\"><div><label class=\"text-sm font-medium text-gray-500\">Téléphone</label><div class=\"text-gray-900\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div></div></div></div><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">Entrepreneur</h2><div class=\"space-y-3\"><div><label class=\"text-sm font-medium text-gray-500\">Société</label><div class=\"text-gray-900\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var12 string
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(portal.ContractorCompany)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 73, Col: 60}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</div></div></div></div><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">Contact</h2><div class=\"space-y-3\"><div><label class=\"text-sm font-medium text-gray-500\">Téléphone</label><div class=\"text-gray-900\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if portal.ContactPhone != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<a href=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<a href=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var12 templ.SafeURL
-				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("tel:" + portal.ContactPhone))
+				var templ_7745c5c3_Var13 templ.SafeURL
+				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("tel:" + portal.ContactPhone))
 				if templ_7745c5c3_Err != nil {
 					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 85, Col: 58}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" class=\"text-blue-600 hover:text-blue-800\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var13 string
-				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(portal.ContactPhone)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 86, Col: 31}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</a>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" class=\"text-blue-600 hover:text-blue-800\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<span class=\"text-gray-400\">Non renseigné</span>")
+				var templ_7745c5c3_Var14 string
+				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(portal.ContactPhone)
 				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div></div><div><label class=\"text-sm font-medium text-gray-500\">Email</label><div class=\"text-gray-900\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			if portal.ContactEmail != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<a href=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var14 templ.SafeURL
-				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("mailto:" + portal.ContactEmail))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 97, Col: 61}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 86, Col: 31}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" class=\"text-blue-600 hover:text-blue-800\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</a>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var15 string
-				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(portal.ContactEmail)
+			} else {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<span class=\"text-gray-400\">Non renseigné</span>")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 98, Col: 31}
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div></div><div><label class=\"text-sm font-medium text-gray-500\">Email</label><div class=\"text-gray-900\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if portal.ContactEmail != "" {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<a href=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var15 templ.SafeURL
+				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("mailto:" + portal.ContactEmail))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 97, Col: 61}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</a>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" class=\"text-blue-600 hover:text-blue-800\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var16 string
+				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(portal.ContactEmail)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal.templ`, Line: 98, Col: 31}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</a>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<span class=\"text-gray-400\">Non renseigné</span>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<span class=\"text-gray-400\">Non renseigné</span>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div></div></div></div><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">QR Code</h2><div class=\"space-y-4\" id=\"qr_code_association_section\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div></div></div></div><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">QR Code</h2><div class=\"space-y-4\" id=\"qr_code_association_section\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -261,7 +274,7 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode, context echo.Conte
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div></div></div><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">Historique des interventions</h2><div class=\"text-center py-8\"><div class=\"text-gray-500\">Aucune intervention enregistrée</div><p class=\"text-gray-400 mt-2\">Les interventions apparaîtront ici une fois créées</p></div></div></div><!-- QR Scanner Modal --> <div id=\"qr-scanner-modal\" data-qr-code-scanner-target=\"modal\" style=\"display: none;\" class=\"fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4\"><div class=\"bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto\"><div class=\"flex justify-between items-center mb-4\"><h3 class=\"text-lg font-semibold text-gray-900\">Scanner QR Code</h3><button type=\"button\" data-action=\"qr-code-scanner#closeQRScanner\" class=\"text-gray-400 hover:text-gray-600\"><svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div><div id=\"scanner-loading\" data-qr-code-scanner-target=\"loading\" class=\"text-center py-4\"><div class=\"animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto\"></div><p class=\"text-gray-600 mt-2\">Démarrage de la caméra...</p></div><div id=\"admin-qr-reader\" data-qr-code-scanner-target=\"reader\" class=\"w-full\"></div><div id=\"scanner-status\" data-qr-code-scanner-target=\"status\" class=\"mt-4 text-center\" style=\"display: none;\"></div><div id=\"scanner-error\" data-qr-code-scanner-target=\"error\" class=\"mt-4 p-3 bg-red-50 border border-red-200 rounded-md\" style=\"display: none;\"><div class=\"flex\"><svg class=\"w-5 h-5 text-red-400 mt-0.5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg><div class=\"ml-3\"><p data-qr-code-scanner-target=\"errorMessage\" class=\"text-red-800 text-sm\"></p></div></div></div><div class=\"mt-4 text-center\"><button type=\"button\" data-action=\"qr-code-scanner#closeQRScanner\" class=\"bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md text-sm font-medium\">Fermer</button></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</div></div></div><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">Historique des interventions</h2><div class=\"text-center py-8\"><div class=\"text-gray-500\">Aucune intervention enregistrée</div><p class=\"text-gray-400 mt-2\">Les interventions apparaîtront ici une fois créées</p></div></div></div><!-- QR Scanner Modal --> <div id=\"qr-scanner-modal\" data-qr-code-scanner-target=\"modal\" style=\"display: none;\" class=\"fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4\"><div class=\"bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto\"><div class=\"flex justify-between items-center mb-4\"><h3 class=\"text-lg font-semibold text-gray-900\">Scanner QR Code</h3><button type=\"button\" data-action=\"qr-code-scanner#closeQRScanner\" class=\"text-gray-400 hover:text-gray-600\"><svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div><div id=\"scanner-loading\" data-qr-code-scanner-target=\"loading\" class=\"text-center py-4\"><div class=\"animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto\"></div><p class=\"text-gray-600 mt-2\">Démarrage de la caméra...</p></div><div id=\"admin-qr-reader\" data-qr-code-scanner-target=\"reader\" class=\"w-full\"></div><div id=\"scanner-status\" data-qr-code-scanner-target=\"status\" class=\"mt-4 text-center\" style=\"display: none;\"></div><div id=\"scanner-error\" data-qr-code-scanner-target=\"error\" class=\"mt-4 p-3 bg-red-50 border border-red-200 rounded-md\" style=\"display: none;\"><div class=\"flex\"><svg class=\"w-5 h-5 text-red-400 mt-0.5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg><div class=\"ml-3\"><p data-qr-code-scanner-target=\"errorMessage\" class=\"text-red-800 text-sm\"></p></div></div></div><div class=\"mt-4 text-center\"><button type=\"button\" data-action=\"qr-code-scanner#closeQRScanner\" class=\"bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md text-sm font-medium\">Fermer</button></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

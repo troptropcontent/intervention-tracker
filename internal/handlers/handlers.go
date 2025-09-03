@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/troptropcontent/qr_code_maintenance/internal/middleware"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/templates"
 	"gorm.io/gorm"
@@ -293,4 +294,33 @@ func (h *Handlers) QRRedirect(c echo.Context) error {
 
 	// Redirect to the portal page using its UUID
 	return c.Redirect(http.StatusSeeOther, "/portals/"+strconv.Itoa(int(qrCode.Portal.ID)))
+}
+
+func (h *Handlers) GetNewIntervention(c echo.Context) error {
+	fmt.Println("********************************************************************************")
+	fmt.Println("inside GetNewIntervention")
+	fmt.Println("********************************************************************************")
+	user, err := middleware.GetCurrentUser(c, h.DB)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get user")
+	}
+	fmt.Println("********************************************************************************")
+	fmt.Println("after user, err := middleware.GetCurrentUser(c, h.DB)")
+	fmt.Println("********************************************************************************")
+
+	id := c.Param("id")
+
+	var portal models.Portal
+	result := h.DB.Where("id = ?", id).First(&portal)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, "Portal not found")
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
+	}
+	fmt.Println("********************************************************************************")
+	fmt.Println("after portal models.Portal")
+	fmt.Println("********************************************************************************")
+
+	return templates.AdminInterventionNew(portal, *user, c).Render(c.Request().Context(), c.Response().Writer)
 }

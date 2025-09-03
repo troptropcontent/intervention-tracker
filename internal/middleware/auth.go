@@ -1,10 +1,13 @@
 package middleware
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"gorm.io/gorm"
 )
 
 func RequireAuth() echo.MiddlewareFunc {
@@ -26,4 +29,19 @@ func RequireAuth() echo.MiddlewareFunc {
 			return next(c)
 		}
 	}
+}
+
+func GetCurrentUser(c echo.Context, db *gorm.DB) (*models.User, error) {
+	userID := c.Get("user_id")
+	if userID == nil {
+		return nil, errors.New("user not authenticated")
+	}
+
+	var user models.User
+	result := db.Where("id = ?", userID).First(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &user, nil
 }
