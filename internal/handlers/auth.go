@@ -88,7 +88,6 @@ func (h *Handlers) PostRegister(c echo.Context) error {
 		FirstName: firstName,
 		LastName:  lastName,
 		IsActive:  true,
-		IsAdmin:   false,
 	}
 
 	if err := user.SetPassword(password); err != nil {
