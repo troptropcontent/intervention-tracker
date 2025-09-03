@@ -1,12 +1,49 @@
 package templates
 
-type BaseConfig struct {
-	Title           string
-	Controller      string
+import "github.com/labstack/echo/v4"
+
+type MainLayoutConfig struct {
+	Title      string
+	Controller string
 	Attributes templ.Attributes
 }
 
-templ Base(config BaseConfig) {
+templ AuthedNav(userEmail string) {
+	<nav class="bg-blue-600 text-white p-4">
+		<div class="container mx-auto flex justify-between items-center">
+			<h1 class="text-xl font-bold">
+				<a href="/" class="hover:text-blue-200">Maintenance Portails</a>
+			</h1>
+			<div class="space-x-4">
+				<a href="/admin/portals" class="hover:text-blue-200">Admin</a>
+				<span class="text-blue-200">{ userEmail }</span>
+				<button 
+					data-controller="logout" 
+					data-action="click->logout#logout"
+					class="hover:text-blue-200 cursor-pointer"
+				>
+					Déconnexion
+				</button>
+			</div>
+		</div>
+	</nav>
+}
+
+templ PublicNav() {
+	<nav class="bg-blue-600 text-white p-4">
+		<div class="container mx-auto flex justify-between items-center">
+			<h1 class="text-xl font-bold">
+				<a href="/" class="hover:text-blue-200">Maintenance Portails</a>
+			</h1>
+			<div class="space-x-4">
+				<a href="/login" class="hover:text-blue-200">Connexion</a>
+				<a href="/register" class="hover:text-blue-200">Inscription</a>
+			</div>
+		</div>
+	</nav>
+}
+
+templ MainLayout(config MainLayoutConfig, context echo.Context) {
 	<!DOCTYPE html>
 	<html lang="fr">
 	<head>
@@ -31,16 +68,11 @@ templ Base(config BaseConfig) {
 		</style>
 	</head>
 	<body class="bg-gray-50 min-h-screen">
-		<nav class="bg-blue-600 text-white p-4">
-			<div class="container mx-auto flex justify-between items-center">
-				<h1 class="text-xl font-bold">
-					<a href="/" class="hover:text-blue-200">Maintenance Portails</a>
-				</h1>
-				<div class="space-x-4">
-					<a href="/admin/portals" class="hover:text-blue-200">Accés Admin</a>
-				</div>
-			</div>
-		</nav>
+		if context.Get("user_email") != nil && context.Get("user_email") != "" {
+			@AuthedNav(context.Get("user_email").(string))
+		} else {
+			@PublicNav()
+		}
 		<main 
 			class="container mx-auto px-4 py-8"
 			if config.Controller != "" {

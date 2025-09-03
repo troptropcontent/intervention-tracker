@@ -28,15 +28,15 @@ func (h *Handlers) GetPortal(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
 	}
 
-	return templates.PortalShow(portal).Render(c.Request().Context(), c.Response().Writer)
+	return templates.PortalShow(portal, c).Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *Handlers) NotFound(c echo.Context) error {
-	return templates.NotFound().Render(c.Request().Context(), c.Response().Writer)
+	return templates.NotFound(c).Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *Handlers) GetAdminPortalsScan(c echo.Context) error {
-	return templates.AdminPortalsScan().Render(c.Request().Context(), c.Response().Writer)
+	return templates.AdminPortalsScan(c).Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *Handlers) GetAdminPortals(c echo.Context) error {
@@ -46,7 +46,7 @@ func (h *Handlers) GetAdminPortals(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to fetch portals")
 	}
 
-	return templates.AdminPortals(portals).Render(c.Request().Context(), c.Response().Writer)
+	return templates.AdminPortals(portals, c).Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *Handlers) GetAdminPortal(c echo.Context) error {
@@ -69,7 +69,7 @@ func (h *Handlers) GetAdminPortal(c echo.Context) error {
 		qrCodePtr = &qrCode
 	}
 
-	return templates.AdminPortal(portal, qrCodePtr).Render(c.Request().Context(), c.Response().Writer)
+	return templates.AdminPortal(portal, qrCodePtr, c).Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *Handlers) GetAdminPortalEdit(c echo.Context) error {
@@ -84,7 +84,7 @@ func (h *Handlers) GetAdminPortalEdit(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
 	}
 
-	return templates.AdminPortalEdit(portal).Render(c.Request().Context(), c.Response().Writer)
+	return templates.AdminPortalEdit(portal, c).Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *Handlers) AssociateQRCode(c echo.Context) error {
