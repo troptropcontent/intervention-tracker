@@ -1,7 +1,9 @@
 package templates
 
-templ NotFound() {
-	@Base(BaseConfig{Title: "Page non trouvée"}) {
+import "github.com/labstack/echo/v4"
+
+templ NotFound(context echo.Context) {
+	@MainLayout(MainLayoutConfig{Title: "Page non trouvée"}, context) {
 		<div class="max-w-4xl mx-auto text-center">
 			<div class="mt-8">
 				<h1 class="text-3xl font-bold text-gray-900 mb-4">404 - Page non trouvée</h1>

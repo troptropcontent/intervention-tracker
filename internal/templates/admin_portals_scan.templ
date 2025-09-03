@@ -1,7 +1,9 @@
 package templates
 
-templ AdminPortalsScan() {
-	@Base(BaseConfig{Title: "Scanner QR Code"}) {
+import "github.com/labstack/echo/v4"
+
+templ AdminPortalsScan( context echo.Context) {
+	@MainLayout(MainLayoutConfig{Title: "Scanner QR Code"}, context) {
 		<div class="max-w-4xl mx-auto">
 			<div class="bg-white rounded-lg shadow p-6">
 				<h1 class="text-3xl font-bold text-gray-900 mb-6 text-center">

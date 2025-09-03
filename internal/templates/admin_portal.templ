@@ -3,10 +3,11 @@ package templates
 import (
 	"strconv"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"github.com/labstack/echo/v4"
 )
 
-templ AdminPortal(portal models.Portal, qrCode *models.QRCode) {
-	@Base(BaseConfig{Title: "Admin - " + portal.Name, Controller: "qr-code-scanner", Attributes: templ.Attributes{"data-qr-code-scanner-portal-id-value": portal.ID}}) {
+templ AdminPortal(portal models.Portal, qrCode *models.QRCode,  context echo.Context) {
+	@MainLayout(MainLayoutConfig{Title: "Admin - " + portal.Name, Controller: "qr-code-scanner", Attributes: templ.Attributes{"data-qr-code-scanner-portal-id-value": portal.ID}}, context) {
 		<div class="max-w-4xl mx-auto">
 			<div class="flex justify-between items-center mb-6">
 				<div>

@@ -1,9 +1,10 @@
 package templates
 
 import "github.com/troptropcontent/qr_code_maintenance/internal/models"
+import "github.com/labstack/echo/v4"
 
-templ PortalShow(portal models.Portal) {
-	@Base(BaseConfig{Title: "Portail - " + portal.Name}) {
+templ PortalShow(portal models.Portal, context echo.Context) {
+	@MainLayout(MainLayoutConfig{Title: "Portail - " + portal.Name}, context) {
 		<div class="max-w-4xl mx-auto">
 			<div class="bg-white shadow rounded-lg p-6">
 				<div class="flex justify-between items-start mb-6">

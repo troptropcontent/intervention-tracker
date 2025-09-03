@@ -3,10 +3,11 @@ package templates
 import (
 	"strconv"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"github.com/labstack/echo/v4"
 )
 
-templ AdminPortalEdit(portal models.Portal) {
-	@Base(BaseConfig{Title: "Modifier - " + portal.Name}) {
+templ AdminPortalEdit(portal models.Portal, context echo.Context) {
+	@MainLayout(MainLayoutConfig{Title: "Modifier - " + portal.Name}, context) {
 		<div class="max-w-4xl mx-auto">
 			<div class="mb-6">
 				<a href={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID))) } class="text-blue-600 hover:text-blue-800 text-sm mb-2 inline-block">
