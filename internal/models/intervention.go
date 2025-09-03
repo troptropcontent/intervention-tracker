@@ -42,6 +42,7 @@ type ControlResult *bool
 type Intervention struct {
 	ID        uint           `json:"id" gorm:"primaryKey"`
 	Date      time.Time      `json:"date" gorm:"not null"`
+	Summary   *string        `json:"summary"`
 	UserID    uint           `json:"user_id" gorm:"not null"`
 	UserName  string         `json:"user_name" gorm:"not null"`
 	PortalID  uint           `json:"portal_id" gorm:"not null"`
