@@ -70,7 +70,15 @@ func (h *Handlers) GetAdminPortal(c echo.Context) error {
 		qrCodePtr = &qrCode
 	}
 
-	return templates.AdminPortal(portal, qrCodePtr, c).Render(c.Request().Context(), c.Response().Writer)
+	// Fetch associated QR code if exists
+	var interventions []models.Intervention
+
+	result = h.DB.Preload("Controls").Find(&interventions, "portal_id = ?", portal.ID)
+	if result.Error != nil {
+		return echo.NewHTTPError(http.StatusNotFound, "Failed to fetch interventions")
+	}
+
+	return templates.AdminPortal(portal, qrCodePtr, interventions, c).Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *Handlers) GetAdminPortalEdit(c echo.Context) error {

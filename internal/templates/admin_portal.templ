@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-templ AdminPortal(portal models.Portal, qrCode *models.QRCode,  context echo.Context) {
+templ AdminPortal(portal models.Portal, qrCode *models.QRCode, interventions []models.Intervention, context echo.Context) {
 	@MainLayout(MainLayoutConfig{Title: "Admin - " + portal.Name, Controller: "qr-code-scanner", Attributes: templ.Attributes{"data-qr-code-scanner-portal-id-value": portal.ID}}, context) {
 		<div class="max-w-4xl mx-auto">
 			<div class="flex justify-between items-center mb-6">
@@ -119,10 +119,18 @@ templ AdminPortal(portal models.Portal, qrCode *models.QRCode,  context echo.Con
 
 			<div class="bg-white shadow-sm rounded-lg p-6">
 				<h2 class="text-xl font-semibold text-gray-900 mb-4">Historique des interventions</h2>
-				<div class="text-center py-8">
-					<div class="text-gray-500">Aucune intervention enregistrée</div>
-					<p class="text-gray-400 mt-2">Les interventions apparaîtront ici une fois créées</p>
-				</div>
+				if len(interventions) > 0 {
+					<div class="space-y-4">
+						for _, intervention := range interventions {
+							@Intervention(&intervention)
+						}
+					</div>
+				} else {
+					<div class="text-center py-8">
+						<div class="text-gray-500">Aucune intervention enregistrée</div>
+						<p class="text-gray-400 mt-2">Les interventions apparaîtront ici une fois créées</p>
+					</div>
+				}
 			</div>
 		</div>
 

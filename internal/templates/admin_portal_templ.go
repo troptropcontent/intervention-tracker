@@ -14,7 +14,7 @@ import (
 	"strconv"
 )
 
-func AdminPortal(portal models.Portal, qrCode *models.QRCode, context echo.Context) templ.Component {
+func AdminPortal(portal models.Portal, qrCode *models.QRCode, interventions []models.Intervention, context echo.Context) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -274,7 +274,32 @@ func AdminPortal(portal models.Portal, qrCode *models.QRCode, context echo.Conte
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</div></div></div><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">Historique des interventions</h2><div class=\"text-center py-8\"><div class=\"text-gray-500\">Aucune intervention enregistrée</div><p class=\"text-gray-400 mt-2\">Les interventions apparaîtront ici une fois créées</p></div></div></div><!-- QR Scanner Modal --> <div id=\"qr-scanner-modal\" data-qr-code-scanner-target=\"modal\" style=\"display: none;\" class=\"fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4\"><div class=\"bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto\"><div class=\"flex justify-between items-center mb-4\"><h3 class=\"text-lg font-semibold text-gray-900\">Scanner QR Code</h3><button type=\"button\" data-action=\"qr-code-scanner#closeQRScanner\" class=\"text-gray-400 hover:text-gray-600\"><svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div><div id=\"scanner-loading\" data-qr-code-scanner-target=\"loading\" class=\"text-center py-4\"><div class=\"animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto\"></div><p class=\"text-gray-600 mt-2\">Démarrage de la caméra...</p></div><div id=\"admin-qr-reader\" data-qr-code-scanner-target=\"reader\" class=\"w-full\"></div><div id=\"scanner-status\" data-qr-code-scanner-target=\"status\" class=\"mt-4 text-center\" style=\"display: none;\"></div><div id=\"scanner-error\" data-qr-code-scanner-target=\"error\" class=\"mt-4 p-3 bg-red-50 border border-red-200 rounded-md\" style=\"display: none;\"><div class=\"flex\"><svg class=\"w-5 h-5 text-red-400 mt-0.5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg><div class=\"ml-3\"><p data-qr-code-scanner-target=\"errorMessage\" class=\"text-red-800 text-sm\"></p></div></div></div><div class=\"mt-4 text-center\"><button type=\"button\" data-action=\"qr-code-scanner#closeQRScanner\" class=\"bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md text-sm font-medium\">Fermer</button></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</div></div></div><div class=\"bg-white shadow-sm rounded-lg p-6\"><h2 class=\"text-xl font-semibold text-gray-900 mb-4\">Historique des interventions</h2>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if len(interventions) > 0 {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<div class=\"space-y-4\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				for _, intervention := range interventions {
+					templ_7745c5c3_Err = Intervention(&intervention).Render(ctx, templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<div class=\"text-center py-8\"><div class=\"text-gray-500\">Aucune intervention enregistrée</div><p class=\"text-gray-400 mt-2\">Les interventions apparaîtront ici une fois créées</p></div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div></div><!-- QR Scanner Modal --> <div id=\"qr-scanner-modal\" data-qr-code-scanner-target=\"modal\" style=\"display: none;\" class=\"fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4\"><div class=\"bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto\"><div class=\"flex justify-between items-center mb-4\"><h3 class=\"text-lg font-semibold text-gray-900\">Scanner QR Code</h3><button type=\"button\" data-action=\"qr-code-scanner#closeQRScanner\" class=\"text-gray-400 hover:text-gray-600\"><svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div><div id=\"scanner-loading\" data-qr-code-scanner-target=\"loading\" class=\"text-center py-4\"><div class=\"animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto\"></div><p class=\"text-gray-600 mt-2\">Démarrage de la caméra...</p></div><div id=\"admin-qr-reader\" data-qr-code-scanner-target=\"reader\" class=\"w-full\"></div><div id=\"scanner-status\" data-qr-code-scanner-target=\"status\" class=\"mt-4 text-center\" style=\"display: none;\"></div><div id=\"scanner-error\" data-qr-code-scanner-target=\"error\" class=\"mt-4 p-3 bg-red-50 border border-red-200 rounded-md\" style=\"display: none;\"><div class=\"flex\"><svg class=\"w-5 h-5 text-red-400 mt-0.5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg><div class=\"ml-3\"><p data-qr-code-scanner-target=\"errorMessage\" class=\"text-red-800 text-sm\"></p></div></div></div><div class=\"mt-4 text-center\"><button type=\"button\" data-action=\"qr-code-scanner#closeQRScanner\" class=\"bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md text-sm font-medium\">Fermer</button></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

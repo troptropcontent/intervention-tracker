@@ -53,7 +53,7 @@ type Intervention struct {
 	// Relationships
 	Portal   Portal    `json:"portal,omitempty" gorm:"foreignKey:PortalID"`
 	User     User      `json:"user,omitempty" gorm:"foreignKey:UserID"`
-	Controls []Control `json:"controls,omitempty" gorm:"foreignKey:InterventionID"`
+	Controls []Control `json:"controls,omitempty" gorm:"foreignKey:intervention_id"`
 }
 
 type Control struct {
@@ -66,7 +66,7 @@ type Control struct {
 	DeletedAt      gorm.DeletedAt `json:"-" gorm:"index"`
 
 	// Relationships
-	Intervention Intervention `json:"intervention,omitempty" gorm:"foreignKey:InterventionID"`
+	Intervention Intervention `json:"intervention,omitempty"`
 }
 
 func (Intervention) TableName() string {

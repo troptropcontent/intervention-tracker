@@ -128,7 +128,7 @@ func AdminInterventionNew(portal models.Portal, user models.User, context echo.C
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var9 string
-				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(getControlTypeLabel(controlType))
+				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(GetControlTypeLabel(controlType))
 				if templ_7745c5c3_Err != nil {
 					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 79, Col: 126}
 				}
@@ -208,7 +208,7 @@ func AdminInterventionNew(portal models.Portal, user models.User, context echo.C
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var15 string
-				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(getControlTypeLabel(controlType))
+				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(GetControlTypeLabel(controlType))
 				if templ_7745c5c3_Err != nil {
 					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 129, Col: 126}
 				}
@@ -287,7 +287,7 @@ func AdminInterventionNew(portal models.Portal, user models.User, context echo.C
 	})
 }
 
-func getControlTypeLabel(controlType string) string {
+func GetControlTypeLabel(controlType string) string {
 	labels := map[string]string{
 		"warning_lights":   "Feux d'avertissement",
 		"area_lighting":    "Éclairage de zone",

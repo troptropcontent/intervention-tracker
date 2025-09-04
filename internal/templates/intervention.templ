@@ -1,0 +1,65 @@
+package templates
+
+import (
+	"strconv"
+	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+)
+
+templ Intervention(intervention *models.Intervention) {
+	<div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+		<div class="flex justify-between items-start mb-3">
+			<div class="flex-1">
+				<div class="flex items-center gap-3 mb-2">
+					<h3 class="text-lg font-semibold text-gray-900">
+						Intervention du { intervention.Date.Format("02/01/2006") }
+					</h3>
+					<span class="text-sm text-gray-500">
+						par { intervention.UserName }
+					</span>
+				</div>
+				if intervention.Summary != nil && *intervention.Summary != "" {
+					<p class="text-gray-600 text-sm mb-3">{ *intervention.Summary }</p>
+				}
+			</div>
+			<div class="text-xs text-gray-400">
+				#{ strconv.Itoa(int(intervention.ID)) }
+			</div>
+		</div>
+		
+		if len(intervention.Controls) > 0 {
+			<div class="border-t border-gray-100 pt-3">
+				<h4 class="text-sm font-medium text-gray-700 mb-2">
+					Contrôles effectués ({ strconv.Itoa(len(intervention.Controls)) })
+				</h4>
+				<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+					for _, control := range intervention.Controls {
+						<div class="flex items-center justify-between gap-2 text-sm">
+							<span class="text-gray-600">{ GetControlTypeLabel(control.Kind) }:</span>
+							if control.Result != nil {
+								if *control.Result {
+									<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+										✓
+									</span>
+								} else {
+									<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+										✗
+									</span>
+								}
+							} else {
+								<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+									- Non testé
+								</span>
+							}
+						</div>
+					}
+				</div>
+			</div>
+		}
+		
+		<div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
+			<div class="text-xs text-gray-500">
+				Créée le { intervention.CreatedAt.Format("02/01/2006 à 15:04") }
+			</div>
+		</div>
+	</div>
+}

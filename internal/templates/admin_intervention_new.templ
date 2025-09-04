@@ -76,7 +76,7 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 									<tbody>
 										for i, controlType := range models.ControlTypesByKind[models.ControlKindSecurity] {
 											<tr class={ templ.KV("bg-gray-50", i%2 == 0) }>
-												<td class="border border-gray-300 px-3 py-2 font-medium" data-label="Contrôle">{ getControlTypeLabel(controlType) }</td>
+												<td class="border border-gray-300 px-3 py-2 font-medium" data-label="Contrôle">{ GetControlTypeLabel(controlType) }</td>
 												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Conforme">
 													<input type="radio" name={ "control_" + controlType } value="true" class="h-4 w-4 text-green-600"/>
 												</td>
@@ -126,7 +126,7 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 									<tbody>
 										for i, controlType := range models.ControlTypesByKind[models.ControlKindOther] {
 											<tr class={ templ.KV("bg-gray-50", i%2 == 0) }>
-												<td class="border border-gray-300 px-3 py-2 font-medium" data-label="Contrôle">{ getControlTypeLabel(controlType) }</td>
+												<td class="border border-gray-300 px-3 py-2 font-medium" data-label="Contrôle">{ GetControlTypeLabel(controlType) }</td>
 												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Conforme">
 													<input type="radio" name={ "control_" + controlType } value="true" class="h-4 w-4 text-green-600"/>
 												</td>
@@ -167,7 +167,7 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 	}
 }
 
-func getControlTypeLabel(controlType string) string {
+func GetControlTypeLabel(controlType string) string {
 	labels := map[string]string{
 		"warning_lights":     "Feux d'avertissement",
 		"area_lighting":      "Éclairage de zone",
