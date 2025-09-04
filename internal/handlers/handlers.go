@@ -297,16 +297,10 @@ func (h *Handlers) QRRedirect(c echo.Context) error {
 }
 
 func (h *Handlers) GetNewIntervention(c echo.Context) error {
-	fmt.Println("********************************************************************************")
-	fmt.Println("inside GetNewIntervention")
-	fmt.Println("********************************************************************************")
 	user, err := middleware.GetCurrentUser(c, h.DB)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get user")
 	}
-	fmt.Println("********************************************************************************")
-	fmt.Println("after user, err := middleware.GetCurrentUser(c, h.DB)")
-	fmt.Println("********************************************************************************")
 
 	id := c.Param("id")
 
@@ -318,9 +312,108 @@ func (h *Handlers) GetNewIntervention(c echo.Context) error {
 		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
 	}
-	fmt.Println("********************************************************************************")
-	fmt.Println("after portal models.Portal")
-	fmt.Println("********************************************************************************")
 
 	return templates.AdminInterventionNew(portal, *user, c).Render(c.Request().Context(), c.Response().Writer)
+}
+
+func (h *Handlers) PostIntervention(c echo.Context) error {
+	user, err := middleware.GetCurrentUser(c, h.DB)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get user")
+	}
+
+	id := c.Param("id")
+	portalID, err := strconv.ParseUint(id, 10, 32)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid portal ID")
+	}
+
+	var portal models.Portal
+	result := h.DB.Where("id = ?", id).First(&portal)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, "Portal not found")
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
+	}
+
+	// Parse form data
+	var formData struct {
+		Date    string `form:"date"`
+		Summary string `form:"summary"`
+	}
+
+	if err := c.Bind(&formData); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid form data")
+	}
+
+	// Parse intervention date
+	interventionDate, err := time.Parse("2006-01-02", formData.Date)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid date format")
+	}
+
+	// Create intervention
+	intervention := models.Intervention{
+		Date:     interventionDate,
+		UserID:   user.ID,
+		UserName: user.FullName(),
+		PortalID: uint(portalID),
+	}
+
+	// Set summary if provided
+	if formData.Summary != "" {
+		intervention.Summary = &formData.Summary
+	}
+
+	// Start transaction
+	tx := h.DB.Begin()
+	if tx.Error != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to start transaction")
+	}
+	defer tx.Rollback()
+
+	// Save intervention
+	if result := tx.Create(&intervention); result.Error != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create intervention")
+	}
+
+	// Process control results
+	allControlTypes := append(models.ControlTypesByKind[models.ControlKindSecurity], models.ControlTypesByKind[models.ControlKindOther]...)
+
+	for _, controlType := range allControlTypes {
+		controlValue := c.FormValue("control_" + controlType)
+
+		// Only create control records for non-empty values (user made a selection)
+		if controlValue != "" {
+			var result models.ControlResult
+			switch controlValue {
+			case "true":
+				trueVal := true
+				result = &trueVal
+			case "false":
+				falseVal := false
+				result = &falseVal
+			}
+			// If controlValue is empty string, result stays nil (not controlled)
+
+			control := models.Control{
+				Kind:           controlType,
+				Result:         result,
+				InterventionID: intervention.ID,
+			}
+
+			if res := tx.Create(&control); res.Error != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create control")
+			}
+		}
+	}
+
+	// Commit transaction
+	if err := tx.Commit().Error; err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to save intervention")
+	}
+
+	// Redirect to portal admin page
+	return c.Redirect(http.StatusSeeOther, "/admin/portals/"+id)
 }

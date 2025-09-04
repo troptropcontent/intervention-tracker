@@ -34,17 +34,6 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 									required
 								/>
 							</div>
-							<div>
-								<label for="user_name" class="block text-sm font-medium text-gray-700 mb-1">Nom de l'intervenant</label>
-								<input 
-									type="text" 
-									id="user_name" 
-									name="user_name" 
-									value={ user.FirstName + " " + user.LastName }
-									class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-									required
-								/>
-							</div>
 						</div>
 						<div class="mt-4">
 							<label for="summary" class="block text-sm font-medium text-gray-700 mb-1">Résumé (optionnel)</label>

@@ -36,3 +36,7 @@ func (u *User) CheckPassword(password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
 	return err == nil
 }
+
+func (u *User) FullName() string {
+	return u.FirstName + " " + u.LastName
+}

@@ -100,193 +100,180 @@ func AdminInterventionNew(portal models.Portal, user models.User, context echo.C
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" required></div><div><label for=\"user_name\" class=\"block text-sm font-medium text-gray-700 mb-1\">Nom de l'intervenant</label> <input type=\"text\" id=\"user_name\" name=\"user_name\" value=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(user.FirstName + " " + user.LastName)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 43, Col: 53}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500\" required></div></div><div class=\"mt-4\"><label for=\"summary\" class=\"block text-sm font-medium text-gray-700 mb-1\">Résumé (optionnel)</label> <textarea id=\"summary\" name=\"summary\" rows=\"3\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500\" placeholder=\"Description générale de l'intervention...\"></textarea></div></div><!-- Controls Tables --><div><h3 class=\"text-lg font-medium text-gray-900 mb-6\">Contrôles d'intervention</h3><!-- Security Controls Table --><div class=\"mb-8\"><h4 class=\"text-md font-medium text-gray-800 mb-3\">Sécurité</h4><div class=\"print:break-inside-avoid\"><table class=\"w-full border-collapse border-none sm:border border-gray-300 text-sm\"><thead><tr class=\"bg-gray-100\"><th class=\"border border-gray-300 px-3 py-2 text-left font-medium w-1/2\">Contrôle</th><th class=\"border border-gray-300 px-2 py-1 text-center font-medium w-2/12\"><span class=\"hidden sm:inline\">Conforme</span> <span class=\"sm:hidden text-green-500\">C</span></th><th class=\"border border-gray-300 px-2 py-1 text-center font-medium w-2/12\"><span class=\"hidden sm:inline\">Non conforme</span> <span class=\"sm:hidden text-red-500\">NC</span></th><th class=\"border border-gray-300 px-2 py-1 text-center font-medium w-2/12\"><span class=\"hidden sm:inline\">Non contrôlé</span> <span class=\"sm:hidden\">NA</span></th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" required></div></div><div class=\"mt-4\"><label for=\"summary\" class=\"block text-sm font-medium text-gray-700 mb-1\">Résumé (optionnel)</label> <textarea id=\"summary\" name=\"summary\" rows=\"3\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500\" placeholder=\"Description générale de l'intervention...\"></textarea></div></div><!-- Controls Tables --><div><h3 class=\"text-lg font-medium text-gray-900 mb-6\">Contrôles d'intervention</h3><!-- Security Controls Table --><div class=\"mb-8\"><h4 class=\"text-md font-medium text-gray-800 mb-3\">Sécurité</h4><div class=\"print:break-inside-avoid\"><table class=\"w-full border-collapse border-none sm:border border-gray-300 text-sm\"><thead><tr class=\"bg-gray-100\"><th class=\"border border-gray-300 px-3 py-2 text-left font-medium w-1/2\">Contrôle</th><th class=\"border border-gray-300 px-2 py-1 text-center font-medium w-2/12\"><span class=\"hidden sm:inline\">Conforme</span> <span class=\"sm:hidden text-green-500\">C</span></th><th class=\"border border-gray-300 px-2 py-1 text-center font-medium w-2/12\"><span class=\"hidden sm:inline\">Non conforme</span> <span class=\"sm:hidden text-red-500\">NC</span></th><th class=\"border border-gray-300 px-2 py-1 text-center font-medium w-2/12\"><span class=\"hidden sm:inline\">Non contrôlé</span> <span class=\"sm:hidden\">NA</span></th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for i, controlType := range models.ControlTypesByKind[models.ControlKindSecurity] {
-				var templ_7745c5c3_Var8 = []any{templ.KV("bg-gray-50", i%2 == 0)}
-				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var8...)
+				var templ_7745c5c3_Var7 = []any{templ.KV("bg-gray-50", i%2 == 0)}
+				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var7...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<tr class=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<tr class=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var8 string
+				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var7).String())
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 1, Col: 0}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\"><td class=\"border border-gray-300 px-3 py-2 font-medium\" data-label=\"Contrôle\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var9 string
-				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var8).String())
+				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(getControlTypeLabel(controlType))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 1, Col: 0}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 79, Col: 126}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\"><td class=\"border border-gray-300 px-3 py-2 font-medium\" data-label=\"Contrôle\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</td><td class=\"border border-gray-300 px-2 py-1 text-center\" data-label=\"Conforme\"><input type=\"radio\" name=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var10 string
-				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(getControlTypeLabel(controlType))
+				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs("control_" + controlType)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 90, Col: 126}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 81, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</td><td class=\"border border-gray-300 px-2 py-1 text-center\" data-label=\"Conforme\"><input type=\"radio\" name=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" value=\"true\" class=\"h-4 w-4 text-green-600\"></td><td class=\"border border-gray-300 px-2 py-1 text-center\" data-label=\"Non conforme\"><input type=\"radio\" name=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs("control_" + controlType)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 92, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 84, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" value=\"true\" class=\"h-4 w-4 text-green-600\"></td><td class=\"border border-gray-300 px-2 py-1 text-center\" data-label=\"Non conforme\"><input type=\"radio\" name=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" value=\"false\" class=\"h-4 w-4 text-red-600\"></td><td class=\"border border-gray-300 px-2 py-1 text-center\" data-label=\"Non contrôlé\"><input type=\"radio\" name=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs("control_" + controlType)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 95, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 87, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" value=\"false\" class=\"h-4 w-4 text-red-600\"></td><td class=\"border border-gray-300 px-2 py-1 text-center\" data-label=\"Non contrôlé\"><input type=\"radio\" name=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var13 string
-				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs("control_" + controlType)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 98, Col: 64}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" value=\"\" checked class=\"h-4 w-4 text-gray-400\"></td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" value=\"\" checked class=\"h-4 w-4 text-gray-400\"></td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</tbody></table><!-- Legend for small screens --><div class=\"sm:hidden mt-3 text-xs text-gray-600 space-y-1\"><div class=\"flex flex-wrap gap-x-4 gap-y-1\"><span><span class=\"text-green-500 font-medium\">C</span> = Conforme</span> <span><span class=\"text-red-500 font-medium\">NC</span> = Non conforme</span> <span><span class=\"font-medium\">NA</span> = Non contrôlé</span></div></div></div></div><!-- Other Controls Table --><div class=\"mb-8\"><h4 class=\"text-md font-medium text-gray-800 mb-3\">Autres</h4><div class=\"print:break-inside-avoid\"><table class=\"w-full border-collapse border-none sm:border border-gray-300 text-sm\"><thead><tr class=\"bg-gray-100\"><th class=\"border border-gray-300 px-3 py-2 text-left font-medium w-1/2\">Contrôle</th><th class=\"border border-gray-300 px-2 py-1 text-center font-medium w-2/12\"><span class=\"hidden sm:inline\">Conforme</span> <span class=\"sm:hidden text-green-500\">C</span></th><th class=\"border border-gray-300 px-2 py-1 text-center font-medium w-2/12\"><span class=\"hidden sm:inline\">Non conforme</span> <span class=\"sm:hidden text-red-500\">NC</span></th><th class=\"border border-gray-300 px-2 py-1 text-center font-medium w-2/12\"><span class=\"hidden sm:inline\">Non contrôlé</span> <span class=\"sm:hidden\">NA</span></th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</tbody></table><!-- Legend for small screens --><div class=\"sm:hidden mt-3 text-xs text-gray-600 space-y-1\"><div class=\"flex flex-wrap gap-x-4 gap-y-1\"><span><span class=\"text-green-500 font-medium\">C</span> = Conforme</span> <span><span class=\"text-red-500 font-medium\">NC</span> = Non conforme</span> <span><span class=\"font-medium\">NA</span> = Non contrôlé</span></div></div></div></div><!-- Other Controls Table --><div class=\"mb-8\"><h4 class=\"text-md font-medium text-gray-800 mb-3\">Autres</h4><div class=\"print:break-inside-avoid\"><table class=\"w-full border-collapse border-none sm:border border-gray-300 text-sm\"><thead><tr class=\"bg-gray-100\"><th class=\"border border-gray-300 px-3 py-2 text-left font-medium w-1/2\">Contrôle</th><th class=\"border border-gray-300 px-2 py-1 text-center font-medium w-2/12\"><span class=\"hidden sm:inline\">Conforme</span> <span class=\"sm:hidden text-green-500\">C</span></th><th class=\"border border-gray-300 px-2 py-1 text-center font-medium w-2/12\"><span class=\"hidden sm:inline\">Non conforme</span> <span class=\"sm:hidden text-red-500\">NC</span></th><th class=\"border border-gray-300 px-2 py-1 text-center font-medium w-2/12\"><span class=\"hidden sm:inline\">Non contrôlé</span> <span class=\"sm:hidden\">NA</span></th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for i, controlType := range models.ControlTypesByKind[models.ControlKindOther] {
-				var templ_7745c5c3_Var14 = []any{templ.KV("bg-gray-50", i%2 == 0)}
-				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var14...)
+				var templ_7745c5c3_Var13 = []any{templ.KV("bg-gray-50", i%2 == 0)}
+				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var13...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<tr class=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<tr class=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var14 string
+				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var13).String())
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 1, Col: 0}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\"><td class=\"border border-gray-300 px-3 py-2 font-medium\" data-label=\"Contrôle\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var15 string
-				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var14).String())
+				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(getControlTypeLabel(controlType))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 1, Col: 0}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 129, Col: 126}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\"><td class=\"border border-gray-300 px-3 py-2 font-medium\" data-label=\"Contrôle\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</td><td class=\"border border-gray-300 px-2 py-1 text-center\" data-label=\"Conforme\"><input type=\"radio\" name=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var16 string
-				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(getControlTypeLabel(controlType))
+				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs("control_" + controlType)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 140, Col: 126}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 131, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</td><td class=\"border border-gray-300 px-2 py-1 text-center\" data-label=\"Conforme\"><input type=\"radio\" name=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" value=\"true\" class=\"h-4 w-4 text-green-600\"></td><td class=\"border border-gray-300 px-2 py-1 text-center\" data-label=\"Non conforme\"><input type=\"radio\" name=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var17 string
 				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs("control_" + controlType)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 142, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 134, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" value=\"true\" class=\"h-4 w-4 text-green-600\"></td><td class=\"border border-gray-300 px-2 py-1 text-center\" data-label=\"Non conforme\"><input type=\"radio\" name=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" value=\"false\" class=\"h-4 w-4 text-red-600\"></td><td class=\"border border-gray-300 px-2 py-1 text-center\" data-label=\"Non contrôlé\"><input type=\"radio\" name=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var18 string
 				templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs("control_" + controlType)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 145, Col: 64}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 137, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" value=\"false\" class=\"h-4 w-4 text-red-600\"></td><td class=\"border border-gray-300 px-2 py-1 text-center\" data-label=\"Non contrôlé\"><input type=\"radio\" name=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var19 string
-				templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs("control_" + controlType)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 148, Col: 64}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" value=\"\" checked class=\"h-4 w-4 text-gray-400\"></td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\" value=\"\" checked class=\"h-4 w-4 text-gray-400\"></td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</tbody></table><!-- Legend for small screens --><div class=\"sm:hidden mt-3 text-xs text-gray-600 space-y-1\"><div class=\"flex flex-wrap gap-x-4 gap-y-1\"><span><span class=\"text-green-500 font-medium\">C</span> = Conforme</span> <span><span class=\"text-red-500 font-medium\">NC</span> = Non conforme</span> <span><span class=\"font-medium\">NA</span> = Non contrôlé</span></div></div></div></div></div><!-- Form Actions --><div class=\"flex justify-end space-x-4 pt-6 border-t border-gray-200\"><a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</tbody></table><!-- Legend for small screens --><div class=\"sm:hidden mt-3 text-xs text-gray-600 space-y-1\"><div class=\"flex flex-wrap gap-x-4 gap-y-1\"><span><span class=\"text-green-500 font-medium\">C</span> = Conforme</span> <span><span class=\"text-red-500 font-medium\">NC</span> = Non conforme</span> <span><span class=\"font-medium\">NA</span> = Non contrôlé</span></div></div></div></div></div><!-- Form Actions --><div class=\"flex justify-end space-x-4 pt-6 border-t border-gray-200\"><a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var20 templ.SafeURL
-			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID))))
+			var templ_7745c5c3_Var19 templ.SafeURL
+			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID))))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 168, Col: 75}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_intervention_new.templ`, Line: 157, Col: 75}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-md font-medium\">Annuler</a> <button type=\"submit\" class=\"bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium\">Créer l'intervention</button></div></form></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" class=\"bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-md font-medium\">Annuler</a> <button type=\"submit\" class=\"bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium\">Créer l'intervention</button></div></form></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
