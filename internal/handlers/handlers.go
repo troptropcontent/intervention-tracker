@@ -425,3 +425,18 @@ func (h *Handlers) PostIntervention(c echo.Context) error {
 	// Redirect to portal admin page
 	return c.Redirect(http.StatusSeeOther, "/admin/portals/"+id)
 }
+
+func (h *Handlers) GetInterventionReport(c echo.Context) error {
+	id := c.Param("id")
+
+	var intervention models.Intervention
+	result := h.DB.Preload("Portal").Preload("Controls").First(&intervention, id)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, "Intervention not found")
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
+	}
+
+	return templates.InterventionReport(intervention).Render(c.Request().Context(), c.Response().Writer)
+}

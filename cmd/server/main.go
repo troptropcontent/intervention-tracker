@@ -69,6 +69,7 @@ func main() {
 	admin_routes.POST("/portals/:id/qr-code/remove", h.RemoveQRCode)
 	admin_routes.GET("/portals/:id/interventions/new", h.GetNewIntervention)
 	admin_routes.POST("/portals/:id/interventions", h.PostIntervention)
+	admin_routes.GET("/interventions/:id/report", h.GetInterventionReport)
 	admin_routes.GET("/portals/scan", h.GetAdminPortalsScan)
 
 	// 404 handler
