@@ -23,7 +23,8 @@ type Portal struct {
 	DeletedAt         gorm.DeletedAt `json:"-" gorm:"index"`
 
 	// Relationships
-	QRCodes []QRCode `json:"qr_codes,omitempty" gorm:"foreignKey:PortalID"`
+	QRCodes       []QRCode       `json:"qr_codes,omitempty" gorm:"foreignKey:PortalID"`
+	Interventions []Intervention `json:"interventions,omitempty" gorm:"foreignKey:PortalID"`
 }
 
 func (Portal) TableName() string {

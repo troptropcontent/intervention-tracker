@@ -174,7 +174,32 @@ func PortalShow(portal models.Portal, context echo.Context) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</dd></div></dl></div></div><div class=\"mt-8 pt-6 border-t border-gray-200\"><div class=\"flex justify-between items-center\"><h3 class=\"text-lg font-medium text-gray-900\">Interventions récentes</h3></div><div class=\"mt-4 text-center py-8 text-gray-500\"><p>Aucune intervention enregistrée</p></div></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</dd></div></dl></div></div><div class=\"mt-8 pt-6 border-t border-gray-200\"><div class=\"flex justify-between items-center\"><h3 class=\"text-lg font-medium text-gray-900\">Interventions récentes</h3></div><div class=\"mt-4\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if len(portal.Interventions) > 0 {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"space-y-4\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				for _, intervention := range portal.Interventions {
+					templ_7745c5c3_Err = Intervention(&intervention).Render(ctx, templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"text-center py-8 text-gray-500\"><p>Aucune intervention enregistrée</p></div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

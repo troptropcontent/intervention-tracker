@@ -25,7 +25,9 @@ func (h *Handlers) GetPortal(c echo.Context) error {
 	id := c.Param("id")
 
 	var portal models.Portal
-	result := h.DB.Where("id = ?", id).First(&portal)
+	result := h.DB.Preload("Interventions", func(db *gorm.DB) *gorm.DB {
+		return db.Order("date DESC").Limit(5)
+	}).Preload("Interventions.Controls").Where("id = ?", id).First(&portal)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
 			return echo.NewHTTPError(http.StatusNotFound, "Portal not found")
