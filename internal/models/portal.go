@@ -9,6 +9,7 @@ import (
 type Portal struct {
 	ID                uint           `json:"id" gorm:"primaryKey"`
 	UUID              string         `json:"uuid" gorm:"type:uuid;unique;not null"`
+	InternalId        string         `json:"internal_id" gorm:"type:string;unique"`
 	Name              string         `json:"name" gorm:"not null"`
 	AddressStreet     string         `json:"address_street" gorm:"not null"`
 	AddressZipcode    string         `json:"address_zipcode" gorm:"size:10;not null"`

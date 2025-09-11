@@ -122,7 +122,7 @@ func PortalShow(portal models.Portal, context echo.Context) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</dd></div></dl></div><div><h3 class=\"text-lg font-medium text-gray-900 mb-4\">Contact maintenance</h3><dl class=\"space-y-3\"><div><dt class=\"text-sm font-medium text-gray-500\">Entreprise</dt><dd class=\"text-sm text-gray-900\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</dd></div></dl></div><div><h3 class=\"text-lg font-medium text-gray-900 mb-4\">Contact maintenance</h3><dl class=\"space-y-3\"><div><dt class=\"text-sm font-medium text-gray-500\">Syndic</dt><dd class=\"text-sm text-gray-900\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -135,7 +135,7 @@ func PortalShow(portal models.Portal, context echo.Context) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</dd></div><div><dt class=\"text-sm font-medium text-gray-500\">Téléphone</dt><dd class=\"text-sm text-gray-900\"><a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</dd></div><div><dt class=\"text-sm font-medium text-gray-500\">Téléphone astreinte</dt><dd class=\"text-sm text-gray-900\"><a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -161,43 +161,20 @@ func PortalShow(portal models.Portal, context echo.Context) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</a></dd></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</a></dd></div><div><dt class=\"text-sm font-medium text-gray-500\">Numéro de contrat</dt><dd class=\"text-sm text-gray-900\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if portal.ContactEmail != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div><dt class=\"text-sm font-medium text-gray-500\">Email</dt><dd class=\"text-sm text-gray-900\"><a href=\"")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var12 templ.SafeURL
-				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinURLErrs("mailto:" + portal.ContactEmail)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/portal_show.templ`, Line: 59, Col: 51}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" class=\"text-blue-600 hover:text-blue-800\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var13 string
-				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(portal.ContactEmail)
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/portal_show.templ`, Line: 60, Col: 32}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</a></dd></div>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
+			var templ_7745c5c3_Var12 string
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(portal.InternalId)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/portal_show.templ`, Line: 57, Col: 61}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</dl></div></div><div class=\"mt-8 pt-6 border-t border-gray-200\"><div class=\"flex justify-between items-center\"><h3 class=\"text-lg font-medium text-gray-900\">Interventions récentes</h3><button class=\"bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm\">Demander une intervention</button></div><div class=\"mt-4 text-center py-8 text-gray-500\"><p>Aucune intervention enregistrée</p></div></div></div></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</dd></div></dl></div></div><div class=\"mt-8 pt-6 border-t border-gray-200\"><div class=\"flex justify-between items-center\"><h3 class=\"text-lg font-medium text-gray-900\">Interventions récentes</h3></div><div class=\"mt-4 text-center py-8 text-gray-500\"><p>Aucune intervention enregistrée</p></div></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
