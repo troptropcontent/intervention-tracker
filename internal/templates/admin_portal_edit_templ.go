@@ -151,7 +151,7 @@ func AdminPortalEdit(portal models.Portal, context echo.Context) templ.Component
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500\" required></div></div></div></div></div><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6\"><div><h3 class=\"text-lg font-medium text-gray-900 mb-4\">Entrepreneur</h3><div><label for=\"contractor_company\" class=\"block text-sm font-medium text-gray-700 mb-1\">Société</label> <input type=\"text\" id=\"contractor_company\" name=\"contractor_company\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500\" required></div></div></div></div></div><div class=\"grid grid-cols-1 md:grid-cols-2 gap-6\"><div><h3 class=\"text-lg font-medium text-gray-900 mb-4\">Syndic</h3><div><label for=\"contractor_company\" class=\"block text-sm font-medium text-gray-700 mb-1\">Nom</label> <input type=\"text\" id=\"contractor_company\" name=\"contractor_company\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -164,40 +164,40 @@ func AdminPortalEdit(portal models.Portal, context echo.Context) templ.Component
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500\" required></div></div><div><h3 class=\"text-lg font-medium text-gray-900 mb-4\">Contact</h3><div class=\"space-y-4\"><div><label for=\"contact_phone\" class=\"block text-sm font-medium text-gray-700 mb-1\">Téléphone</label> <input type=\"tel\" id=\"contact_phone\" name=\"contact_phone\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500\" required></div><div><label for=\"contact_phone\" class=\"block text-sm font-medium text-gray-700 mb-1\">Téléphone Astreinte</label> <input type=\"tel\" id=\"contact_phone\" name=\"contact_phone\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(portal.ContactPhone)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal_edit.templ`, Line: 117, Col: 37}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal_edit.templ`, Line: 112, Col: 37}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500\" required></div><div><label for=\"contact_email\" class=\"block text-sm font-medium text-gray-700 mb-1\">Email</label> <input type=\"email\" id=\"contact_email\" name=\"contact_email\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500\" required></div><div><label for=\"contact_phone\" class=\"block text-sm font-medium text-gray-700 mb-1\">Numéro de contrat</label> <input id=\"internal_id\" name=\"internal_id\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var13 string
-			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(portal.ContactEmail)
+			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(portal.InternalId)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal_edit.templ`, Line: 128, Col: 37}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal_edit.templ`, Line: 122, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500\"></div></div></div></div><div class=\"flex justify-end space-x-4 pt-6 border-t border-gray-200\"><a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" class=\"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500\" required></div></div></div><div class=\"flex justify-end space-x-4 pt-6 border-t border-gray-200\"><a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var14 templ.SafeURL
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID))))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal_edit.templ`, Line: 137, Col: 75}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/admin_portal_edit.templ`, Line: 131, Col: 75}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
