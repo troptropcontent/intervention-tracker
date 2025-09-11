@@ -62,6 +62,8 @@ else
     print_warning "GIT_EMAIL and/or GIT_NAME environment variables not set - skipping git configuration"
 fi
 
+sudo chown -R $(whoami):$(whoami) /go/pkg
+
 echo
 echo -e "${GREEN}╔════════════════════════════════════════╗${NC}"
 echo -e "${GREEN}║        Setup Complete! 🎉              ║${NC}"
