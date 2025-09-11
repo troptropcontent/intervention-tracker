@@ -8,6 +8,7 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services"
 	"github.com/troptropcontent/qr_code_maintenance/internal/templates"
+	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 )
 
 // PDFService handles PDF generation for interventions
@@ -30,8 +31,27 @@ func (s *PDFService) GenerateReportPDF(intervention *models.Intervention) (*os.F
 		return nil, fmt.Errorf("failed to render intervention HTML: %w", err)
 	}
 
+	cssPath, err := utils.GetStaticFilePath("css/output.css")
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve CSS file path: %w", err)
+	}
+	
+	css_bytes, err := os.ReadFile(cssPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read CSS file: %w", err)
+	}
+
+	var files []services.ConvertHtmlToPdfFiles
+	files = append(files, services.ConvertHtmlToPdfFiles{
+		Name:         "index.html",
+		ContentBytes: []byte(html_string),
+	}, services.ConvertHtmlToPdfFiles{
+		Name:         "output.css",
+		ContentBytes: css_bytes,
+	})
+
 	// Generate PDF using Gotenberg service
-	tempFile, err := s.gotenbergService.ConvertHTMLToPDF(html_string, "intervention_report")
+	tempFile, err := s.gotenbergService.ConvertHTMLToPDF(files, "intervention_report")
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate PDF: %w", err)
 	}
@@ -44,7 +64,7 @@ func (s *PDFService) renderInterventionHTML(intervention *models.Intervention) (
 	var buf []byte
 	htmlBuffer := &htmlWriter{buf: buf}
 
-	if err := templates.InterventionReport(intervention).Render(context.Background(), htmlBuffer); err != nil {
+	if err := templates.InterventionReport(templates.InterventionReportConfig{Intervention: intervention, StylesheetPath: "output.css"}).Render(context.Background(), htmlBuffer); err != nil {
 		return "", fmt.Errorf("failed to render template: %w", err)
 	}
 
