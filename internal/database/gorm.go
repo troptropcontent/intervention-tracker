@@ -61,6 +61,14 @@ func ConnectGORM() (*gorm.DB, error) {
 	return db, nil
 }
 
+func MustConnectGORM() *gorm.DB {
+	db, err := ConnectGORM()
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	return db
+}
+
 func AutoMigrate(db *gorm.DB) error {
 	log.Println("Running auto migrations...")
 
