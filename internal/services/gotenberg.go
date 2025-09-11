@@ -26,8 +26,13 @@ func NewGotenbergService(baseURL string) *GotenbergService {
 	}
 }
 
+type ConvertHtmlToPdfFiles struct {
+	Name         string
+	ContentBytes []byte
+}
+
 // ConvertHTMLToPDF converts HTML string to PDF and returns a temporary file
-func (s *GotenbergService) ConvertHTMLToPDF(htmlContent, filenamePrefix string) (*os.File, error) {
+func (s *GotenbergService) ConvertHTMLToPDF(files []ConvertHtmlToPdfFiles, filenamePrefix string) (*os.File, error) {
 	// Create temporary file for PDF
 	tempFile, err := os.CreateTemp("", fmt.Sprintf("%s_*.pdf", filenamePrefix))
 	if err != nil {
@@ -35,7 +40,7 @@ func (s *GotenbergService) ConvertHTMLToPDF(htmlContent, filenamePrefix string) 
 	}
 
 	// Convert HTML to PDF
-	if err := s.convertHTML(htmlContent, tempFile); err != nil {
+	if err := s.convertHTML(files, tempFile); err != nil {
 		tempFile.Close()
 		os.Remove(tempFile.Name())
 		return nil, fmt.Errorf("failed to convert HTML to PDF: %w", err)
@@ -52,18 +57,15 @@ func (s *GotenbergService) ConvertHTMLToPDF(htmlContent, filenamePrefix string) 
 }
 
 // convertHTML sends HTML to Gotenberg and writes PDF response to writer
-func (s *GotenbergService) convertHTML(htmlContent string, writer io.Writer) error {
+func (s *GotenbergService) convertHTML(files []ConvertHtmlToPdfFiles, writer io.Writer) error {
 	// Create multipart form
 	var body bytes.Buffer
 	w := multipart.NewWriter(&body)
 
-	// Add HTML file
-	htmlPart, err := w.CreateFormFile("files", "index.html")
+	// Add files form data
+	err := s.writeFilesFormData(files, w)
 	if err != nil {
-		return fmt.Errorf("failed to create form file: %w", err)
-	}
-	if _, err := htmlPart.Write([]byte(htmlContent)); err != nil {
-		return fmt.Errorf("failed to write HTML content: %w", err)
+		return fmt.Errorf("failed to add files form data: %w", err)
 	}
 
 	// Set PDF options (A4, margins, print background)
@@ -110,5 +112,18 @@ func (s *GotenbergService) convertHTML(htmlContent string, writer io.Writer) err
 		return fmt.Errorf("failed to copy PDF response: %w", err)
 	}
 
+	return nil
+}
+
+func (s *GotenbergService) writeFilesFormData(files []ConvertHtmlToPdfFiles, writer *multipart.Writer) error {
+	for _, file := range files {
+		htmlPart, err := writer.CreateFormFile("files", file.Name)
+		if err != nil {
+			return fmt.Errorf("failed to create form file: %w", err)
+		}
+		if _, err := htmlPart.Write(file.ContentBytes); err != nil {
+			return fmt.Errorf("failed to write HTML content: %w", err)
+		}
+	}
 	return nil
 }
