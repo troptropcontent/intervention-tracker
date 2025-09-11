@@ -2,13 +2,17 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/troptropcontent/qr_code_maintenance/internal/config"
 	"github.com/troptropcontent/qr_code_maintenance/internal/middleware"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/interventions"
 	"github.com/troptropcontent/qr_code_maintenance/internal/templates"
 	"gorm.io/gorm"
 )
@@ -422,6 +426,15 @@ func (h *Handlers) PostIntervention(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to save intervention")
 	}
 
+	// Send email notification (don't fail the request if this fails)
+	go func() {
+		var reloadedIntervention models.Intervention
+		h.DB.Preload("User").Preload("Portal").Preload("Controls").First(&reloadedIntervention, intervention.ID)
+		if err := h.sendInterventionNotification(&reloadedIntervention, &portal, user); err != nil {
+			log.Printf("Failed to send intervention notification: %v", err)
+		}
+	}()
+
 	// Redirect to portal admin page
 	return c.Redirect(http.StatusSeeOther, "/admin/portals/"+id)
 }
@@ -439,4 +452,36 @@ func (h *Handlers) GetInterventionReport(c echo.Context) error {
 	}
 
 	return templates.InterventionReport(templates.InterventionReportConfig{Intervention: &intervention}).Render(c.Request().Context(), c.Response().Writer)
+}
+
+// sendInterventionNotification sends an email notification with PDF report
+func (h *Handlers) sendInterventionNotification(intervention *models.Intervention, portal *models.Portal, user *models.User) error {
+	// Initialize email configuration
+	emailConfig, err := config.GetEmailConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get email config: %w", err)
+	}
+
+	// Initialize Gmail service
+	gmailService, err := email.NewGmailService(email.GmailConfig{
+		CredentialsPath: emailConfig.Gmail.CredentialsPath,
+		TokenPath:       emailConfig.Gmail.TokenPath,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to initialize Gmail service: %w", err)
+	}
+
+	// Initialize PDF service
+	gotenbergURL := "http://gotemberg:3000" // From docker-compose.yml
+	pdfService := interventions.NewPDFService(gotenbergURL)
+
+	// Initialize notification service
+	notificationService := interventions.NewNotificationService(pdfService, gmailService)
+
+	// Set the related entities on the intervention for the notification
+	intervention.Portal = *portal
+	intervention.User = *user
+
+	// Send notification
+	return notificationService.SendInterventionReport(intervention)
 }
