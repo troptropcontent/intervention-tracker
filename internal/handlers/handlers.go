@@ -438,5 +438,5 @@ func (h *Handlers) GetInterventionReport(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
 	}
 
-	return templates.InterventionReport(&intervention).Render(c.Request().Context(), c.Response().Writer)
+	return templates.InterventionReport(templates.InterventionReportConfig{Intervention: &intervention}).Render(c.Request().Context(), c.Response().Writer)
 }

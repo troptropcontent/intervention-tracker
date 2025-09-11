@@ -5,14 +5,23 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 )
 
-templ InterventionReport(intervention *models.Intervention) {
+type InterventionReportConfig struct  {
+	Intervention *models.Intervention
+	StylesheetPath string
+}
+
+templ InterventionReport(config InterventionReportConfig) {
 	<!DOCTYPE html>
 	<html lang="fr">
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>Rapport d'Intervention - { intervention.Portal.Name }</title>
-		<link rel="stylesheet" href="/static/css/output.css"/>
+		<title>Rapport d'Intervention - { config.Intervention.Portal.Name }</title>
+		if config.StylesheetPath != "" {
+			<link rel="stylesheet" href={ config.StylesheetPath }/>
+		} else {
+			<link rel="stylesheet" href="/static/css/output.css"/>
+		}
 		<style>
 			@media print {
 				body { print-color-adjust: exact; }
@@ -51,7 +60,7 @@ templ InterventionReport(intervention *models.Intervention) {
 			<div class="content">
 				<div class="text-center mb-8 pb-6 border-b-2 border-blue-600 break-after-avoid">
 					<h1 class="text-2xl font-bold text-blue-600 mb-2">Rapport d'Intervention</h1>
-					<p class="text-gray-600">Portail: { intervention.Portal.Name }</p>
+					<p class="text-gray-600">Portail: { config.Intervention.Portal.Name }</p>
 				</div>
 
 				<div class="mb-8 break-inside-avoid">
@@ -59,31 +68,31 @@ templ InterventionReport(intervention *models.Intervention) {
 					<div class="grid grid-cols-2 gap-6">
 						<div>
 							<div class="text-xs font-bold text-gray-500 uppercase tracking-wide">Date d'intervention</div>
-							<div class="text-sm text-gray-900 mt-1">{ intervention.Date.Format("02/01/2006") }</div>
+							<div class="text-sm text-gray-900 mt-1">{ config.Intervention.Date.Format("02/01/2006") }</div>
 						</div>
 						<div>
 							<div class="text-xs font-bold text-gray-500 uppercase tracking-wide">Intervenant</div>
-							<div class="text-sm text-gray-900 mt-1">{ intervention.UserName }</div>
+							<div class="text-sm text-gray-900 mt-1">{ config.Intervention.UserName }</div>
 						</div>
 						<div>
 							<div class="text-xs font-bold text-gray-500 uppercase tracking-wide">Adresse</div>
 							<div class="text-sm text-gray-900 mt-1">
-								{ intervention.Portal.AddressStreet }<br/>
-								{ intervention.Portal.AddressZipcode } { intervention.Portal.AddressCity }
+								{ config.Intervention.Portal.AddressStreet }<br/>
+								{ config.Intervention.Portal.AddressZipcode } { config.Intervention.Portal.AddressCity }
 							</div>
 						</div>
 						<div>
 							<div class="text-xs font-bold text-gray-500 uppercase tracking-wide">Entreprise</div>
-							<div class="text-sm text-gray-900 mt-1">{ intervention.Portal.ContractorCompany }</div>
+							<div class="text-sm text-gray-900 mt-1">{ config.Intervention.Portal.ContractorCompany }</div>
 						</div>
 					</div>
 				</div>
 
-				if intervention.Summary != nil && *intervention.Summary != "" {
+				if config.Intervention.Summary != nil && *config.Intervention.Summary != "" {
 					<div class="mb-8 break-inside-avoid">
 						<h2 class="text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-200">Résumé de l'intervention</h2>
 						<div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-							<p class="text-sm text-gray-800">{ *intervention.Summary }</p>
+							<p class="text-sm text-gray-800">{ *config.Intervention.Summary }</p>
 						</div>
 					</div>
 				}
@@ -109,12 +118,12 @@ templ InterventionReport(intervention *models.Intervention) {
 									<tr>
 										<td class="border border-gray-300 px-2 py-1">{ GetControlTypeLabel(securityControl) }</td>
 										<td class="border border-gray-300 px-2 py-1 text-center">
-											{ getControlResult(intervention.Controls, securityControl) }
+											{ getControlResult(config.Intervention.Controls, securityControl) }
 										</td>
 										if i < len(models.ControlTypesByKind[models.ControlKindOther]) {
 											<td class="border border-gray-300 px-2 py-1">{ GetControlTypeLabel(models.ControlTypesByKind[models.ControlKindOther][i]) }</td>
 											<td class="border border-gray-300 px-2 py-1 text-center">
-												{ getControlResult(intervention.Controls, models.ControlTypesByKind[models.ControlKindOther][i]) }
+												{ getControlResult(config.Intervention.Controls, models.ControlTypesByKind[models.ControlKindOther][i]) }
 											</td>
 										} else {
 											<td class="border border-gray-300 px-2 py-1"></td>
@@ -130,7 +139,7 @@ templ InterventionReport(intervention *models.Intervention) {
 											<td class="border border-gray-300 px-2 py-1 text-center"></td>
 											<td class="border border-gray-300 px-2 py-1">{ GetControlTypeLabel(models.ControlTypesByKind[models.ControlKindOther][i]) }</td>
 											<td class="border border-gray-300 px-2 py-1 text-center">
-												{ getControlResult(intervention.Controls, models.ControlTypesByKind[models.ControlKindOther][i]) }
+												{ getControlResult(config.Intervention.Controls, models.ControlTypesByKind[models.ControlKindOther][i]) }
 											</td>
 										</tr>
 									}
@@ -145,8 +154,8 @@ templ InterventionReport(intervention *models.Intervention) {
 			</div>
 
 			<div class="footer mt-12 pt-6 border-t border-gray-200 text-center text-xs text-gray-500 break-before-avoid">
-				Rapport généré le { intervention.CreatedAt.Format("02/01/2006 à 15:04") } - 
-				Référence: #{ strconv.Itoa(int(intervention.ID)) }
+				Rapport généré le { config.Intervention.CreatedAt.Format("02/01/2006 à 15:04") } - 
+				Référence: #{ strconv.Itoa(int(config.Intervention.ID)) }
 			</div>
 		</div>
 	</body>

@@ -13,7 +13,12 @@ import (
 	"strconv"
 )
 
-func InterventionReport(intervention *models.Intervention) templ.Component {
+type InterventionReportConfig struct {
+	Intervention   *models.Intervention
+	StylesheetPath string
+}
+
+func InterventionReport(config InterventionReportConfig) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -39,266 +44,294 @@ func InterventionReport(intervention *models.Intervention) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(intervention.Portal.Name)
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(config.Intervention.Portal.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 14, Col: 60}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 19, Col: 67}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><link rel=\"stylesheet\" href=\"/static/css/output.css\"><style>\n\t\t\t@media print {\n\t\t\t\tbody { print-color-adjust: exact; }\n\t\t\t\t.footer {\n\t\t\t\t\tposition: fixed;\n\t\t\t\t\tbottom: 0;\n\t\t\t\t\tleft: 0;\n\t\t\t\t\tright: 0;\n\t\t\t\t\tbackground: white;\n\t\t\t\t\tpadding: 1rem 2rem;\n\t\t\t\t}\n\t\t\t\t.content {\n\t\t\t\t\tpadding-bottom: 4rem;\n\t\t\t\t}\n\t\t\t}\n\t\t\t@media screen {\n\t\t\t\thtml, body {\n\t\t\t\t\theight: 100%;\n\t\t\t\t}\n\t\t\t\t.page-container {\n\t\t\t\t\tmin-height: 100vh;\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\tflex-direction: column;\n\t\t\t\t}\n\t\t\t\t.content {\n\t\t\t\t\tflex: 1;\n\t\t\t\t}\n\t\t\t\t.footer {\n\t\t\t\t\tmargin-top: auto;\n\t\t\t\t}\n\t\t\t}\n\t\t</style></head><body class=\"font-sans text-gray-800 bg-white p-8 max-w-4xl mx-auto\"><div class=\"page-container\"><div class=\"content\"><div class=\"text-center mb-8 pb-6 border-b-2 border-blue-600 break-after-avoid\"><h1 class=\"text-2xl font-bold text-blue-600 mb-2\">Rapport d'Intervention</h1><p class=\"text-gray-600\">Portail: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(intervention.Portal.Name)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 54, Col: 65}
+		if config.StylesheetPath != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<link rel=\"stylesheet\" href=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 templ.SafeURL
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(config.StylesheetPath)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 21, Col: 54}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<link rel=\"stylesheet\" href=\"/static/css/output.css\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p></div><div class=\"mb-8 break-inside-avoid\"><h2 class=\"text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-200\">Informations générales</h2><div class=\"grid grid-cols-2 gap-6\"><div><div class=\"text-xs font-bold text-gray-500 uppercase tracking-wide\">Date d'intervention</div><div class=\"text-sm text-gray-900 mt-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<style>\n\t\t\t@media print {\n\t\t\t\tbody { print-color-adjust: exact; }\n\t\t\t\t.footer {\n\t\t\t\t\tposition: fixed;\n\t\t\t\t\tbottom: 0;\n\t\t\t\t\tleft: 0;\n\t\t\t\t\tright: 0;\n\t\t\t\t\tbackground: white;\n\t\t\t\t\tpadding: 1rem 2rem;\n\t\t\t\t}\n\t\t\t\t.content {\n\t\t\t\t\tpadding-bottom: 4rem;\n\t\t\t\t}\n\t\t\t}\n\t\t\t@media screen {\n\t\t\t\thtml, body {\n\t\t\t\t\theight: 100%;\n\t\t\t\t}\n\t\t\t\t.page-container {\n\t\t\t\t\tmin-height: 100vh;\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\tflex-direction: column;\n\t\t\t\t}\n\t\t\t\t.content {\n\t\t\t\t\tflex: 1;\n\t\t\t\t}\n\t\t\t\t.footer {\n\t\t\t\t\tmargin-top: auto;\n\t\t\t\t}\n\t\t\t}\n\t\t</style></head><body class=\"font-sans text-gray-800 bg-white p-8 max-w-4xl mx-auto\"><div class=\"page-container\"><div class=\"content\"><div class=\"text-center mb-8 pb-6 border-b-2 border-blue-600 break-after-avoid\"><h1 class=\"text-2xl font-bold text-blue-600 mb-2\">Rapport d'Intervention</h1><p class=\"text-gray-600\">Portail: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(intervention.Date.Format("02/01/2006"))
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(config.Intervention.Portal.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 62, Col: 87}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 63, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div></div><div><div class=\"text-xs font-bold text-gray-500 uppercase tracking-wide\">Intervenant</div><div class=\"text-sm text-gray-900 mt-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</p></div><div class=\"mb-8 break-inside-avoid\"><h2 class=\"text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-200\">Informations générales</h2><div class=\"grid grid-cols-2 gap-6\"><div><div class=\"text-xs font-bold text-gray-500 uppercase tracking-wide\">Date d'intervention</div><div class=\"text-sm text-gray-900 mt-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(intervention.UserName)
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(config.Intervention.Date.Format("02/01/2006"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 66, Col: 70}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 71, Col: 94}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></div><div><div class=\"text-xs font-bold text-gray-500 uppercase tracking-wide\">Adresse</div><div class=\"text-sm text-gray-900 mt-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></div><div><div class=\"text-xs font-bold text-gray-500 uppercase tracking-wide\">Intervenant</div><div class=\"text-sm text-gray-900 mt-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(intervention.Portal.AddressStreet)
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(config.Intervention.UserName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 71, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 75, Col: 77}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<br>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div><div><div class=\"text-xs font-bold text-gray-500 uppercase tracking-wide\">Adresse</div><div class=\"text-sm text-gray-900 mt-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(intervention.Portal.AddressZipcode)
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(config.Intervention.Portal.AddressStreet)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 72, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 80, Col: 50}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, " ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<br>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(intervention.Portal.AddressCity)
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(config.Intervention.Portal.AddressZipcode)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 72, Col: 80}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 81, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></div><div><div class=\"text-xs font-bold text-gray-500 uppercase tracking-wide\">Entreprise</div><div class=\"text-sm text-gray-900 mt-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, " ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var9 string
-		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(intervention.Portal.ContractorCompany)
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(config.Intervention.Portal.AddressCity)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 77, Col: 86}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 81, Col: 94}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div></div><div><div class=\"text-xs font-bold text-gray-500 uppercase tracking-wide\">Entreprise</div><div class=\"text-sm text-gray-900 mt-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if intervention.Summary != nil && *intervention.Summary != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"mb-8 break-inside-avoid\"><h2 class=\"text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-200\">Résumé de l'intervention</h2><div class=\"bg-gray-50 border border-gray-200 rounded-lg p-4\"><p class=\"text-sm text-gray-800\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var10 string
-			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(*intervention.Summary)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 86, Col: 63}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</p></div></div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
+		var templ_7745c5c3_Var10 string
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(config.Intervention.Portal.ContractorCompany)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 86, Col: 93}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"mb-8 break-inside-avoid\"><h2 class=\"text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-200\">Tableau des contrôles</h2><div class=\"overflow-x-auto\"><table class=\"w-full border-collapse border border-gray-300 text-xs\"><thead><tr class=\"bg-gray-100\"><th class=\"border border-gray-300 px-2 py-2 text-left font-bold\" colspan=\"2\">Sécurité</th><th class=\"border border-gray-300 px-2 py-2 text-left font-bold\" colspan=\"2\">Autres</th></tr><tr class=\"bg-gray-50\"><th class=\"border border-gray-300 px-2 py-1 text-left font-medium\">Contrôle</th><th class=\"border border-gray-300 px-2 py-1 text-center font-medium w-20\">Résultat</th><th class=\"border border-gray-300 px-2 py-1 text-left font-medium\">Contrôle</th><th class=\"border border-gray-300 px-2 py-1 text-center font-medium w-20\">Résultat</th></tr></thead> <tbody>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for i, securityControl := range models.ControlTypesByKind[models.ControlKindSecurity] {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<tr><td class=\"border border-gray-300 px-2 py-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div></div></div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if config.Intervention.Summary != nil && *config.Intervention.Summary != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"mb-8 break-inside-avoid\"><h2 class=\"text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-200\">Résumé de l'intervention</h2><div class=\"bg-gray-50 border border-gray-200 rounded-lg p-4\"><p class=\"text-sm text-gray-800\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var11 string
-			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(GetControlTypeLabel(securityControl))
+			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(*config.Intervention.Summary)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 110, Col: 93}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 95, Col: 70}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</td><td class=\"border border-gray-300 px-2 py-1 text-center\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</p></div></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"mb-8 break-inside-avoid\"><h2 class=\"text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-200\">Tableau des contrôles</h2><div class=\"overflow-x-auto\"><table class=\"w-full border-collapse border border-gray-300 text-xs\"><thead><tr class=\"bg-gray-100\"><th class=\"border border-gray-300 px-2 py-2 text-left font-bold\" colspan=\"2\">Sécurité</th><th class=\"border border-gray-300 px-2 py-2 text-left font-bold\" colspan=\"2\">Autres</th></tr><tr class=\"bg-gray-50\"><th class=\"border border-gray-300 px-2 py-1 text-left font-medium\">Contrôle</th><th class=\"border border-gray-300 px-2 py-1 text-center font-medium w-20\">Résultat</th><th class=\"border border-gray-300 px-2 py-1 text-left font-medium\">Contrôle</th><th class=\"border border-gray-300 px-2 py-1 text-center font-medium w-20\">Résultat</th></tr></thead> <tbody>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for i, securityControl := range models.ControlTypesByKind[models.ControlKindSecurity] {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<tr><td class=\"border border-gray-300 px-2 py-1\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var12 string
-			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(getControlResult(intervention.Controls, securityControl))
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(GetControlTypeLabel(securityControl))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 112, Col: 69}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 119, Col: 93}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</td><td class=\"border border-gray-300 px-2 py-1 text-center\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var13 string
+			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(getControlResult(config.Intervention.Controls, securityControl))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 121, Col: 76}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if i < len(models.ControlTypesByKind[models.ControlKindOther]) {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<td class=\"border border-gray-300 px-2 py-1\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var13 string
-				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(GetControlTypeLabel(models.ControlTypesByKind[models.ControlKindOther][i]))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 115, Col: 132}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</td><td class=\"border border-gray-300 px-2 py-1 text-center\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<td class=\"border border-gray-300 px-2 py-1\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var14 string
-				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(getControlResult(intervention.Controls, models.ControlTypesByKind[models.ControlKindOther][i]))
+				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(GetControlTypeLabel(models.ControlTypesByKind[models.ControlKindOther][i]))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 117, Col: 108}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 124, Col: 132}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</td>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</td><td class=\"border border-gray-300 px-2 py-1 text-center\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var15 string
+				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(getControlResult(config.Intervention.Controls, models.ControlTypesByKind[models.ControlKindOther][i]))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 126, Col: 115}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</td>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<td class=\"border border-gray-300 px-2 py-1\"></td><td class=\"border border-gray-300 px-2 py-1 text-center\"></td>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<td class=\"border border-gray-300 px-2 py-1\"></td><td class=\"border border-gray-300 px-2 py-1 text-center\"></td>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</tr>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
 		if len(models.ControlTypesByKind[models.ControlKindOther]) > len(models.ControlTypesByKind[models.ControlKindSecurity]) {
 			for i := len(models.ControlTypesByKind[models.ControlKindSecurity]); i < len(models.ControlTypesByKind[models.ControlKindOther]); i++ {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<tr><td class=\"border border-gray-300 px-2 py-1\"></td><td class=\"border border-gray-300 px-2 py-1 text-center\"></td><td class=\"border border-gray-300 px-2 py-1\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var15 string
-				templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(GetControlTypeLabel(models.ControlTypesByKind[models.ControlKindOther][i]))
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 131, Col: 132}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</td><td class=\"border border-gray-300 px-2 py-1 text-center\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<tr><td class=\"border border-gray-300 px-2 py-1\"></td><td class=\"border border-gray-300 px-2 py-1 text-center\"></td><td class=\"border border-gray-300 px-2 py-1\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var16 string
-				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(getControlResult(intervention.Controls, models.ControlTypesByKind[models.ControlKindOther][i]))
+				templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(GetControlTypeLabel(models.ControlTypesByKind[models.ControlKindOther][i]))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 133, Col: 108}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 140, Col: 132}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</td><td class=\"border border-gray-300 px-2 py-1 text-center\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var17 string
+				templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(getControlResult(config.Intervention.Controls, models.ControlTypesByKind[models.ControlKindOther][i]))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 142, Col: 115}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</tbody></table></div><div class=\"mt-2 text-xs text-gray-600\"><strong>Légende:</strong> OK = Conforme, D = Défaillant, NC = Non Contrôlé</div></div></div><div class=\"footer mt-12 pt-6 border-t border-gray-200 text-center text-xs text-gray-500 break-before-avoid\">Rapport généré le ")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var17 string
-		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(intervention.CreatedAt.Format("02/01/2006 à 15:04"))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 148, Col: 79}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, " -  Référence: #")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</tbody></table></div><div class=\"mt-2 text-xs text-gray-600\"><strong>Légende:</strong> OK = Conforme, D = Défaillant, NC = Non Contrôlé</div></div></div><div class=\"footer mt-12 pt-6 border-t border-gray-200 text-center text-xs text-gray-500 break-before-avoid\">Rapport généré le ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var18 string
-		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(int(intervention.ID)))
+		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(config.Intervention.CreatedAt.Format("02/01/2006 à 15:04"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 149, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 157, Col: 86}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, " -  Référence: #")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var19 string
+		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(int(config.Intervention.ID)))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/intervention_pdf.templ`, Line: 158, Col: 61}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
