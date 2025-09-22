@@ -14,6 +14,10 @@ importers:
       tailwindcss:
         specifier: ^4.1.11
         version: 4.1.11
+    devDependencies:
+      daisyui:
+        specifier: ^5.1.13
+        version: 5.1.13
 
 packages:
 
@@ -216,6 +220,9 @@ packages:
   chownr@3.0.0:
     resolution: {integrity: sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==}
     engines: {node: '>=18'}
+
+  daisyui@5.1.13:
+    resolution: {integrity: sha512-KWPF/4R+EHTJRqKZFNmSDPfAZ5xeS6YWB/2kS7Y6wGKg+atscUi2DOp6HoDD/OgGML0PJTtTpgwpTfeHVfjk7w==}
 
   detect-libc@1.0.3:
     resolution: {integrity: sha512-pGjwhsmsp4kL2RTz08wcOlGN83otlqHeD/Z5T8GXZB+/YcpQ/dgo+lbU8ZsGxV0HIvqqxo9l7mqYwyYMD9bKDg==}
@@ -538,6 +545,8 @@ snapshots:
       fill-range: 7.1.1
 
   chownr@3.0.0: {}
+
+  daisyui@5.1.13: {}
 
   detect-libc@1.0.3: {}
 

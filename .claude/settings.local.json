@@ -4,7 +4,9 @@
       "Bash(find:*)",
       "Bash(ls:*)",
       "Bash(git config:*)",
-      "Bash(timeout 5s gofmt:*)"
+      "Bash(timeout 5s gofmt:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs"
     ],
     "deny": []
   }
