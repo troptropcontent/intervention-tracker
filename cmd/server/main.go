@@ -21,7 +21,7 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	emailService, err := email.NewSMTPServiceGmail()
+	emailService, err := email.NewSMTPServiceFromEnv(&email.NewSMTPServiceFromEnvOptions{})
 	if err != nil {
 		log.Fatalf("failed to instanciate email service: %v", err)
 	}
