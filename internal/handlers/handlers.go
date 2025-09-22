@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/troptropcontent/qr_code_maintenance/internal/config"
 	"github.com/troptropcontent/qr_code_maintenance/internal/middleware"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
@@ -18,7 +17,8 @@ import (
 )
 
 type Handlers struct {
-	DB *gorm.DB
+	DB                       *gorm.DB
+	EmailNotificationService email.EmailService
 }
 
 func (h *Handlers) GetPortal(c echo.Context) error {
@@ -458,27 +458,12 @@ func (h *Handlers) GetInterventionReport(c echo.Context) error {
 
 // sendInterventionNotification sends an email notification with PDF report
 func (h *Handlers) sendInterventionNotification(intervention *models.Intervention, portal *models.Portal, user *models.User) error {
-	// Initialize email configuration
-	emailConfig, err := config.GetEmailConfig()
-	if err != nil {
-		return fmt.Errorf("failed to get email config: %w", err)
-	}
-
-	// Initialize Gmail service
-	gmailService, err := email.NewGmailService(email.GmailConfig{
-		CredentialsPath: emailConfig.Gmail.CredentialsPath,
-		TokenPath:       emailConfig.Gmail.TokenPath,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to initialize Gmail service: %w", err)
-	}
-
 	// Initialize PDF service
 	gotenbergURL := "http://gotemberg:3000" // From docker-compose.yml
 	pdfService := interventions.NewPDFService(gotenbergURL)
 
 	// Initialize notification service
-	notificationService := interventions.NewNotificationService(pdfService, gmailService)
+	notificationService := interventions.NewNotificationService(pdfService, h.EmailNotificationService)
 
 	// Set the related entities on the intervention for the notification
 	intervention.Portal = *portal

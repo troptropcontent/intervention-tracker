@@ -86,3 +86,16 @@ func AutoMigrate(db *gorm.DB) error {
 	log.Println("Migrations completed successfully")
 	return nil
 }
+
+func InitializeDatabase() (*gorm.DB, error) {
+	db, err := ConnectGORM()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := AutoMigrate(db); err != nil {
+		return nil, err
+	}
+
+	return db, nil
+}

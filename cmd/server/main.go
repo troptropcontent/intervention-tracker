@@ -10,30 +10,23 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/database"
 	"github.com/troptropcontent/qr_code_maintenance/internal/handlers"
 	authmiddleware "github.com/troptropcontent/qr_code_maintenance/internal/middleware"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
 	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 )
 
 func main() {
 	// Connect to database with GORM
-	db, err := database.ConnectGORM()
+	db, err := database.InitializeDatabase()
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	// Run auto migrations
-	if err := database.AutoMigrate(db); err != nil {
-		log.Fatalf("Failed to run migrations: %v", err)
-	}
-
-	// Get underlying sql.DB for connection management
-	sqlDB, err := db.DB()
+	emailService, err := email.NewSMTPServiceGmail()
 	if err != nil {
-		log.Fatalf("Failed to get underlying sql.DB: %v", err)
+		log.Fatalf("failed to instanciate email service: %v", err)
 	}
-	defer sqlDB.Close()
-
 	// Initialize handlers
-	h := &handlers.Handlers{DB: db}
+	h := &handlers.Handlers{DB: db, EmailNotificationService: emailService}
 
 	e := echo.New()
 
