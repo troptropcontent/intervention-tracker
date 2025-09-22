@@ -11,5 +11,5 @@ type EmailService interface {
 	//   - body: email content (can be plain text or HTML)
 	//   - attachment: file path to attachment; if empty, sends email without attachment
 	// Returns an error if the email fails to send.
-	Send(to, subject, body, attachment string) error
+	Send(to []string, subject string, body string, attachments []string) error
 }

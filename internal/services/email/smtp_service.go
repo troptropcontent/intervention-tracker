@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -17,6 +16,11 @@ import (
 
 	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 )
+
+const SMTP_USERNAME_ENV_VAR string = "SMTP_USERNAME"
+const SMTP_PASSWORD_ENV_VAR string = "SMTP_PASSWORD"
+const SMTP_HOST_ENV_VAR string = "SMTP_HOST"
+const SMTP_PORT_ENV_VAR string = "SMTP_PORT"
 
 // Credentials represents the Gmail SMTP credentials structure
 type Credentials struct {
@@ -68,104 +72,63 @@ func NewSMTPService(config SMTPConfig) *SMTPService {
 	}
 }
 
-// loadCredentialsFromFile loads SMTP credentials from a JSON file
-func loadCredentialsFromFile(path string) (*Credentials, error) {
-	var fullPath string
-
-	// If path is absolute, use as-is; otherwise, resolve from project root
-	if filepath.IsAbs(path) {
-		fullPath = path
-	} else {
-		fullPath = utils.MustGetPathFromRoot(path)
-	}
-
-	jsonFile, err := os.Open(fullPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open SMTP credentials file at %s: %v", fullPath, err)
-	}
-	defer jsonFile.Close()
-
-	byteValue, err := io.ReadAll(jsonFile)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read SMTP credentials file: %v", err)
-	}
-
-	var creds Credentials
-	if err := json.Unmarshal(byteValue, &creds); err != nil {
-		return nil, fmt.Errorf("failed to parse SMTP credentials: %v", err)
-	}
-
-	// Validate credentials
-	if creds.Username == "" || creds.Password == "" {
-		return nil, fmt.Errorf("credentials file must contain both username and password")
-	}
-
-	return &creds, nil
-}
-
-// loadCredentialsFromEnv loads SMTP credentials from environment variables
-func loadCredentialsFromEnv(usernameVar, passwordVar string) (*Credentials, error) {
-	username := os.Getenv(usernameVar)
-	password := os.Getenv(passwordVar)
-
-	if username == "" {
-		return nil, fmt.Errorf("environment variable %s is not set or empty", usernameVar)
-	}
-	if password == "" {
-		return nil, fmt.Errorf("environment variable %s is not set or empty", passwordVar)
-	}
-
-	return &Credentials{
-		Username: username,
-		Password: password,
-	}, nil
-}
-
-// NewSMTPServiceFromFile creates a new SMTP service by loading credentials from a file
-func NewSMTPServiceFromFile(host, port string, credentialsPath string) (*SMTPService, error) {
-	creds, err := loadCredentialsFromFile(credentialsPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load credentials from file: %v", err)
-	}
-
-	return NewSMTPService(SMTPConfig{
-		Host:     host,
-		Port:     port,
-		Username: creds.Username,
-		Password: creds.Password,
-		From:     creds.Username, // Use username as from address by default
-	}), nil
+type NewSMTPServiceFromEnvOptions struct {
+	HostEnvVar, PortEnvVar, UsernameEnvVar, PasswordEnvVar, FromAddressEnvVar string
 }
 
 // NewSMTPServiceFromEnv creates a new SMTP service by loading credentials from environment variables
-func NewSMTPServiceFromEnv(host, port, usernameVar, passwordVar, fromAddress string) (*SMTPService, error) {
-	creds, err := loadCredentialsFromEnv(usernameVar, passwordVar)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load credentials from environment: %v", err)
+func NewSMTPServiceFromEnv(options *NewSMTPServiceFromEnvOptions) (*SMTPService, error) {
+	usernameEnvVar := SMTP_USERNAME_ENV_VAR
+	if options.UsernameEnvVar != "" {
+		usernameEnvVar = options.UsernameEnvVar
+	}
+	username := utils.GetEnv(usernameEnvVar, "")
+	if username == "" {
+		return nil, fmt.Errorf("environment variable %s is not set or empty", usernameEnvVar)
 	}
 
-	from := fromAddress
-	if from == "" {
-		from = creds.Username // Use username as from address if not specified
+	passwordEnvVar := SMTP_PASSWORD_ENV_VAR
+	if options.PasswordEnvVar != "" {
+		passwordEnvVar = options.PasswordEnvVar
+	}
+	password := utils.GetEnv(passwordEnvVar, "")
+	if password == "" {
+		return nil, fmt.Errorf("environment variable %s is not set or empty", passwordEnvVar)
+	}
+
+	hostEnvVar := SMTP_HOST_ENV_VAR
+	if options.HostEnvVar != "" {
+		hostEnvVar = options.HostEnvVar
+	}
+	host := utils.GetEnv(hostEnvVar, "")
+	if host == "" {
+		return nil, fmt.Errorf("environment variable %s is not set or empty", hostEnvVar)
+	}
+
+	portEnvVar := SMTP_PORT_ENV_VAR
+	if options.PortEnvVar != "" {
+		portEnvVar = options.PortEnvVar
+	}
+	port := utils.GetEnv(portEnvVar, "")
+	if port == "" {
+		return nil, fmt.Errorf("environment variable %s is not set or empty", portEnvVar)
+	}
+
+	fromAddress := ""
+	if options.FromAddressEnvVar != "" {
+		fromAddress = utils.GetEnv(options.FromAddressEnvVar, "")
+	}
+	if fromAddress == "" {
+		fromAddress = username // Use username as from address if not specified
 	}
 
 	return NewSMTPService(SMTPConfig{
 		Host:     host,
 		Port:     port,
-		Username: creds.Username,
-		Password: creds.Password,
-		From:     from,
+		Username: username,
+		Password: password,
+		From:     fromAddress,
 	}), nil
-}
-
-// NewGmailSMTPService creates a new Gmail SMTP service instance by loading credentials from file
-func NewSMTPServiceGmail() (*SMTPService, error) {
-	return NewSMTPServiceFromFile("smtp.gmail.com", "587", "gmail_smtp_credentials.json")
-}
-
-// NewGmailSMTPServiceFromEnv creates a new Gmail SMTP service from environment variables
-func NewGmailSMTPServiceFromEnv() (*SMTPService, error) {
-	return NewSMTPServiceFromEnv("smtp.gmail.com", "587", "GMAIL_USERNAME", "GMAIL_PASSWORD", "")
 }
 
 // validateEmail checks if an email address is valid
@@ -295,42 +258,31 @@ func (s *SMTPService) sendMessage(conn *smtp.Client, msg *EmailMessage) error {
 	return nil
 }
 
-// SendMessage sends an email using the structured EmailMessage type
-func (s *SMTPService) SendMessage(msg *EmailMessage) error {
-	// Validate message
+// Send implements the EmailService interface (backward compatibility)
+func (s *SMTPService) Send(to []string, subject string, body string, attachments []string) error {
+	// Convert legacy parameters to new structure
+	msg := &EmailMessage{
+		To:      to,
+		Subject: subject,
+		Body:    body,
+	}
+
+	for _, attachment := range attachments {
+		msg.Attachments = append(msg.Attachments, Attachment{FilePath: attachment})
+	}
+
 	if err := s.validateMessage(msg); err != nil {
 		return fmt.Errorf("message validation failed: %v", err)
 	}
 
-	// Create connection
 	conn, err := s.createConnection()
 	if err != nil {
 		return err
 	}
 	defer conn.Quit()
 
-	// Send message
-	return s.sendMessage(conn, msg)
-}
-
-// Send implements the EmailService interface (backward compatibility)
-func (s *SMTPService) Send(to, subject, body, attachments string) error {
-	// Convert legacy parameters to new structure
-	msg := &EmailMessage{
-		To:      []string{to},
-		Subject: subject,
-		Body:    body,
-	}
-
-	// Add attachment if provided
-	if attachments != "" {
-		msg.Attachments = []Attachment{
-			{FilePath: attachments},
-		}
-	}
-
 	// Use new SendMessage method
-	return s.SendMessage(msg)
+	return s.sendMessage(conn, msg)
 }
 
 // buildMessageFromStruct creates an email message from EmailMessage struct
