@@ -1,17 +1,15 @@
 package email
 
-// EmailConfig contains all email configuration parameters
-type EmailConfig struct {
-	To             string
-	Subject        string
-	Body           string
-	AttachmentPath string // Optional - empty means no attachment
-}
-
-// EmailService defines the interface for email operations
+// EmailService defines the interface for sending emails with optional attachments.
+// This interface abstracts email sending operations to allow for different implementations
+// (Gmail, SMTP, etc.) while maintaining a consistent API.
 type EmailService interface {
-	// Send sends an email based on the provided configuration
-	// If AttachmentPath is empty, sends a simple text email
-	// If AttachmentPath is provided, sends email with attachment
-	Send(config EmailConfig) error
+	// Send sends an email to the specified recipient with the given subject and body.
+	// Parameters:
+	//   - to: recipient email address
+	//   - subject: email subject line
+	//   - body: email content (can be plain text or HTML)
+	//   - attachment: file path to attachment; if empty, sends email without attachment
+	// Returns an error if the email fails to send.
+	Send(to, subject, body, attachment string) error
 }
