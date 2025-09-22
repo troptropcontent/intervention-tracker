@@ -1,0 +1,20 @@
+package templates
+
+import "time"
+
+templ InputCalendar(label, name, value string, required bool) {
+   <div>
+        <label for={name} class="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+        <input 
+            type="date" 
+            id={name} 
+            name={name} 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            value={time.Now().Format("2006-01-02")}
+            if t, e := time.Parse("2006-01-02", value); e == nil {
+               value={t.Format("2006-01-02")}
+            }
+            required?={ required }
+        />
+    </div>
+}
