@@ -41,7 +41,7 @@ func TestSMTPService_SendMessage_Integration(t *testing.T) {
 			Body:    "This is a test email sent from the SMTP service integration test.",
 		}
 
-		err := service.SendMessage(msg)
+		err := service.Send(msg.To, msg.Subject, msg.Body, []string{})
 		assert.NoError(t, err, "Should be able to send simple email")
 	})
 
@@ -68,7 +68,7 @@ func TestSMTPService_SendMessage_Integration(t *testing.T) {
 			},
 		}
 
-		err = service.SendMessage(msg)
+		err = service.Send(msg.To, msg.Subject, msg.Body, []string{msg.Attachments[0].FilePath})
 		assert.NoError(t, err, "Should be able to send email with attachment")
 	})
 
@@ -84,7 +84,7 @@ func TestSMTPService_SendMessage_Integration(t *testing.T) {
 			Body:    "This is a test email sent to multiple recipients from the SMTP service integration test.",
 		}
 
-		err := service.SendMessage(msg)
+		err := service.Send(msg.To, msg.Subject, msg.Body, []string{})
 		assert.NoError(t, err, "Should be able to send email to multiple recipients")
 	})
 }
@@ -95,51 +95,24 @@ func TestSMTPService_Gmail_Integration(t *testing.T) {
 	}
 
 	t.Run("gmail service from environment", func(t *testing.T) {
-		// Set up Gmail environment variables
-		username := os.Getenv("GMAIL_USERNAME")
-		password := os.Getenv("GMAIL_PASSWORD")
-		
+		// Set up SMTP environment variables
+		username := os.Getenv("SMTP_USERNAME")
+		password := os.Getenv("SMTP_PASSWORD")
+
 		if username == "" || password == "" {
-			t.Skip("Skipping Gmail integration test. Required environment variables not set: GMAIL_USERNAME, GMAIL_PASSWORD")
+			t.Skip("Skipping SMTP integration test. Required environment variables not set: SMTP_USERNAME, SMTP_PASSWORD")
 		}
 
-		service, err := NewGmailSMTPServiceFromEnv()
-		require.NoError(t, err, "Should be able to create Gmail service from environment")
+		service, err := NewSMTPServiceFromEnv(&NewSMTPServiceFromEnvOptions{})
+		require.NoError(t, err, "Should be able to create SMTP service from environment")
 
-		msg := &EmailMessage{
-			To:      []string{username}, // Send to self for testing
-			Subject: "Test Gmail Integration",
-			Body:    "This is a test email sent through Gmail SMTP from the integration test.",
-		}
-
-		err = service.SendMessage(msg)
-		assert.NoError(t, err, "Should be able to send email through Gmail")
+		err = service.Send([]string{username}, "Test SMTP Integration", "This is a test email sent through SMTP from the integration test.", []string{})
+		assert.NoError(t, err, "Should be able to send email through SMTP")
 	})
 
-	t.Run("gmail service from file", func(t *testing.T) {
-		// This test requires gmail_smtp_credentials.json to exist
-		service, err := NewSMTPServiceGmail()
-		if err != nil {
-			t.Skipf("Skipping Gmail file integration test. gmail_smtp_credentials.json not found: %v", err)
-		}
-
-		msg := &EmailMessage{
-			To:      []string{"test@example.com"}, // You should change this to a real email for testing
-			Subject: "Test Gmail Integration from File",
-			Body:    "This is a test email sent through Gmail SMTP using credentials from file.",
-		}
-
-		// Note: This might fail if the email address is not valid
-		// Consider using a real test email address
-		err = service.SendMessage(msg)
-		
-		// We don't assert no error here because the email might be invalid
-		// In a real integration test, you'd use valid test emails
-		t.Logf("Send result: %v", err)
-	})
 }
 
-func TestSMTPService_Legacy_Integration(t *testing.T) {
+func TestSMTPService_Send_Integration(t *testing.T) {
 	if os.Getenv("INTEGRATION_TEST") == "" {
 		t.Skip("Skipping integration test. Set INTEGRATION_TEST=1 to run")
 	}
@@ -161,39 +134,39 @@ func TestSMTPService_Legacy_Integration(t *testing.T) {
 		From:     username,
 	})
 
-	t.Run("legacy send method without attachment", func(t *testing.T) {
+	t.Run("send method without attachment", func(t *testing.T) {
 		err := service.Send(
-			username, // Send to self for testing
-			"Test Legacy Send Method",
-			"This is a test email sent using the legacy Send method.",
-			"", // No attachment
+			[]string{username}, // Send to self for testing
+			"Test Send Method",
+			"This is a test email sent using the Send method.",
+			[]string{}, // No attachment
 		)
 
-		assert.NoError(t, err, "Should be able to send email using legacy method")
+		assert.NoError(t, err, "Should be able to send email using send method")
 	})
 
-	t.Run("legacy send method with attachment", func(t *testing.T) {
+	t.Run("send method with attachment", func(t *testing.T) {
 		// Create a temporary test file
-		tmpFile, err := os.CreateTemp("", "legacy_test_*.txt")
+		tmpFile, err := os.CreateTemp("", "test_*.txt")
 		require.NoError(t, err)
 		defer os.Remove(tmpFile.Name())
 
-		tmpFile.WriteString("Legacy test attachment content")
+		tmpFile.WriteString("Test attachment content")
 		tmpFile.Close()
 
 		err = service.Send(
-			username, // Send to self for testing
-			"Test Legacy Send Method with Attachment",
-			"This is a test email sent using the legacy Send method with an attachment.",
-			tmpFile.Name(),
+			[]string{username}, // Send to self for testing
+			"Test Send Method with Attachment",
+			"This is a test email sent using the Send method with an attachment.",
+			[]string{tmpFile.Name()},
 		)
 
-		assert.NoError(t, err, "Should be able to send email with attachment using legacy method")
+		assert.NoError(t, err, "Should be able to send email with attachment using send method")
 	})
 }
 
 // Performance integration tests
-func BenchmarkSMTPService_SendMessage_Integration(b *testing.B) {
+func BenchmarkSMTPService_Send_Integration(b *testing.B) {
 	if os.Getenv("INTEGRATION_TEST") == "" {
 		b.Skip("Skipping integration benchmark. Set INTEGRATION_TEST=1 to run")
 	}
@@ -223,7 +196,7 @@ func BenchmarkSMTPService_SendMessage_Integration(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		err := service.SendMessage(msg)
+		err := service.Send(msg.To, msg.Subject, msg.Body, []string{})
 		if err != nil {
 			b.Fatalf("Failed to send email: %v", err)
 		}
