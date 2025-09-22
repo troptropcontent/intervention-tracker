@@ -36,7 +36,7 @@ func (s *NotificationService) SendInterventionReport(intervention *models.Interv
 	subject := fmt.Sprintf("Rapport d'Intervention #%d - %s", intervention.ID, intervention.Portal.Name)
 	body := s.buildEmailBody(intervention)
 
-	if err := s.emailService.Send(intervention.User.Email, subject, body, pdfFile.Name()); err != nil {
+	if err := s.emailService.Send([]string{intervention.User.Email}, subject, body, []string{pdfFile.Name()}); err != nil {
 		return fmt.Errorf("failed to send email: %w", err)
 	}
 
