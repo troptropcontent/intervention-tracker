@@ -63,7 +63,7 @@ func TestConvertHTMLToPDF_Success(t *testing.T) {
 
 	service := NewGotenbergService(server.URL)
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
-	
+
 	files := []ConvertHtmlToPdfFiles{
 		{
 			Name:         "index.html",
@@ -98,7 +98,7 @@ func TestConvertHTMLToPDF_GotenbergError(t *testing.T) {
 
 	service := NewGotenbergService(server.URL)
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
-	
+
 	files := []ConvertHtmlToPdfFiles{
 		{
 			Name:         "index.html",
@@ -117,7 +117,7 @@ func TestConvertHTMLToPDF_NetworkError(t *testing.T) {
 	// Use invalid URL to simulate network error
 	service := NewGotenbergService("http://invalid-gotenberg-url:9999")
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
-	
+
 	files := []ConvertHtmlToPdfFiles{
 		{
 			Name:         "index.html",
@@ -165,7 +165,7 @@ func TestConvertHTML_Success(t *testing.T) {
 
 	service := NewGotenbergService(server.URL)
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
-	
+
 	files := []ConvertHtmlToPdfFiles{
 		{
 			Name:         "index.html",
@@ -189,7 +189,7 @@ func TestConvertHTML_HTTPError(t *testing.T) {
 
 	service := NewGotenbergService(server.URL)
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
-	
+
 	files := []ConvertHtmlToPdfFiles{
 		{
 			Name:         "index.html",
@@ -206,7 +206,7 @@ func TestConvertHTML_HTTPError(t *testing.T) {
 func TestConvertHTML_InvalidURL(t *testing.T) {
 	service := NewGotenbergService("http://invalid-url:9999")
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
-	
+
 	files := []ConvertHtmlToPdfFiles{
 		{
 			Name:         "index.html",
@@ -246,7 +246,7 @@ func TestConvertHTML_MultipartFormOptions(t *testing.T) {
 	defer server.Close()
 
 	service := NewGotenbergService(server.URL)
-	
+
 	files := []ConvertHtmlToPdfFiles{
 		{
 			Name:         "index.html",
@@ -281,7 +281,7 @@ func TestConvertHTML_HTMLFileContent(t *testing.T) {
 	defer server.Close()
 
 	service := NewGotenbergService(server.URL)
-	
+
 	files := []ConvertHtmlToPdfFiles{
 		{
 			Name:         "index.html",
@@ -326,7 +326,7 @@ func TestGotenbergService_Integration_EndToEnd(t *testing.T) {
     </ul>
 </body>
 </html>`
-	
+
 	files := []ConvertHtmlToPdfFiles{
 		{
 			Name:         "index.html",
@@ -369,7 +369,7 @@ func TestGotenbergService_RealEndToEnd(t *testing.T) {
 	}
 
 	service := NewGotenbergService(gotenbergURL)
-	
+
 	// Test HTML content with various elements to ensure proper rendering
 	htmlContent := `
 <!DOCTYPE html>
@@ -482,7 +482,7 @@ func TestGotenbergService_RealEndToEnd(t *testing.T) {
 
 	tempFile, err := service.ConvertHTMLToPDF(files, "real_e2e_test")
 	require.NoError(t, err, "Failed to convert HTML to PDF using real Gotenberg service")
-	
+
 	defer func() {
 		tempFile.Close()
 		os.Remove(tempFile.Name())
@@ -511,7 +511,7 @@ func TestGotenbergService_RealEndToEnd(t *testing.T) {
 	// Reset to beginning and verify we can read again
 	_, err = tempFile.Seek(0, 0)
 	require.NoError(t, err, "Should be able to seek to beginning")
-	
+
 	firstBytes := make([]byte, 4)
 	n, err := tempFile.Read(firstBytes)
 	require.NoError(t, err, "Should be able to read from beginning")

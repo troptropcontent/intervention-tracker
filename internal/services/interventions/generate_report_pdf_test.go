@@ -41,7 +41,7 @@ func TestPDFService_GenerateReportPDF_Success(t *testing.T) {
 		assert.Equal(t, "index.html", header.Filename)
 		content, err := io.ReadAll(file)
 		require.NoError(t, err)
-		
+
 		htmlContent := string(content)
 		assert.Contains(t, htmlContent, "Test Portal")
 		assert.Contains(t, htmlContent, "John Doe")
@@ -79,7 +79,7 @@ func TestPDFService_GenerateReportPDF_EmptyData(t *testing.T) {
 	intervention := &models.Intervention{}
 
 	tempFile, err := service.GenerateReportPDF(intervention)
-	
+
 	assert.Error(t, err)
 	assert.Nil(t, tempFile)
 	assert.Contains(t, err.Error(), "failed to generate PDF")
@@ -97,7 +97,7 @@ func TestPDFService_GenerateReportPDF_GotenbergError(t *testing.T) {
 	intervention := createTestIntervention()
 
 	tempFile, err := service.GenerateReportPDF(intervention)
-	
+
 	assert.Error(t, err)
 	assert.Nil(t, tempFile)
 	assert.Contains(t, err.Error(), "failed to generate PDF")
@@ -109,19 +109,11 @@ func TestPDFService_GenerateReportPDF_NetworkError(t *testing.T) {
 	intervention := createTestIntervention()
 
 	tempFile, err := service.GenerateReportPDF(intervention)
-	
+
 	assert.Error(t, err)
 	assert.Nil(t, tempFile)
 	assert.Contains(t, err.Error(), "failed to generate PDF")
 }
-
-
-
-
-
-
-
-
 
 func TestPDFService_Integration_EndToEnd(t *testing.T) {
 	// Create a mock server that simulates Gotenberg
@@ -150,7 +142,7 @@ func TestPDFService_Integration_EndToEnd(t *testing.T) {
 		assert.Equal(t, "index.html", header.Filename)
 		content, err := io.ReadAll(file)
 		require.NoError(t, err)
-		
+
 		htmlContent := string(content)
 		assert.Contains(t, htmlContent, "Test Portal")
 		assert.Contains(t, htmlContent, "John Doe")
@@ -167,7 +159,7 @@ func TestPDFService_Integration_EndToEnd(t *testing.T) {
 
 	tempFile, err := service.GenerateReportPDF(intervention)
 	require.NoError(t, err, "Failed to generate PDF report")
-	
+
 	defer func() {
 		tempFile.Close()
 		os.Remove(tempFile.Name())
@@ -192,7 +184,7 @@ func TestPDFService_Integration_EndToEnd(t *testing.T) {
 func createTestIntervention() *models.Intervention {
 	testDate := time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC)
 	summary := "Test summary"
-	
+
 	return &models.Intervention{
 		ID:       1,
 		Date:     testDate,
@@ -212,4 +204,3 @@ func createTestIntervention() *models.Intervention {
 		Controls: []models.Control{},
 	}
 }
-

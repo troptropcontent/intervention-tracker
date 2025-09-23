@@ -35,7 +35,7 @@ func (s *PDFService) GenerateReportPDF(intervention *models.Intervention) (*os.F
 	if err != nil {
 		return nil, fmt.Errorf("failed to resolve CSS file path: %w", err)
 	}
-	
+
 	css_bytes, err := os.ReadFile(cssPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read CSS file: %w", err)

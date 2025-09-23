@@ -38,12 +38,12 @@ func GetGmailCredentialsPath() string {
 	if path := os.Getenv("GMAIL_CREDENTIALS_PATH"); path != "" {
 		return path
 	}
-	
+
 	root, err := utils.GetProjectRootPath()
 	if err != nil {
 		return "credentials.json" // fallback to current directory
 	}
-	
+
 	return filepath.Join(root, "credentials.json")
 }
 
@@ -52,11 +52,11 @@ func GetGmailTokenPath() string {
 	if path := os.Getenv("GMAIL_TOKEN_PATH"); path != "" {
 		return path
 	}
-	
+
 	root, err := utils.GetProjectRootPath()
 	if err != nil {
 		return "token.json" // fallback to current directory
 	}
-	
+
 	return filepath.Join(root, "token.json")
 }

@@ -21,7 +21,7 @@ func TestSMTPService_SendMessage_Integration(t *testing.T) {
 	password := os.Getenv("SMTP_PASSWORD")
 	host := os.Getenv("SMTP_HOST")
 	port := os.Getenv("SMTP_PORT")
-	
+
 	if username == "" || password == "" || host == "" || port == "" {
 		t.Skip("Skipping integration test. Required environment variables not set: SMTP_USERNAME, SMTP_PASSWORD, SMTP_HOST, SMTP_PORT")
 	}
@@ -121,7 +121,7 @@ func TestSMTPService_Send_Integration(t *testing.T) {
 	password := os.Getenv("SMTP_PASSWORD")
 	host := os.Getenv("SMTP_HOST")
 	port := os.Getenv("SMTP_PORT")
-	
+
 	if username == "" || password == "" || host == "" || port == "" {
 		t.Skip("Skipping integration test. Required environment variables not set")
 	}
@@ -175,7 +175,7 @@ func BenchmarkSMTPService_Send_Integration(b *testing.B) {
 	password := os.Getenv("SMTP_PASSWORD")
 	host := os.Getenv("SMTP_HOST")
 	port := os.Getenv("SMTP_PORT")
-	
+
 	if username == "" || password == "" || host == "" || port == "" {
 		b.Skip("Skipping integration benchmark. Required environment variables not set")
 	}
@@ -227,7 +227,7 @@ Integration Test Setup Instructions:
 5. Run benchmarks:
    INTEGRATION_TEST=1 go test -bench=. ./internal/services/email/
 
-Note: 
+Note:
 - Never commit real credentials to version control
 - Use app passwords for Gmail, not regular passwords
 - Consider using test email addresses that you control
