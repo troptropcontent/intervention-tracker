@@ -17,7 +17,8 @@
 		"vscode": {
 			"extensions": [
 				"a-h.templ",
-				"anthropic.claude-code"
+				"anthropic.claude-code",
+				"bradlc.vscode-tailwindcss"
 			]
 		}
 	},

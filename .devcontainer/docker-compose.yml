@@ -10,7 +10,7 @@ services:
       dockerfile: Dockerfile
     env_file:
         # Ensure that the variables in .env match the same variables in devcontainer.json
-        - .env
+        - ../.env
 
     volumes:
       - ../..:/workspaces:cached
@@ -31,7 +31,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
     env_file:
       # Ensure that the variables in .env match the same variables in devcontainer.json
-      - .env
+      - ../.env
 
   gotemberg:
     image: gotenberg/gotenberg:8
