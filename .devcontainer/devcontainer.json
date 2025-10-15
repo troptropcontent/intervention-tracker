@@ -18,7 +18,8 @@
 			"extensions": [
 				"a-h.templ",
 				"anthropic.claude-code",
-				"bradlc.vscode-tailwindcss"
+				"bradlc.vscode-tailwindcss",
+				"GitHub.vscode-pull-request-github"
 			]
 		}
 	},
