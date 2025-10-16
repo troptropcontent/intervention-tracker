@@ -62,6 +62,15 @@ else
     print_warning "GIT_EMAIL and/or GIT_NAME environment variables not set - skipping git configuration"
 fi
 
+# Install Air for Go live reload
+print_step "Installing Air live reload tool for Go..."
+go install github.com/air-verse/air@latest
+if command -v air &> /dev/null; then
+    print_success "Air installed successfully at $(which air)"
+else
+    print_warning "Air installation could not be verified - check GOPATH/bin is in PATH"
+fi
+
 sudo chown -R $(whoami):$(whoami) /go/pkg
 
 echo
