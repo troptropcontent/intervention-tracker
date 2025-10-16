@@ -19,7 +19,8 @@
 				"a-h.templ",
 				"anthropic.claude-code",
 				"bradlc.vscode-tailwindcss",
-				"GitHub.vscode-pull-request-github"
+				"GitHub.vscode-pull-request-github",
+				"golang.go"
 			]
 		}
 	},
