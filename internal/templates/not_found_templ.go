@@ -43,7 +43,7 @@ func NotFound(context echo.Context) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-4xl mx-auto text-center\"><div class=\"mt-8\"><h1 class=\"text-3xl font-bold text-gray-900 mb-4\">404 - Page non trouvée</h1><p class=\"text-lg text-gray-600 mb-6\">La page que vous recherchez n'existe pas ou a été déplacée.</p><div class=\"space-y-3\"><a href=\"/\" class=\"inline-flex px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition\">Retour à l'accueil</a><div class=\"mt-4\"><p class=\"text-sm text-gray-500\">Ou utilisez la navigation ci-dessus pour explorer le site.</p></div></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"max-w-4xl mx-auto text-center\"><div class=\"mt-8\"><h1 class=\"text-3xl font-bold text-gray-900 mb-4\">404 - Page non trouvée</h1><p class=\"text-lg text-gray-600 mb-6\">La page que vous recherchez n'existe pas ou a été déplacée.</p><div class=\"space-y-3\"><a href=\"/\" class=\"btn btn-primary\">Retour à l'accueil</a><div class=\"mt-4\"><p class=\"text-sm text-gray-500\">Ou utilisez la navigation ci-dessus pour explorer le site.</p></div></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
