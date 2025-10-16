@@ -37,7 +37,7 @@ func AuthedNav(userEmail string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"bg-primary text-white p-4\"><div class=\"container mx-auto flex justify-between items-center\"><h1 class=\"text-xl font-bold\"><a href=\"/\" class=\"hover:text-blue-200\">Maintenance Portails</a></h1><div class=\"space-x-4\"><a href=\"/admin/portals\" class=\"hover:text-blue-200\">Admin</a> <span class=\"text-blue-200\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"bg-primary text-white p-4\"><div class=\"container mx-auto flex justify-between items-center\"><h1 class=\"text-xl font-bold\"><a href=\"/\" class=\"hover:text-blue-200\">Maintenance Automatisme</a></h1><div class=\"space-x-4\"><a href=\"/admin/portals\" class=\"hover:text-blue-200\">Admin</a> <span class=\"text-blue-200\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -79,7 +79,7 @@ func PublicNav() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<nav class=\"bg-primary text-white p-4\"><div class=\"container mx-auto flex justify-between items-center\"><h1 class=\"text-xl font-bold\"><a href=\"/\" class=\"hover:text-blue-200\">Maintenance Portails</a></h1><div class=\"space-x-4\"><a href=\"/login\" class=\"hover:text-blue-200\">Connexion</a> <a href=\"/register\" class=\"hover:text-blue-200\">Inscription</a></div></div></nav>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<nav class=\"bg-primary text-white p-4\"><div class=\"container mx-auto flex justify-between items-center\"><h1 class=\"text-xl font-bold\"><a href=\"/\" class=\"hover:text-blue-200\">Maintenance Automatisme</a></h1><div class=\"space-x-4\"><a href=\"/login\" class=\"hover:text-blue-200\">Connexion</a> <a href=\"/register\" class=\"hover:text-blue-200\">Inscription</a></div></div></nav>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
