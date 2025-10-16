@@ -93,9 +93,5 @@ func InitializeDatabase() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	if err := AutoMigrate(db); err != nil {
-		return nil, err
-	}
-
 	return db, nil
 }
