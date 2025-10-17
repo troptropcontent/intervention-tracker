@@ -11,6 +11,7 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/handlers"
 	authmiddleware "github.com/troptropcontent/qr_code_maintenance/internal/middleware"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 )
 
@@ -25,8 +26,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to instanciate email service: %v", err)
 	}
+
+	translator := translation.NewTranslator()
+
 	// Initialize handlers
-	h := &handlers.Handlers{DB: db, EmailNotificationService: emailService}
+	h := &handlers.Handlers{
+		DB:                       db,
+		EmailNotificationService: emailService,
+		TranslationService:       translator}
 
 	e := echo.New()
 
