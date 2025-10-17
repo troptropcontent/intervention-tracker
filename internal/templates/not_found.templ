@@ -1,23 +1,24 @@
 package templates
 
 import "github.com/labstack/echo/v4"
+import "github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 
-templ NotFound(context echo.Context) {
+templ NotFound(context echo.Context, translator translation.TranslatorService) {
 	@MainLayout(MainLayoutConfig{Title: "Page non trouvée"}, context) {
 		<div class="max-w-4xl mx-auto text-center">
 			<div class="mt-8">
-				<h1 class="text-3xl font-bold text-gray-900 mb-4">404 - Page non trouvée</h1>
+				<h1 class="text-3xl font-bold text-gray-900 mb-4">{translator.MustTranslate("views.static.not_found.title")}</h1>
 				<p class="text-lg text-gray-600 mb-6">
-					La page que vous recherchez n'existe pas ou a été déplacée.
+					{translator.MustTranslate("views.static.not_found.description")}
 				</p>
 				<div class="space-y-3">
-					<a href="/" 
+					<a href="/"
 					   class="btn btn-primary">
-						Retour à l'accueil
+						{translator.MustTranslate("views.static.not_found.back_to_home")}
 					</a>
 					<div class="mt-4">
 						<p class="text-sm text-gray-500">
-							Ou utilisez la navigation ci-dessus pour explorer le site.
+							{translator.MustTranslate("views.static.not_found.navigation_hint")}
 						</p>
 					</div>
 				</div>
