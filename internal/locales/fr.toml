@@ -1,0 +1,5 @@
+# Views
+"views.static.not_found.title" = "404 - Page non trouvée"
+"views.static.not_found.description" = "La page que vous recherchez n'existe pas ou a été déplacée."
+"views.static.not_found.back_to_home" = "Retour à l'accueil"
+"views.static.not_found.navigation_hint" = "Ou utilisez la navigation ci-dessus pour explorer le site."
