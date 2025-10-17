@@ -20,7 +20,8 @@
 				"anthropic.claude-code",
 				"bradlc.vscode-tailwindcss",
 				"GitHub.vscode-pull-request-github",
-				"golang.go"
+				"golang.go",
+				"tamasfe.even-better-toml"
 			]
 		}
 	},
