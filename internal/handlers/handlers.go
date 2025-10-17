@@ -12,6 +12,7 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/interventions"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"github.com/troptropcontent/qr_code_maintenance/internal/templates"
 	"gorm.io/gorm"
 )
@@ -19,6 +20,7 @@ import (
 type Handlers struct {
 	DB                       *gorm.DB
 	EmailNotificationService email.EmailService
+	TranslationService       translation.TranslatorService
 }
 
 func (h *Handlers) GetPortal(c echo.Context) error {
@@ -39,7 +41,7 @@ func (h *Handlers) GetPortal(c echo.Context) error {
 }
 
 func (h *Handlers) NotFound(c echo.Context) error {
-	return templates.NotFound(c).Render(c.Request().Context(), c.Response().Writer)
+	return templates.NotFound(c, h.TranslationService).Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *Handlers) GetAdminPortalsScan(c echo.Context) error {
