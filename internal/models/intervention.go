@@ -13,6 +13,35 @@ const (
 	ControlKindOther    ControlKind = "other"
 )
 
+type ControlTypesStruct struct {
+	Security []string
+	Other    []string
+}
+
+var ControleTypes = ControlTypesStruct{
+	Security: []string{
+		"warning_lights",
+		"area_lighting",
+		"safety_cells",
+		"pressure_bar",
+		"floor_loop",
+		"force_limiter",
+		"safety_springs",
+		"floor_markings",
+	},
+	Other: []string{
+		"apron_condition",
+		"horizontal_rails",
+		"vertical_rails",
+		"roller_condition",
+		"drive_system",
+		"limit_switches",
+		"control_devices",
+		"control_panel",
+		"manual_override",
+	},
+}
+
 var ControlTypesByKind = map[ControlKind][]string{
 	ControlKindSecurity: {
 		"warning_lights",
@@ -46,6 +75,7 @@ type Intervention struct {
 	UserID    uint           `json:"user_id" gorm:"not null"`
 	UserName  string         `json:"user_name" gorm:"not null"`
 	PortalID  uint           `json:"portal_id" gorm:"not null"`
+	Signature string         `json:"signature" gorm:"type:text"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
