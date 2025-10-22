@@ -355,8 +355,9 @@ func (h *Handlers) PostIntervention(c echo.Context) error {
 
 	// Parse form data
 	var formData struct {
-		Date    string `form:"date"`
-		Summary string `form:"summary"`
+		Date      string `form:"date"`
+		Summary   string `form:"summary"`
+		Signature string `form:"signature"`
 	}
 
 	if err := c.Bind(&formData); err != nil {
@@ -371,10 +372,11 @@ func (h *Handlers) PostIntervention(c echo.Context) error {
 
 	// Create intervention
 	intervention := models.Intervention{
-		Date:     interventionDate,
-		UserID:   user.ID,
-		UserName: user.FullName(),
-		PortalID: uint(portalID),
+		Date:      interventionDate,
+		UserID:    user.ID,
+		UserName:  user.FullName(),
+		Signature: formData.Signature,
+		PortalID:  uint(portalID),
 	}
 
 	// Set summary if provided
@@ -455,7 +457,7 @@ func (h *Handlers) GetInterventionReport(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
 	}
 
-	return templates.InterventionReport(templates.InterventionReportConfig{Intervention: &intervention}).Render(c.Request().Context(), c.Response().Writer)
+	return templates.InterventionReport(templates.InterventionReportConfig{Intervention: &intervention, Translator: h.TranslationService}).Render(c.Request().Context(), c.Response().Writer)
 }
 
 // sendInterventionNotification sends an email notification with PDF report
