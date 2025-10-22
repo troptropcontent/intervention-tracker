@@ -1,188 +1,139 @@
 package templates
 
 import (
-	"strconv"
+	"fmt"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 )
 
-type InterventionReportConfig struct  {
-	Intervention *models.Intervention
+type InterventionReportConfig struct {
+	Intervention   *models.Intervention
 	StylesheetPath string
+	LogoPath       string
+	Translator     translation.TranslatorService
+}
+
+func findControlResult(intervention *models.Intervention, controlKey string) string {
+	var result = "na"
+	for _, control := range intervention.Controls {
+		if control.Kind == controlKey {
+			if *control.Result {
+				result = "passed"
+			} else {
+				result = "fail"
+			}
+		}
+	}
+	return result
+}
+
+templ controleTable(title string, intervention *models.Intervention, controls []string, t translation.TranslatorService) {
+	<table class="table w-full border-collapse border border-gray-300">
+		<thead class="bg-gray-100">
+			<tr class="border-b border-gray-300">
+				<th colspan="2" class="text-sm text-left p-2 font-bold">{ title }</th>
+			</tr>
+			<tr class="border-b border-gray-300">
+				<th class="text-sm text-left p-2 font-semibold">Contrôle</th>
+				<th class="text-sm text-right p-2 font-semibold">Resultat</th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, control := range controls {
+				<tr class="border-b border-gray-200">
+					<td class="text-sm p-2">{ t.MustTranslate(fmt.Sprintf("models.control.kinds.%v", control)) }</td>
+					<td class="text-right p-2">
+						switch findControlResult(intervention, control) {
+							case "passed":
+								<span class="badge badge-sm badge-outline badge-success">{ t.MustTranslate("views.admin.intervention_report.controls.result.passed") }</span>
+							case "fail":
+								<span class="badge badge-sm badge-outline badge-error">{ t.MustTranslate("views.admin.intervention_report.controls.result.fail") }</span>
+							default:
+								<span class="badge badge-sm badge-outline badge-warning">{ t.MustTranslate("views.admin.intervention_report.controls.result.na") }</span>
+						}
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+templ InterventionReportSection(title string) {
+	<section class="px-6">
+		<h2 class="text-l font-semibold text-primary mb-4">{ title }</h2>
+		{ children... }
+	</section>
 }
 
 templ InterventionReport(config InterventionReportConfig) {
 	<!DOCTYPE html>
 	<html lang="fr">
-	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>Rapport d'Intervention - { config.Intervention.Portal.Name }</title>
-		if config.StylesheetPath != "" {
-			<link rel="stylesheet" href={ config.StylesheetPath }/>
-		} else {
-			<link rel="stylesheet" href="/static/css/output.css"/>
-		}
-		<style>
-			@media print {
-				body { print-color-adjust: exact; }
-				.footer {
-					position: fixed;
-					bottom: 0;
-					left: 0;
-					right: 0;
-					background: white;
-					padding: 1rem 2rem;
-				}
-				.content {
-					padding-bottom: 4rem;
-				}
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Rapport d'Intervention - { config.Intervention.Portal.Name }</title>
+			if config.StylesheetPath != "" {
+				<link rel="stylesheet" href={ config.StylesheetPath }/>
+			} else {
+				<link rel="stylesheet" href="/static/css/output.css"/>
 			}
-			@media screen {
-				html, body {
-					height: 100%;
-				}
-				.page-container {
-					min-height: 100vh;
-					display: flex;
-					flex-direction: column;
-				}
-				.content {
-					flex: 1;
-				}
-				.footer {
-					margin-top: auto;
-				}
-			}
-		</style>
-	</head>
-	<body class="font-sans text-gray-800 bg-white p-8 max-w-4xl mx-auto">
-		<div class="page-container">
-			<div class="content">
-				<div class="text-center mb-8 pb-6 border-b-2 border-blue-600 break-after-avoid">
-					<h1 class="text-2xl font-bold text-blue-600 mb-2">Rapport d'Intervention</h1>
-					<p class="text-gray-600">Portail: { config.Intervention.Portal.Name }</p>
-				</div>
-
-				<div class="mb-8 break-inside-avoid">
-					<h2 class="text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-200">Informations générales</h2>
-					<div class="grid grid-cols-2 gap-6">
-						<div>
-							<div class="text-xs font-bold text-gray-500 uppercase tracking-wide">Date d'intervention</div>
-							<div class="text-sm text-gray-900 mt-1">{ config.Intervention.Date.Format("02/01/2006") }</div>
-						</div>
-						<div>
-							<div class="text-xs font-bold text-gray-500 uppercase tracking-wide">Intervenant</div>
-							<div class="text-sm text-gray-900 mt-1">{ config.Intervention.UserName }</div>
-						</div>
-						<div>
-							<div class="text-xs font-bold text-gray-500 uppercase tracking-wide">Adresse</div>
-							<div class="text-sm text-gray-900 mt-1">
-								{ config.Intervention.Portal.AddressStreet }<br/>
-								{ config.Intervention.Portal.AddressZipcode } { config.Intervention.Portal.AddressCity }
-							</div>
-						</div>
-						<div>
-							<div class="text-xs font-bold text-gray-500 uppercase tracking-wide">Entreprise</div>
-							<div class="text-sm text-gray-900 mt-1">{ config.Intervention.Portal.ContractorCompany }</div>
-						</div>
-					</div>
-				</div>
-
-				if config.Intervention.Summary != nil && *config.Intervention.Summary != "" {
-					<div class="mb-8 break-inside-avoid">
-						<h2 class="text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-200">Résumé de l'intervention</h2>
-						<div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-							<p class="text-sm text-gray-800">{ *config.Intervention.Summary }</p>
-						</div>
-					</div>
-				}
-
-				<div class="mb-8 break-inside-avoid">
-					<h2 class="text-lg font-bold text-gray-700 mb-4 pb-2 border-b border-gray-200">Tableau des contrôles</h2>
-					<div class="overflow-x-auto">
-						<table class="w-full border-collapse border border-gray-300 text-xs">
-							<thead>
-								<tr class="bg-gray-100">
-									<th class="border border-gray-300 px-2 py-2 text-left font-bold" colspan="2">Sécurité</th>
-									<th class="border border-gray-300 px-2 py-2 text-left font-bold" colspan="2">Autres</th>
-								</tr>
-								<tr class="bg-gray-50">
-									<th class="border border-gray-300 px-2 py-1 text-left font-medium">Contrôle</th>
-									<th class="border border-gray-300 px-2 py-1 text-center font-medium w-20">Résultat</th>
-									<th class="border border-gray-300 px-2 py-1 text-left font-medium">Contrôle</th>
-									<th class="border border-gray-300 px-2 py-1 text-center font-medium w-20">Résultat</th>
-								</tr>
-							</thead>
-							<tbody>
-								for i, securityControl := range models.ControlTypesByKind[models.ControlKindSecurity] {
-									<tr>
-										<td class="border border-gray-300 px-2 py-1">{ GetControlTypeLabel(securityControl) }</td>
-										<td class="border border-gray-300 px-2 py-1 text-center">
-											{ getControlResult(config.Intervention.Controls, securityControl) }
-										</td>
-										if i < len(models.ControlTypesByKind[models.ControlKindOther]) {
-											<td class="border border-gray-300 px-2 py-1">{ GetControlTypeLabel(models.ControlTypesByKind[models.ControlKindOther][i]) }</td>
-											<td class="border border-gray-300 px-2 py-1 text-center">
-												{ getControlResult(config.Intervention.Controls, models.ControlTypesByKind[models.ControlKindOther][i]) }
-											</td>
-										} else {
-											<td class="border border-gray-300 px-2 py-1"></td>
-											<td class="border border-gray-300 px-2 py-1 text-center"></td>
-										}
-									</tr>
-								}
-								// Handle remaining "other" controls if there are more than security controls
-								if len(models.ControlTypesByKind[models.ControlKindOther]) > len(models.ControlTypesByKind[models.ControlKindSecurity]) {
-									for i := len(models.ControlTypesByKind[models.ControlKindSecurity]); i < len(models.ControlTypesByKind[models.ControlKindOther]); i++ {
-										<tr>
-											<td class="border border-gray-300 px-2 py-1"></td>
-											<td class="border border-gray-300 px-2 py-1 text-center"></td>
-											<td class="border border-gray-300 px-2 py-1">{ GetControlTypeLabel(models.ControlTypesByKind[models.ControlKindOther][i]) }</td>
-											<td class="border border-gray-300 px-2 py-1 text-center">
-												{ getControlResult(config.Intervention.Controls, models.ControlTypesByKind[models.ControlKindOther][i]) }
-											</td>
-										</tr>
-									}
-								}
-							</tbody>
-						</table>
-					</div>
-					<div class="mt-2 text-xs text-gray-600">
-						<strong>Légende:</strong> OK = Conforme, D = Défaillant, NC = Non Contrôlé
-					</div>
-				</div>
-			</div>
-
-			<div class="footer mt-12 pt-6 border-t border-gray-200 text-center text-xs text-gray-500 break-before-avoid">
-				Rapport généré le { config.Intervention.CreatedAt.Format("02/01/2006 à 15:04") } - 
-				Référence: #{ strconv.Itoa(int(config.Intervention.ID)) }
-			</div>
-		</div>
-	</body>
-	</html>
-}
-
-func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
-}
-
-func getControlResult(controls []models.Control, controlKind string) string {
-	for _, control := range controls {
-		if control.Kind == controlKind {
-			if control.Result != nil {
-				if *control.Result {
-					return "OK"
+		</head>
+		<body class="bg-base flex flex-col gap-2">
+			<header class="bg-primary text-white px-6 py-2 flex justify-between items-center">
+				<h1 class="text-3xl font-bold">Rapport d'Intervention</h1>
+				if config.LogoPath != "" {
+					<img src={ config.LogoPath } alt="Logo entreprise" class="h-20"/>
 				} else {
-					return "D"
+					<img src="/static/images/logo.png" alt="Logo entreprise" class="h-20"/>
 				}
+			</header>
+			@InterventionReportSection("Informations Générales") {
+				<div class="grid grid-cols-2 gap-2">
+					<div class="form-control">
+						<label class="label">
+							<span class="text-sm label-text font-semibold">Numéro de contrat</span>
+						</label>
+						<div class="bg-base-200 p-3 rounded-lg text-sm">
+							<p>{ config.Intervention.Portal.InternalId }</p>
+						</div>
+					</div>
+					<div class="form-control">
+						<label class="label">
+							<span class="text-sm label-text font-semibold">Adresse</span>
+						</label>
+						<div class="card card-border p-3 bg-base-200 text-sm">
+							<p>{ config.Intervention.Portal.AddressStreet }</p>
+							<p>{ config.Intervention.Portal.AddressZipcode }, { config.Intervention.Portal.AddressCity }</p>
+						</div>
+					</div>
+				</div>
 			}
-			return "NC"
-		}
-	}
-	return "NC"
+			@InterventionReportSection("Contrôles effectués") {
+				<div class="grid grid-cols-2 gap-x-4">
+					<div>
+						@controleTable("Controles de sécurité", config.Intervention, models.ControleTypes.Security, config.Translator)
+					</div>
+					<div>
+						@controleTable("Autres contrôles", config.Intervention, models.ControleTypes.Other, config.Translator)
+					</div>
+				</div>
+			}
+			@InterventionReportSection("Résumé") {
+				<div>
+					<div class="bg-base-200 p-4 rounded-lg">
+						<p class="whitespace-pre-wrap">{ *config.Intervention.Summary }</p>
+					</div>
+				</div>
+			}
+			<section class="px-6 flex-grow">
+				<div class="flex flex-col items-end gap-2">
+					<p class="text-md font-semibold">{ config.Intervention.UserName }</p>
+					<p class="text-sm text-base-content">
+						Le { config.Intervention.Date.Format("02/01/2006") }
+					</p>
+					<img src={ config.Intervention.Signature } alt="Signature" class="h-20"/>
+				</div>
+			</section>
+		</body>
+	</html>
 }
