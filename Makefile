@@ -1,6 +1,6 @@
 # QR Code Maintenance - Build Commands
 
-.PHONY: tailwind tailwind-watch tailwind-build server
+.PHONY: tailwind tailwind-watch tailwind-build server live db
 
 # Build Tailwind CSS once
 tailwind:
@@ -38,8 +38,11 @@ live/server:
 
 # run tailwindcss to generate the styles.css bundle in watch mode.
 live/tailwind:
-	pnpm tailwindcss -i static/css/input.css -o static/css/output.css --minify --watch
+	pnpm tailwindcss -i static/css/input.css -o static/css/output.css --watch
 
 # start all 5 watch processes in parallel.
 live: 
 	make -j3 live/templ live/server live/tailwind
+
+db:
+	PGPASSWORD=postgres psql -h db -p 5432 -U postgres -d qr_maintenance
