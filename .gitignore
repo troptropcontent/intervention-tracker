@@ -6,3 +6,4 @@ token.json
 gmail_smtp_credentials.json
 .env
 tmp/*
+*_templ.go
