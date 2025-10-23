@@ -28,28 +28,28 @@ func findControlResult(intervention *models.Intervention, controlKey string) str
 }
 
 templ controleTable(title string, intervention *models.Intervention, controls []string, t translation.TranslatorService) {
-	<table class="table w-full border-collapse border border-gray-300">
+	<table class="table w-full border-separate border-spacing-0 rounded-lg border border-gray-300">
 		<thead class="bg-gray-100">
-			<tr class="border-b border-gray-300">
-				<th colspan="2" class="text-sm text-left p-2 font-bold">{ title }</th>
+			<tr>
+				<th colspan="2" class="rounded-t-lg border-b border-gray-300 text-sm text-left p-2 font-bold">{ title }</th>
 			</tr>
-			<tr class="border-b border-gray-300">
-				<th class="text-sm text-left p-2 font-semibold">Contrôle</th>
-				<th class="text-sm text-right p-2 font-semibold">Resultat</th>
+			<tr>
+				<th class="text-sm text-left p-2 font-semibold border-r border-b border-gray-300">Contrôle</th>
+				<th class="text-sm text-right p-2 font-semibold border-b border-gray-300">Resultat</th>
 			</tr>
 		</thead>
 		<tbody>
 			for _, control := range controls {
-				<tr class="border-b border-gray-200">
-					<td class="text-sm p-2">{ t.MustTranslate(fmt.Sprintf("models.control.kinds.%v", control)) }</td>
-					<td class="text-right p-2">
+				<tr class="group">
+					<td class="text-sm p-2 border-r border-b group-last:border-b-0 border-gray-200">{ t.MustTranslate(fmt.Sprintf("models.control.kinds.%v", control)) }</td>
+					<td class="text-right p-2 border-b group-last:border-b-0 border-gray-200">
 						switch findControlResult(intervention, control) {
 							case "passed":
-								<span class="badge badge-sm badge-outline badge-success">{ t.MustTranslate("views.admin.intervention_report.controls.result.passed") }</span>
+								<span class="badge badge-xs badge-outline badge-success">{ t.MustTranslate("views.admin.intervention_report.controls.result.passed") }</span>
 							case "fail":
-								<span class="badge badge-sm badge-outline badge-error">{ t.MustTranslate("views.admin.intervention_report.controls.result.fail") }</span>
+								<span class="badge badge-xs badge-outline badge-error">{ t.MustTranslate("views.admin.intervention_report.controls.result.fail") }</span>
 							default:
-								<span class="badge badge-sm badge-outline badge-warning">{ t.MustTranslate("views.admin.intervention_report.controls.result.na") }</span>
+								<span class="badge badge-xs badge-outline badge-warning">{ t.MustTranslate("views.admin.intervention_report.controls.result.na") }</span>
 						}
 					</td>
 				</tr>
