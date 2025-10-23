@@ -436,6 +436,7 @@ func (h *Handlers) PostIntervention(c echo.Context) error {
 	go func() {
 		var reloadedIntervention models.Intervention
 		h.DB.Preload("User").Preload("Portal").Preload("Controls").First(&reloadedIntervention, intervention.ID)
+
 		if err := h.sendInterventionNotification(&reloadedIntervention, &portal, user); err != nil {
 			log.Printf("Failed to send intervention notification: %v", err)
 		}
