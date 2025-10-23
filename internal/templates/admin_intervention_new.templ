@@ -1,9 +1,9 @@
 package templates
 
 import (
-	"strconv"
-	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/labstack/echo/v4"
+	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"strconv"
 )
 
 templ AdminInterventionNew(portal models.Portal, user models.User, context echo.Context) {
@@ -15,7 +15,6 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 				</a>
 				<h1 class="text-3xl font-bold text-gray-900">Nouvelle intervention - { portal.Name }</h1>
 			</div>
-
 			<div class="bg-white shadow-sm rounded-lg p-6">
 				<form method="POST" action={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID)) + "/interventions") } class="space-y-8">
 					<!-- Intervention Details -->
@@ -24,13 +23,11 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 							@InputCalendar("Date d'intervention", "date", "", true)
 						</div>
-						@InputTextarea(&InputTextareaConfig{Label: "Résumé (optionnel)", Placeholder: "Description générale de l'intervention...", Name: "summary", Required: true, WraperClass:  "mt-4"})
+						@InputTextarea(&InputTextareaConfig{Label: "Résumé (optionnel)", Placeholder: "Description générale de l'intervention...", Name: "summary", Required: true, WraperClass: "mt-4"})
 					</div>
-
 					<!-- Controls Tables -->
 					<div>
 						<h3 class="text-lg font-medium text-gray-900 mb-6">Contrôles d'intervention</h3>
-						
 						<!-- Security Controls Table -->
 						<div class="mb-8">
 							<h4 class="text-md font-medium text-gray-800 mb-3">Sécurité</h4>
@@ -80,7 +77,6 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 								</div>
 							</div>
 						</div>
-
 						<!-- Other Controls Table -->
 						<div class="mb-8">
 							<h4 class="text-md font-medium text-gray-800 mb-3">Autres</h4>
@@ -114,7 +110,7 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 													<input type="radio" name={ "control_" + controlType } value="false" class="h-4 w-4 text-red-600"/>
 												</td>
 												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non contrôlé">
-													<input type="radio" name={ "control_" + controlType } value="" checked  class="h-4 w-4 text-gray-400"/>
+													<input type="radio" name={ "control_" + controlType } value="" checked class="h-4 w-4 text-gray-400"/>
 												</td>
 											</tr>
 										}
@@ -131,7 +127,7 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 							</div>
 						</div>
 					</div>
-
+					@SignaturePad("signature")
 					<!-- Form Actions -->
 					<div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
 						<a href={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID))) } class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-md font-medium">
@@ -149,25 +145,25 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 
 func GetControlTypeLabel(controlType string) string {
 	labels := map[string]string{
-		"warning_lights":     "Feux d'avertissement",
-		"area_lighting":      "Éclairage de zone",
-		"safety_cells":       "Cellules de sécurité",
-		"pressure_bar":       "Barre de pression",
-		"floor_loop":         "Boucle de sol",
-		"force_limiter":      "Limiteur d'effort",
-		"safety_springs":     "Ressorts de sécurité",
-		"floor_markings":     "Marquage au sol",
-		"apron_condition":    "État du tablier",
-		"horizontal_rails":   "Rails horizontaux",
-		"vertical_rails":     "Rails verticaux",
-		"roller_condition":   "État des galets",
-		"drive_system":       "Système d'entraînement",
-		"limit_switches":     "Interrupteurs de fin de course",
-		"control_devices":    "Organes de commande",
-		"control_panel":      "Coffret de commande",
-		"manual_override":    "Manœuvre de secours",
+		"warning_lights":   "Feux d'avertissement",
+		"area_lighting":    "Éclairage de zone",
+		"safety_cells":     "Cellules de sécurité",
+		"pressure_bar":     "Barre de pression",
+		"floor_loop":       "Boucle de sol",
+		"force_limiter":    "Limiteur d'effort",
+		"safety_springs":   "Ressorts de sécurité",
+		"floor_markings":   "Marquage au sol",
+		"apron_condition":  "État du tablier",
+		"horizontal_rails": "Rails horizontaux",
+		"vertical_rails":   "Rails verticaux",
+		"roller_condition": "État des galets",
+		"drive_system":     "Système d'entraînement",
+		"limit_switches":   "Interrupteurs de fin de course",
+		"control_devices":  "Organes de commande",
+		"control_panel":    "Coffret de commande",
+		"manual_override":  "Manœuvre de secours",
 	}
-	
+
 	if label, exists := labels[controlType]; exists {
 		return label
 	}

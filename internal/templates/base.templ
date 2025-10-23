@@ -17,8 +17,8 @@ templ AuthedNav(userEmail string) {
 			<div class="space-x-4">
 				<a href="/admin/portals" class="hover:text-blue-200">Admin</a>
 				<span class="text-blue-200">{ userEmail }</span>
-				<button 
-					data-controller="logout" 
+				<button
+					data-controller="logout"
 					data-action="click->logout#logout"
 					class="hover:text-blue-200 cursor-pointer"
 				>
@@ -46,15 +46,16 @@ templ PublicNav() {
 templ MainLayout(config MainLayoutConfig, context echo.Context) {
 	<!DOCTYPE html>
 	<html lang="fr">
-	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>{ config.Title } - Maintenance Portails</title>
-		<link rel="stylesheet" href="/static/css/output.css"/>
-		<script src="/static/js/htmx.min.js"></script>
-		<script src="/static/js/html5-qrcode.min.js"></script>
-		<script src="/static/js/application.js" type="module"></script>
-		<style>
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ config.Title } - Maintenance Portails</title>
+			<link rel="stylesheet" href="/static/css/output.css"/>
+			<script src="/static/js/htmx.min.js"></script>
+			<script src="/static/js/html5-qrcode.min.js"></script>
+			<script src="/static/js/signature_pad.umd.min.js"></script>
+			<script src="/static/js/application.js" type="module"></script>
+			<style>
 			.htmx-indicator {
 				opacity: 0;
 				transition: opacity 200ms ease-in;
@@ -66,23 +67,22 @@ templ MainLayout(config MainLayoutConfig, context echo.Context) {
 				opacity: 1;
 			}
 		</style>
-	</head>
-	<body class="bg-gray-50 min-h-screen">
-		if context.Get("user_email") != nil && context.Get("user_email") != "" {
-			@AuthedNav(context.Get("user_email").(string))
-		} else {
-			@PublicNav()
-		}
-		<main 
-			class="container mx-auto px-4 py-8"
-			if config.Controller != "" {
-				data-controller={ config.Controller }
+		</head>
+		<body class="bg-gray-50 min-h-screen">
+			if context.Get("user_email") != nil && context.Get("user_email") != "" {
+				@AuthedNav(context.Get("user_email").(string))
+			} else {
+				@PublicNav()
 			}
-			
-			{ config.Attributes... }
-		>
-			{ children... }
-		</main>
-	</body>
+			<main
+				class="container mx-auto px-4 py-8"
+				if config.Controller != "" {
+					data-controller={ config.Controller }
+				}
+				{ config.Attributes... }
+			>
+				{ children... }
+			</main>
+		</body>
 	</html>
 }

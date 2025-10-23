@@ -7,6 +7,7 @@ import (
 
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"github.com/troptropcontent/qr_code_maintenance/internal/templates"
 	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 )
@@ -41,6 +42,16 @@ func (s *PDFService) GenerateReportPDF(intervention *models.Intervention) (*os.F
 		return nil, fmt.Errorf("failed to read CSS file: %w", err)
 	}
 
+	logoPath, err := utils.GetStaticFilePath("images/logo.png")
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve logo file path: %w", err)
+	}
+
+	logo_bytes, err := os.ReadFile(logoPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read logo file: %w", err)
+	}
+
 	var files []services.ConvertHtmlToPdfFiles
 	files = append(files, services.ConvertHtmlToPdfFiles{
 		Name:         "index.html",
@@ -48,6 +59,9 @@ func (s *PDFService) GenerateReportPDF(intervention *models.Intervention) (*os.F
 	}, services.ConvertHtmlToPdfFiles{
 		Name:         "output.css",
 		ContentBytes: css_bytes,
+	}, services.ConvertHtmlToPdfFiles{
+		Name:         "logo.png",
+		ContentBytes: logo_bytes,
 	})
 
 	// Generate PDF using Gotenberg service
@@ -61,10 +75,17 @@ func (s *PDFService) GenerateReportPDF(intervention *models.Intervention) (*os.F
 
 // renderInterventionHTML renders the intervention template to HTML string
 func (s *PDFService) renderInterventionHTML(intervention *models.Intervention) (string, error) {
+	translator := translation.NewTranslator()
 	var buf []byte
 	htmlBuffer := &htmlWriter{buf: buf}
 
-	if err := templates.InterventionReport(templates.InterventionReportConfig{Intervention: intervention, StylesheetPath: "output.css"}).Render(context.Background(), htmlBuffer); err != nil {
+	templateConfig := templates.InterventionReportConfig{
+		Intervention:   intervention,
+		StylesheetPath: "output.css",
+		LogoPath:       "logo.png",
+		Translator:     translator,
+	}
+	if err := templates.InterventionReport(templateConfig).Render(context.Background(), htmlBuffer); err != nil {
 		return "", fmt.Errorf("failed to render template: %w", err)
 	}
 
