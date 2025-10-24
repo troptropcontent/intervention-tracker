@@ -2,15 +2,11 @@ package interventions
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
-	"io"
 	"log"
 	"os"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/attachments"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"gorm.io/gorm"
@@ -41,52 +37,9 @@ func AttachReportPdf(db *gorm.DB, storageService storage.StorageService, emailSe
 	defer pdfFile.Close()
 	defer os.Remove(pdfFile.Name()) // Clean up temporary file
 
-	// Get file info for metadata
-	fileInfo, err := pdfFile.Stat()
-	if err != nil {
-		log.Printf("Failed to get file info for intervention %d: %v", interventionId, err)
-		return
-	}
+	var attachmentService attachments.Attacher = attachments.NewAttachmentService(db, storageService)
 
-	// Generate unique storage key
-	// Format: interventions/{intervention_id}/{uuid}.pdf
-	storageKey := fmt.Sprintf("interventions/%d/%s.pdf", interventionId, uuid.New().String())
-
-	// Seek to beginning of file before uploading
-	if _, err := pdfFile.Seek(0, io.SeekStart); err != nil {
-		log.Printf("Failed to seek file for intervention %d: %v", interventionId, err)
-		return
-	}
-
-	// Upload to S3
-	_, err = storageService.UploadFile(ctx, storageKey, pdfFile, "application/pdf")
-	if err != nil {
-		log.Printf("Failed to upload PDF to S3 for intervention %d: %v", interventionId, err)
-		return
-	}
-
-	// Create Attachment record
-	now := sql.NullTime{Time: time.Now(), Valid: true}
-	attachment := models.Attachment{
-		HolderType:  "interventions",
-		HolderID:    interventionId,
-		StorageKey:  storageKey,
-		FileName:    fmt.Sprintf("intervention_%d_report.pdf", interventionId),
-		ContentType: "application/pdf",
-		FileSize:    fileInfo.Size(),
-		UploadedAt:  now,
-	}
-
-	if err := db.Create(&attachment).Error; err != nil {
-		log.Printf("Failed to create attachment record for intervention %d: %v", interventionId, err)
-		// Attempt to clean up uploaded file
-		if cleanupErr := storageService.DeleteFile(ctx, storageKey); cleanupErr != nil {
-			log.Printf("Failed to cleanup S3 file after attachment creation failure: %v", cleanupErr)
-		}
-		return
-	}
-
-	log.Printf("Successfully attached PDF report for intervention %d (attachment ID: %d)", interventionId, attachment.ID)
+	attachmentService.Attach(ctx, pdfFile, intervention.ID, "interventions", "application/pdf")
 
 	// Send notification email in a separate goroutine
 	go func() {
