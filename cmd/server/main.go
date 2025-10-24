@@ -11,6 +11,7 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/handlers"
 	authmiddleware "github.com/troptropcontent/qr_code_maintenance/internal/middleware"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 )
@@ -27,12 +28,19 @@ func main() {
 		log.Fatalf("failed to instanciate email service: %v", err)
 	}
 
+	// Initialize S3 storage service (reads config from environment variables)
+	storageService, err := storage.NewS3StorageService(nil)
+	if err != nil {
+		log.Fatalf("failed to initialize storage service: %v", err)
+	}
+
 	translator := translation.NewTranslator()
 
 	// Initialize handlers
 	h := &handlers.Handlers{
 		DB:                       db,
 		EmailNotificationService: emailService,
+		StorageService:           storageService,
 		TranslationService:       translator}
 
 	e := echo.New()

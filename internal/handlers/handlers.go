@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -12,6 +11,7 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/interventions"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"github.com/troptropcontent/qr_code_maintenance/internal/templates"
 	"gorm.io/gorm"
@@ -20,6 +20,7 @@ import (
 type Handlers struct {
 	DB                       *gorm.DB
 	EmailNotificationService email.EmailService
+	StorageService           storage.StorageService
 	TranslationService       translation.TranslatorService
 }
 
@@ -432,15 +433,9 @@ func (h *Handlers) PostIntervention(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to save intervention")
 	}
 
-	// Send email notification (don't fail the request if this fails)
-	go func() {
-		var reloadedIntervention models.Intervention
-		h.DB.Preload("User").Preload("Portal").Preload("Controls").First(&reloadedIntervention, intervention.ID)
-
-		if err := h.sendInterventionNotification(&reloadedIntervention, &portal, user); err != nil {
-			log.Printf("Failed to send intervention notification: %v", err)
-		}
-	}()
+	// Attach PDF report to S3 and send notification email asynchronously
+	// This doesn't block the HTTP response - errors are logged
+	go interventions.AttachReportPdf(h.DB, h.StorageService, h.EmailNotificationService, intervention.ID)
 
 	// Redirect to portal admin page
 	return c.Redirect(http.StatusSeeOther, "/admin/portals/"+id)
