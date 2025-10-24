@@ -31,103 +31,99 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 						</div>
 					}
 					@InterventionInputGroup("Contrôles d'intervention") {
-						<div>
-							<h3 class="text-lg font-medium text-gray-900 mb-6">Contrôles d'intervention</h3>
-							<!-- Security Controls Table -->
-							<div class="mb-8">
-								<h4 class="text-md font-medium text-gray-800 mb-3">Sécurité</h4>
-								<div class="print:break-inside-avoid">
-									<table class="w-full border-collapse border-none sm:border border-gray-300 text-sm">
-										<thead>
-											<tr class="bg-gray-100">
-												<th class="border border-gray-300 px-3 py-2 text-left font-medium w-1/2">Contrôle</th>
-												<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
-													<span class="hidden sm:inline">Conforme</span>
-													<span class="sm:hidden text-green-500">C</span>
-												</th>
-												<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
-													<span class="hidden sm:inline">Non conforme</span>
-													<span class="sm:hidden text-red-500">NC</span>
-												</th>
-												<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
-													<span class="hidden sm:inline">Non contrôlé</span>
-													<span class="sm:hidden">NA</span>
-												</th>
+						<div class="mb-8">
+							<h4 class="text-md font-medium text-gray-800 mb-3">Sécurité</h4>
+							<div class="print:break-inside-avoid">
+								<table class="w-full border-collapse border-none sm:border border-gray-300 text-sm">
+									<thead>
+										<tr class="bg-gray-100">
+											<th class="border border-gray-300 px-3 py-2 text-left font-medium w-1/2">Contrôle</th>
+											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
+												<span class="hidden sm:inline">Conforme</span>
+												<span class="sm:hidden text-green-500">C</span>
+											</th>
+											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
+												<span class="hidden sm:inline">Non conforme</span>
+												<span class="sm:hidden text-red-500">NC</span>
+											</th>
+											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
+												<span class="hidden sm:inline">Non contrôlé</span>
+												<span class="sm:hidden">NA</span>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										for i, controlType := range models.ControlTypesByKind[models.ControlKindSecurity] {
+											<tr class={ templ.KV("bg-gray-50", i%2 == 0) }>
+												<td class="border border-gray-300 px-3 py-2 font-medium" data-label="Contrôle">{ GetControlTypeLabel(controlType) }</td>
+												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Conforme">
+													<input type="radio" name={ "control_" + controlType } value="true" class="h-4 w-4 text-green-600"/>
+												</td>
+												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non conforme">
+													<input type="radio" name={ "control_" + controlType } value="false" class="h-4 w-4 text-red-600"/>
+												</td>
+												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non contrôlé">
+													<input type="radio" name={ "control_" + controlType } value="" checked class="h-4 w-4 text-gray-400"/>
+												</td>
 											</tr>
-										</thead>
-										<tbody>
-											for i, controlType := range models.ControlTypesByKind[models.ControlKindSecurity] {
-												<tr class={ templ.KV("bg-gray-50", i%2 == 0) }>
-													<td class="border border-gray-300 px-3 py-2 font-medium" data-label="Contrôle">{ GetControlTypeLabel(controlType) }</td>
-													<td class="border border-gray-300 px-2 py-1 text-center" data-label="Conforme">
-														<input type="radio" name={ "control_" + controlType } value="true" class="h-4 w-4 text-green-600"/>
-													</td>
-													<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non conforme">
-														<input type="radio" name={ "control_" + controlType } value="false" class="h-4 w-4 text-red-600"/>
-													</td>
-													<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non contrôlé">
-														<input type="radio" name={ "control_" + controlType } value="" checked class="h-4 w-4 text-gray-400"/>
-													</td>
-												</tr>
-											}
-										</tbody>
-									</table>
-									<!-- Legend for small screens -->
-									<div class="sm:hidden mt-3 text-xs text-gray-600 space-y-1">
-										<div class="flex flex-wrap gap-x-4 gap-y-1">
-											<span><span class="text-green-500 font-medium">C</span> = Conforme</span>
-											<span><span class="text-red-500 font-medium">NC</span> = Non conforme</span>
-											<span><span class="font-medium">NA</span> = Non contrôlé</span>
-										</div>
+										}
+									</tbody>
+								</table>
+								<!-- Legend for small screens -->
+								<div class="sm:hidden mt-3 text-xs text-gray-600 space-y-1">
+									<div class="flex flex-wrap gap-x-4 gap-y-1">
+										<span><span class="text-green-500 font-medium">C</span> = Conforme</span>
+										<span><span class="text-red-500 font-medium">NC</span> = Non conforme</span>
+										<span><span class="font-medium">NA</span> = Non contrôlé</span>
 									</div>
 								</div>
 							</div>
-							<!-- Other Controls Table -->
-							<div class="mb-8">
-								<h4 class="text-md font-medium text-gray-800 mb-3">Autres</h4>
-								<div class="print:break-inside-avoid">
-									<table class="w-full border-collapse border-none sm:border border-gray-300 text-sm">
-										<thead>
-											<tr class="bg-gray-100">
-												<th class="border border-gray-300 px-3 py-2 text-left font-medium w-1/2">Contrôle</th>
-												<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
-													<span class="hidden sm:inline">Conforme</span>
-													<span class="sm:hidden text-green-500">C</span>
-												</th>
-												<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
-													<span class="hidden sm:inline">Non conforme</span>
-													<span class="sm:hidden text-red-500">NC</span>
-												</th>
-												<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
-													<span class="hidden sm:inline">Non contrôlé</span>
-													<span class="sm:hidden">NA</span>
-												</th>
+						</div>
+						<!-- Other Controls Table -->
+						<div class="mb-8">
+							<h4 class="text-md font-medium text-gray-800 mb-3">Autres</h4>
+							<div class="print:break-inside-avoid">
+								<table class="w-full border-collapse border-none sm:border border-gray-300 text-sm">
+									<thead>
+										<tr class="bg-gray-100">
+											<th class="border border-gray-300 px-3 py-2 text-left font-medium w-1/2">Contrôle</th>
+											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
+												<span class="hidden sm:inline">Conforme</span>
+												<span class="sm:hidden text-green-500">C</span>
+											</th>
+											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
+												<span class="hidden sm:inline">Non conforme</span>
+												<span class="sm:hidden text-red-500">NC</span>
+											</th>
+											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
+												<span class="hidden sm:inline">Non contrôlé</span>
+												<span class="sm:hidden">NA</span>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										for i, controlType := range models.ControlTypesByKind[models.ControlKindOther] {
+											<tr class={ templ.KV("bg-gray-50", i%2 == 0) }>
+												<td class="border border-gray-300 px-3 py-2 font-medium" data-label="Contrôle">{ GetControlTypeLabel(controlType) }</td>
+												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Conforme">
+													<input type="radio" name={ "control_" + controlType } value="true" class="h-4 w-4 text-green-600"/>
+												</td>
+												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non conforme">
+													<input type="radio" name={ "control_" + controlType } value="false" class="h-4 w-4 text-red-600"/>
+												</td>
+												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non contrôlé">
+													<input type="radio" name={ "control_" + controlType } value="" checked class="h-4 w-4 text-gray-400"/>
+												</td>
 											</tr>
-										</thead>
-										<tbody>
-											for i, controlType := range models.ControlTypesByKind[models.ControlKindOther] {
-												<tr class={ templ.KV("bg-gray-50", i%2 == 0) }>
-													<td class="border border-gray-300 px-3 py-2 font-medium" data-label="Contrôle">{ GetControlTypeLabel(controlType) }</td>
-													<td class="border border-gray-300 px-2 py-1 text-center" data-label="Conforme">
-														<input type="radio" name={ "control_" + controlType } value="true" class="h-4 w-4 text-green-600"/>
-													</td>
-													<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non conforme">
-														<input type="radio" name={ "control_" + controlType } value="false" class="h-4 w-4 text-red-600"/>
-													</td>
-													<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non contrôlé">
-														<input type="radio" name={ "control_" + controlType } value="" checked class="h-4 w-4 text-gray-400"/>
-													</td>
-												</tr>
-											}
-										</tbody>
-									</table>
-									<!-- Legend for small screens -->
-									<div class="sm:hidden mt-3 text-xs text-gray-600 space-y-1">
-										<div class="flex flex-wrap gap-x-4 gap-y-1">
-											<span><span class="text-green-500 font-medium">C</span> = Conforme</span>
-											<span><span class="text-red-500 font-medium">NC</span> = Non conforme</span>
-											<span><span class="font-medium">NA</span> = Non contrôlé</span>
-										</div>
+										}
+									</tbody>
+								</table>
+								<!-- Legend for small screens -->
+								<div class="sm:hidden mt-3 text-xs text-gray-600 space-y-1">
+									<div class="flex flex-wrap gap-x-4 gap-y-1">
+										<span><span class="text-green-500 font-medium">C</span> = Conforme</span>
+										<span><span class="text-red-500 font-medium">NC</span> = Non conforme</span>
+										<span><span class="font-medium">NA</span> = Non contrôlé</span>
 									</div>
 								</div>
 							</div>
