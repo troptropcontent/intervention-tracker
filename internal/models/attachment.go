@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"time"
 
 	"gorm.io/gorm"
@@ -16,7 +17,7 @@ type Attachment struct {
 	FileName    string         `json:"file_name" gorm:"not null"`                    // Original filename
 	ContentType string         `json:"content_type" gorm:"type:varchar(255)"`        // MIME type (e.g., "application/pdf")
 	FileSize    int64          `json:"file_size"`                                    // Size in bytes
-	UploadedAt  time.Time      `json:"uploaded_at" gorm:"not null"`                  // When the file was uploaded
+	UploadedAt  sql.NullTime   `json:"uploaded_at"`                                  // When the file was uploaded
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `json:"-" gorm:"index"`
