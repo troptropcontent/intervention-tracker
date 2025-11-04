@@ -37,9 +37,16 @@ func AttachReportPdf(db *gorm.DB, storageService storage.StorageService, emailSe
 	defer pdfFile.Close()
 	defer os.Remove(pdfFile.Name()) // Clean up temporary file
 
+	// Get file info for metadata
+	fileInfo, err := pdfFile.Stat()
+	if err != nil {
+		log.Printf("Failed to get file info for intervention %d: %v", interventionId, err)
+		return
+	}
+
 	var attachmentService attachments.Attacher = attachments.NewAttachmentService(db, storageService)
 
-	attachmentService.Attach(ctx, pdfFile, intervention.ID, "interventions", "application/pdf")
+	attachmentService.Attach(ctx, pdfFile, fileInfo.Name(), intervention.ID, "interventions", "report")
 
 	// Send notification email in a separate goroutine
 	go func() {
