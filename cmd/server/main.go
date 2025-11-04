@@ -10,6 +10,8 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/database"
 	"github.com/troptropcontent/qr_code_maintenance/internal/handlers"
 	authmiddleware "github.com/troptropcontent/qr_code_maintenance/internal/middleware"
+	"github.com/troptropcontent/qr_code_maintenance/internal/routers"
+	"github.com/troptropcontent/qr_code_maintenance/internal/routers/interventions"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
@@ -42,6 +44,13 @@ func main() {
 		EmailNotificationService: emailService,
 		StorageService:           storageService,
 		TranslationService:       translator}
+
+	dependencies := routers.Dependencies{
+		DB:                       db,
+		EmailNotificationService: emailService,
+		StorageService:           storageService,
+		TranslationService:       translator,
+	}
 
 	e := echo.New()
 
@@ -77,6 +86,8 @@ func main() {
 	admin_routes.POST("/portals/:id/qr-code/remove", h.RemoveQRCode)
 	admin_routes.GET("/portals/:id/interventions/new", h.GetNewIntervention)
 	admin_routes.POST("/portals/:id/interventions", h.PostIntervention)
+
+	interventions.NewRouter(*admin_routes, &dependencies)
 	admin_routes.GET("/interventions/:id/report", h.GetInterventionReport)
 	admin_routes.GET("/portals/scan", h.GetAdminPortalsScan)
 
