@@ -6,6 +6,8 @@ import (
 
 	"github.com/go-playground/form"
 	"github.com/labstack/echo/v4"
+	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"gorm.io/gorm"
 )
 
 func ParseFormData(c echo.Context, target any) error {
@@ -27,4 +29,20 @@ func ParseFormData(c echo.Context, target any) error {
 	}
 
 	return nil
+}
+
+func FindAuthenticatedUser(c echo.Context, db *gorm.DB) (*models.User, error) {
+	userID := c.Get("user_id")
+	if userID == nil {
+		return nil, fmt.Errorf("no authenticated user in context")
+	}
+
+	var user models.User
+	result := db.First(&user, userID)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("could not find authenticated user: %w", result.Error)
+	}
+
+	return &user, nil
 }
