@@ -17,7 +17,10 @@ func findControlResult(intervention *models.Intervention, controlKey string) str
 	var result = "na"
 	for _, control := range intervention.Controls {
 		if control.Kind == controlKey {
-			if *control.Result {
+			// Check if Result is nil (control was not checked)
+			if control.Result == nil {
+				result = "na"
+			} else if *control.Result {
 				result = "passed"
 			} else {
 				result = "fail"
@@ -121,7 +124,9 @@ templ InterventionReport(config InterventionReportConfig) {
 			@InterventionReportSection("Résumé") {
 				<div>
 					<div class="bg-base-200 p-4 rounded-lg">
-						<p class="wrap-break-word">{ *config.Intervention.Summary }</p>
+						if config.Intervention.Summary != nil {
+							<p class="wrap-break-word">{ *config.Intervention.Summary }</p>
+						}
 					</div>
 				</div>
 			}
