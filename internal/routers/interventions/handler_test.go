@@ -56,8 +56,8 @@ func TestCreateNewIntervention_Success(t *testing.T) {
 
 	// Verify redirect URL format
 	location := rec.Header().Get("Location")
-	assert.Contains(t, location, "/interventions/")
-	assert.NotEqual(t, "/interventions/0", location)
+	assert.Contains(t, location, "/portals/")
+	assert.NotEqual(t, "/portals/0", location)
 
 	// Verify intervention was created in database
 	var intervention models.Intervention
@@ -442,7 +442,7 @@ func TestCreateNewIntervention_RedirectsToCorrectURL(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verify redirect URL
-	expectedLocation := fmt.Sprintf("/interventions/%d", intervention.ID)
+	expectedLocation := fmt.Sprintf("/portals/%d", intervention.ID)
 	actualLocation := rec.Header().Get("Location")
 	assert.Equal(t, expectedLocation, actualLocation)
 }
