@@ -19,16 +19,18 @@ export default class extends Controller {
     const file = e.target.files?.[0]
     if (!file) return
 
-    const match = e.target.name.match(/photos\[(?<index>\d+)\]file/)
+    const match = e.target.name.match(/photos\[(?<index>\d+)\].file/)
     const index = match?.groups?.index
     if (!index) return
 
     const nameInput = this.photoInputGroupNameInputTargets.find(
-      input => input.name === `photos[${index}]name`
+      input => input.name === `photos[${index}].name`
     )
 
     if (nameInput) {
-      nameInput.value = file.name
+      const fileName = file.name;
+      const lastDotIndex = fileName.lastIndexOf('.');
+      nameInput.value = lastDotIndex > 0 ? fileName.substring(0, lastDotIndex) : fileName;
     }
   }
 }
