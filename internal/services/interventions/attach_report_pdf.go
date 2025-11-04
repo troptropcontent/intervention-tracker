@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"time"
 
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/attachments"
@@ -22,9 +23,22 @@ func AttachReportPdf(db *gorm.DB, storageService storage.StorageService, emailSe
 
 	// Load intervention with all relationships
 	var intervention models.Intervention
-	if err := db.Preload("User").Preload("Portal").Preload("Controls").First(&intervention, interventionId).Error; err != nil {
+	if err := db.Preload("User").Preload("Attachments", "kind = ?", "photo").Preload("Portal").Preload("Controls").First(&intervention, interventionId).Error; err != nil {
 		log.Printf("Failed to load intervention %d: %v", interventionId, err)
 		return
+	}
+
+	for i, photo := range intervention.Attachments {
+		url, err := storageService.GetFileURL(
+			ctx,
+			photo.StorageKey,
+			15*time.Minute, // URL valid for 15 minutes
+		)
+		if err != nil {
+			log.Printf("Could not retrieve signed url for %v: %v", photo.FileName, err)
+			return
+		}
+		intervention.Attachments[i].SignedUrl = url
 	}
 
 	// Generate PDF report
