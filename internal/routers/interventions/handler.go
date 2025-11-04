@@ -1,14 +1,19 @@
 package interventions
 
 import (
+	"context"
 	"fmt"
 	"mime/multipart"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/routers"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/interventions"
-	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
+	"github.com/troptropcontent/qr_code_maintenance/internal/templates"
+	"gorm.io/gorm"
 )
 
 type CreateNewInterventionFormData struct {
@@ -94,15 +99,47 @@ func CreateNewIntervention(dependencies *routers.Dependencies) echo.HandlerFunc 
 			PortalID:  formData.PortalID,
 		}
 
-		utils.PP(args)
-
 		// Create the intervention
-		intervention, err := createService.Create(args)
+		_, err = createService.Create(args)
 		if err != nil {
 			return err
 		}
 
 		// Redirect to the intervention detail page or success page
-		return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/interventions/%d", intervention.ID))
+		// Use portalUri := c.Echo().Reverse("admin-get-portal", formData.PortalID) when all routes will be migrated to the server
+		return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/admin/portals/%d", formData.PortalID))
+	}
+}
+
+func GetInterventionReport(dependencies *routers.Dependencies) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		interventionIdString := c.Param("intervention_id")
+		interventionId, err := strconv.Atoi(interventionIdString)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, "could not extract interventionId from request path")
+		}
+
+		var intervention models.Intervention
+		result := dependencies.DB.Preload("Attachments", "kind = ?", "photo").Preload("Portal").Preload("Controls").First(&intervention, interventionId)
+
+		if result.Error != nil {
+			if result.Error == gorm.ErrRecordNotFound {
+				return echo.NewHTTPError(http.StatusNotFound, "Intervention not found")
+			}
+			return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
+		}
+		ctx := context.Background()
+		for i, photo := range intervention.Attachments {
+			url, err := dependencies.StorageService.GetFileURL(
+				ctx,
+				photo.StorageKey,
+				15*time.Minute, // URL valid for 15 minutes
+			)
+			if err != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, "Could not retrieve signed url for %v", photo.FileName)
+			}
+			intervention.Attachments[i].SignedUrl = url
+		}
+		return templates.InterventionReport(templates.InterventionReportConfig{Intervention: &intervention, Translator: dependencies.TranslationService}).Render(c.Request().Context(), c.Response().Writer)
 	}
 }
