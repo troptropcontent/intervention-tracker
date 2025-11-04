@@ -1,6 +1,7 @@
 package templates
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"strconv"
@@ -42,6 +43,55 @@ templ addNewPhotoInputGroupButton() {
 	</button>
 }
 
+templ controlTable(controls []string, baseInputIndex int) {
+	<div class="print:break-inside-avoid">
+		<table class="table w-full border-separate border-spacing-0 border-gray-300 text-sm">
+			<thead>
+				<tr class="bg-gray-100">
+					<th class="rounded-tl-md border border-gray-300 border-b-0 border-r-0 px-3 py-2 text-left font-medium w-1/2">Contrôle</th>
+					<th class="border border-gray-300 border-b-0  border-r-0 px-2 py-1 text-center font-medium w-2/12">
+						<span class="hidden sm:inline">Conforme</span>
+						<span class="sm:hidden text-green-500">C</span>
+					</th>
+					<th class="border border-gray-300 border-b-0  border-r-0 px-2 py-1 text-center font-medium w-2/12">
+						<span class="hidden sm:inline">Non conforme</span>
+						<span class="sm:hidden text-red-500">NC</span>
+					</th>
+					<th class="rounded-tr-md border border-gray-300 border-b-0  px-2 py-1 text-center font-medium w-2/12">
+						<span class="hidden sm:inline">Non contrôlé</span>
+						<span class="sm:hidden">NA</span>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				for i, control := range controls {
+					<tr class={ templ.KV("bg-gray-50", i%2 == 0), "group" }>
+						<td class="group-last:rounded-bl-md border border-gray-300 border-b-0 group-last:border-b border-r-0 px-3 py-2 font-medium" data-label="Contrôle">{ GetControlTypeLabel(control) }</td>
+						<td class="border border-gray-300 border-b-0 group-last:border-b border-r-0 px-2 py-1 text-center" data-label="Conforme">
+							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value="true" class="h-4 w-4 text-green-600"/>
+						</td>
+						<td class="border border-gray-300 border-b-0 group-last:border-b border-r-0 px-2 py-1 text-center" data-label="Non conforme">
+							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value="false" class="h-4 w-4 text-red-600"/>
+						</td>
+						<td class="group-last:rounded-br-md border border-gray-300 border-b-0 group-last:border-b px-2 py-1 text-center" data-label="Non contrôlé">
+							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value="" checked class="h-4 w-4 text-gray-400"/>
+						</td>
+						<input type="hidden" name={ fmt.Sprintf("controls[%v].kind", baseInputIndex+i) } value={ control } checked class="h-4 w-4 text-gray-400"/>
+					</tr>
+				}
+			</tbody>
+		</table>
+		<!-- Legend for small screens -->
+		<div class="sm:hidden mt-3 text-xs text-gray-600 space-y-1">
+			<div class="flex flex-wrap gap-x-4 gap-y-1">
+				<span><span class="text-green-500 font-medium">C</span> = Conforme</span>
+				<span><span class="text-red-500 font-medium">NC</span> = Non conforme</span>
+				<span><span class="font-medium">NA</span> = Non contrôlé</span>
+			</div>
+		</div>
+	</div>
+}
+
 templ AdminInterventionNew(portal models.Portal, user models.User, context echo.Context) {
 	@MainLayout(MainLayoutConfig{Title: "Nouvelle intervention - " + portal.Name}, context) {
 		<div class="max-w-4xl mx-auto">
@@ -55,7 +105,8 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 				<h1 class="text-3xl font-bold text-base-content">Nouvelle intervention - { portal.Name }</h1>
 			</div>
 			<div class="card bg-base-100 shadow-sm">
-				<form method="POST" action={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID)) + "/interventions") } class="card-body space-y-8">
+				<form method="POST" action={ templ.URL("/admin/interventions") } enctype="multipart/form-data" class="card-body space-y-8">
+					<input type="hidden" name="portal_id" value={ int(portal.ID) }/>
 					<!-- Intervention Details -->
 					@InterventionInputGroup(InterventionInputGroupConfig{Label: "Détails de l'intervention"}) {
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -65,100 +116,12 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 					@InterventionInputGroup(InterventionInputGroupConfig{Label: "Contrôles d'intervention"}) {
 						<div class="mb-8">
 							<h4 class="text-md font-medium text-gray-800 mb-3">Sécurité</h4>
-							<div class="print:break-inside-avoid">
-								<table class="w-full border-collapse border-none sm:border border-gray-300 text-sm">
-									<thead>
-										<tr class="bg-gray-100">
-											<th class="border border-gray-300 px-3 py-2 text-left font-medium w-1/2">Contrôle</th>
-											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
-												<span class="hidden sm:inline">Conforme</span>
-												<span class="sm:hidden text-green-500">C</span>
-											</th>
-											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
-												<span class="hidden sm:inline">Non conforme</span>
-												<span class="sm:hidden text-red-500">NC</span>
-											</th>
-											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
-												<span class="hidden sm:inline">Non contrôlé</span>
-												<span class="sm:hidden">NA</span>
-											</th>
-										</tr>
-									</thead>
-									<tbody>
-										for i, controlType := range models.ControlTypesByKind[models.ControlKindSecurity] {
-											<tr class={ templ.KV("bg-gray-50", i%2 == 0) }>
-												<td class="border border-gray-300 px-3 py-2 font-medium" data-label="Contrôle">{ GetControlTypeLabel(controlType) }</td>
-												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Conforme">
-													<input type="radio" name={ "control_" + controlType } value="true" class="h-4 w-4 text-green-600"/>
-												</td>
-												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non conforme">
-													<input type="radio" name={ "control_" + controlType } value="false" class="h-4 w-4 text-red-600"/>
-												</td>
-												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non contrôlé">
-													<input type="radio" name={ "control_" + controlType } value="" checked class="h-4 w-4 text-gray-400"/>
-												</td>
-											</tr>
-										}
-									</tbody>
-								</table>
-								<!-- Legend for small screens -->
-								<div class="sm:hidden mt-3 text-xs text-gray-600 space-y-1">
-									<div class="flex flex-wrap gap-x-4 gap-y-1">
-										<span><span class="text-green-500 font-medium">C</span> = Conforme</span>
-										<span><span class="text-red-500 font-medium">NC</span> = Non conforme</span>
-										<span><span class="font-medium">NA</span> = Non contrôlé</span>
-									</div>
-								</div>
-							</div>
+							@controlTable(models.ControlTypesByKind[models.ControlKindSecurity], 0)
 						</div>
 						<!-- Other Controls Table -->
 						<div class="mb-8">
 							<h4 class="text-md font-medium text-gray-800 mb-3">Autres</h4>
-							<div class="print:break-inside-avoid">
-								<table class="w-full border-collapse border-none sm:border border-gray-300 text-sm">
-									<thead>
-										<tr class="bg-gray-100">
-											<th class="border border-gray-300 px-3 py-2 text-left font-medium w-1/2">Contrôle</th>
-											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
-												<span class="hidden sm:inline">Conforme</span>
-												<span class="sm:hidden text-green-500">C</span>
-											</th>
-											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
-												<span class="hidden sm:inline">Non conforme</span>
-												<span class="sm:hidden text-red-500">NC</span>
-											</th>
-											<th class="border border-gray-300 px-2 py-1 text-center font-medium w-2/12">
-												<span class="hidden sm:inline">Non contrôlé</span>
-												<span class="sm:hidden">NA</span>
-											</th>
-										</tr>
-									</thead>
-									<tbody>
-										for i, controlType := range models.ControlTypesByKind[models.ControlKindOther] {
-											<tr class={ templ.KV("bg-gray-50", i%2 == 0) }>
-												<td class="border border-gray-300 px-3 py-2 font-medium" data-label="Contrôle">{ GetControlTypeLabel(controlType) }</td>
-												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Conforme">
-													<input type="radio" name={ "control_" + controlType } value="true" class="h-4 w-4 text-green-600"/>
-												</td>
-												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non conforme">
-													<input type="radio" name={ "control_" + controlType } value="false" class="h-4 w-4 text-red-600"/>
-												</td>
-												<td class="border border-gray-300 px-2 py-1 text-center" data-label="Non contrôlé">
-													<input type="radio" name={ "control_" + controlType } value="" checked class="h-4 w-4 text-gray-400"/>
-												</td>
-											</tr>
-										}
-									</tbody>
-								</table>
-								<!-- Legend for small screens -->
-								<div class="sm:hidden mt-3 text-xs text-gray-600 space-y-1">
-									<div class="flex flex-wrap gap-x-4 gap-y-1">
-										<span><span class="text-green-500 font-medium">C</span> = Conforme</span>
-										<span><span class="text-red-500 font-medium">NC</span> = Non conforme</span>
-										<span><span class="font-medium">NA</span> = Non contrôlé</span>
-									</div>
-								</div>
-							</div>
+							@controlTable(models.ControlTypesByKind[models.ControlKindOther], len(models.ControlTypesByKind[models.ControlKindSecurity]))
 						</div>
 					}
 					@InterventionInputGroup(InterventionInputGroupConfig{Label: "Résumé de l'intervention"}) {
@@ -183,8 +146,8 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 								<div class="card bg-base-100 border border-base-300 card-sm" data-intervention-photo-inputs-target="photoInputGroup">
 									<div class="card-body p-4 gap-3">
 										<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-											@InputText("Nom de la photo", "Nom de la pièce jointe", "photos[{{index}}]name", true, templ.Attributes{"data-intervention-photo-inputs-target": "photoInputGroupNameInput"})
-											@InputFile("Fichier", "photos[{{index}}]file", true, templ.Attributes{"data-action": "change->intervention-photo-inputs#changeNameInputValue"})
+											@InputText("Nom de la photo", "Nom de la pièce jointe", "photos[{{index}}].name", true, templ.Attributes{"data-intervention-photo-inputs-target": "photoInputGroupNameInput"})
+											@InputFile("Fichier", "photos[{{index}}].file", true, templ.Attributes{"data-action": "change->intervention-photo-inputs#changeNameInputValue"})
 										</div>
 									</div>
 								</div>
