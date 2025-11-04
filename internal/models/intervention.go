@@ -81,9 +81,10 @@ type Intervention struct {
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 
 	// Relationships
-	Portal   Portal    `json:"portal,omitempty" gorm:"foreignKey:PortalID"`
-	User     User      `json:"user,omitempty" gorm:"foreignKey:UserID"`
-	Controls []Control `json:"controls,omitempty" gorm:"foreignKey:intervention_id"`
+	Portal      Portal       `json:"portal,omitempty" gorm:"foreignKey:PortalID"`
+	User        User         `json:"user,omitempty" gorm:"foreignKey:UserID"`
+	Controls    []Control    `json:"controls,omitempty" gorm:"foreignKey:intervention_id"`
+	Attachments []Attachment `gorm:"polymorphic:Holder;"`
 }
 
 type Control struct {
