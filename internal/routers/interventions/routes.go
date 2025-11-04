@@ -1,0 +1,11 @@
+package interventions
+
+import (
+	"github.com/labstack/echo/v4"
+	"github.com/troptropcontent/qr_code_maintenance/internal/routers"
+)
+
+func NewRouter(parentGroup echo.Group, dependencies *routers.Dependencies) {
+	intervention_routes := parentGroup.Group("/interventions")
+	intervention_routes.POST("", CreateNewIntervention(dependencies))
+}
