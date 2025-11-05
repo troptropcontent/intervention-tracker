@@ -20,6 +20,14 @@ const (
 	InterventionTypeRepair      InterventionType = "repair"
 )
 
+func (t InterventionType) IsValid() bool {
+	switch t {
+	case InterventionTypeMaintenance, InterventionTypeRepair:
+		return true
+	}
+	return false
+}
+
 type ControlTypesStruct struct {
 	Security []string
 	Other    []string
