@@ -3243,9 +3243,6 @@
   .h-80 {
     height: calc(var(--spacing) * 80);
   }
-  .max-h-52 {
-    max-height: calc(var(--spacing) * 52);
-  }
   .max-h-\[70vh\] {
     max-height: 70vh;
   }
@@ -3284,9 +3281,6 @@
   }
   .w-80 {
     width: calc(var(--spacing) * 80);
-  }
-  .w-auto {
-    width: auto;
   }
   .w-full {
     width: 100%;
@@ -3657,6 +3651,14 @@
   .object-contain {
     object-fit: contain;
   }
+  .radio-xs {
+    @layer daisyui.modifier {
+      padding: 0.125rem;
+      &:is([type="radio"]) {
+        --size: calc(var(--size-selector, 0.25rem) * 4);
+      }
+    }
+  }
   .p-0 {
     padding: calc(var(--spacing) * 0);
   }
@@ -3986,6 +3988,21 @@
       }
     }
   }
+  .radio-error {
+    @layer daisyui.modifier {
+      --input-color: var(--color-error);
+    }
+  }
+  .radio-primary {
+    @layer daisyui.modifier {
+      --input-color: var(--color-primary);
+    }
+  }
+  .radio-success {
+    @layer daisyui.modifier {
+      --input-color: var(--color-success);
+    }
+  }
   .group-last\:rounded-br-md {
     &:is(:where(.group):last-child *) {
       border-bottom-right-radius: var(--radius-md);
@@ -4006,11 +4023,6 @@
     &:is(:where(.group):last-child *) {
       border-bottom-style: var(--tw-border-style);
       border-bottom-width: 0px;
-    }
-  }
-  .last\:mb-0 {
-    &:last-child {
-      margin-bottom: calc(var(--spacing) * 0);
     }
   }
   .only\:block {
@@ -4159,11 +4171,6 @@
   .print\:break-inside-avoid {
     @media print {
       break-inside: avoid;
-    }
-  }
-  .print\:break-after-page {
-    @media print {
-      break-after: page;
     }
   }
 }

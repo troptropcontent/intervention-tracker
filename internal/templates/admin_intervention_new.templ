@@ -68,13 +68,13 @@ templ controlTable(controls []string, baseInputIndex int) {
 					<tr class={ templ.KV("bg-gray-50", i%2 == 0), "group" }>
 						<td class="group-last:rounded-bl-md border border-gray-300 border-b-0 group-last:border-b border-r-0 px-3 py-2 font-medium" data-label="Contrôle">{ GetControlTypeLabel(control) }</td>
 						<td class="border border-gray-300 border-b-0 group-last:border-b border-r-0 px-2 py-1 text-center" data-label="Conforme">
-							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value="true" class="h-4 w-4 text-green-600"/>
+							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value="true" class="radio radio-xs radio-success"/>
 						</td>
 						<td class="border border-gray-300 border-b-0 group-last:border-b border-r-0 px-2 py-1 text-center" data-label="Non conforme">
-							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value="false" class="h-4 w-4 text-red-600"/>
+							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value="false" class="radio radio-xs radio-error"/>
 						</td>
 						<td class="group-last:rounded-br-md border border-gray-300 border-b-0 group-last:border-b px-2 py-1 text-center" data-label="Non contrôlé">
-							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value="" checked class="h-4 w-4 text-gray-400"/>
+							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value="" checked class="radio radio-xs radio-primary"/>
 						</td>
 						<input type="hidden" name={ fmt.Sprintf("controls[%v].kind", baseInputIndex+i) } value={ control } checked class="h-4 w-4 text-gray-400"/>
 					</tr>
