@@ -33,6 +33,7 @@ func TestCreateInterventionService_Create_Success(t *testing.T) {
 	fixture := setupTestFixture(db)
 
 	args := &CreateArgs{
+		Type:      models.InterventionTypeMaintenance,
 		Date:      "2024-01-15",
 		Summary:   "Routine maintenance check",
 		Signature: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA",
@@ -88,6 +89,45 @@ func TestCreateInterventionService_Create_Success(t *testing.T) {
 	assert.Nil(t, intervention.Controls[2].Result, "Result should be nil for unchecked")
 }
 
+func TestCreateInterventionService_CreateRepair_Success(t *testing.T) {
+	db := tests.SetupTestDB(t)
+	service := &CreateInterventionService{DB: db}
+	fixture := setupTestFixture(db)
+
+	args := &CreateArgs{
+		Type:      models.InterventionTypeRepair,
+		Date:      "2024-01-15",
+		Summary:   "Routine maintenance check",
+		Signature: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA",
+		PortalID:  fixture.portal.ID,
+		UserID:    fixture.user.ID,
+		UserName:  fixture.user.FullName(),
+	}
+
+	intervention, err := service.Create(args)
+
+	require.NoError(t, err, "Create should succeed")
+	assert.NotNil(t, intervention, "Intervention should not be nil")
+	assert.NotZero(t, intervention.ID, "Intervention ID should be set")
+
+	// Verify date parsing
+	expectedDate := time.Date(2024, 1, 15, 0, 0, 0, 0, time.UTC)
+	assert.Equal(t, expectedDate, intervention.Date, "Date should be parsed correctly")
+
+	// Verify intervention type
+	assert.Equal(t, models.InterventionTypeRepair, intervention.Type, "Type should be set to 'maintenance'")
+
+	// Verify summary
+	assert.NotNil(t, intervention.Summary, "Summary should not be nil")
+	assert.Equal(t, "Routine maintenance check", *intervention.Summary, "Summary should match")
+
+	// Verify signature
+	assert.Equal(t, "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA", intervention.Signature, "Signature should match")
+
+	// Verify no controls were created
+	assert.Len(t, intervention.Controls, 0, "Should have 0 controls")
+}
+
 func TestCreateInterventionService_Create_InvalidDateFormat(t *testing.T) {
 	db := tests.SetupTestDB(t)
 	service := &CreateInterventionService{DB: db}
@@ -127,6 +167,7 @@ func TestCreateInterventionService_Create_InvalidDateFormat(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			args := &CreateArgs{
+				Type:      models.InterventionTypeMaintenance,
 				Date:      tc.dateString,
 				Summary:   "Test summary",
 				Signature: "test-signature",
@@ -196,6 +237,7 @@ func TestCreateInterventionService_Create_ControlResultParsing(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			args := &CreateArgs{
+				Type:      models.InterventionTypeMaintenance,
 				Date:      "2024-01-15",
 				Summary:   "Test",
 				Signature: "sig",
@@ -233,6 +275,7 @@ func TestCreateInterventionService_Create_EmptySummary(t *testing.T) {
 	fixture := setupTestFixture(db)
 
 	args := &CreateArgs{
+		Type:      models.InterventionTypeMaintenance,
 		Date:      "2024-01-15",
 		Summary:   "",
 		Signature: "test-signature",
@@ -255,6 +298,7 @@ func TestCreateInterventionService_Create_NoControls(t *testing.T) {
 	fixture := setupTestFixture(db)
 
 	args := &CreateArgs{
+		Type:      models.InterventionTypeMaintenance,
 		Date:      "2024-01-15",
 		Summary:   "Test without controls",
 		Signature: "test-signature",
@@ -295,6 +339,7 @@ func TestCreateInterventionService_Create_MultipleControls(t *testing.T) {
 	}
 
 	args := &CreateArgs{
+		Type:      models.InterventionTypeMaintenance,
 		Date:      "2024-01-15",
 		Summary:   "Full security check",
 		Signature: "test-signature",
@@ -322,6 +367,7 @@ func TestCreateInterventionService_Create_DatabasePersistence(t *testing.T) {
 	fixture := setupTestFixture(db)
 
 	args := &CreateArgs{
+		Type:      models.InterventionTypeMaintenance,
 		Date:      "2024-01-15",
 		Summary:   "Persistence test",
 		Signature: "test-signature",
@@ -363,6 +409,7 @@ func TestCreateInterventionService_Create_TimestampsSet(t *testing.T) {
 	beforeCreate := time.Now()
 
 	args := &CreateArgs{
+		Type:      models.InterventionTypeMaintenance,
 		Date:      "2024-01-15",
 		Summary:   "Timestamp test",
 		Signature: "test-signature",

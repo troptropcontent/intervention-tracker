@@ -33,6 +33,7 @@ type CreateArgs struct {
 	PortalID  uint
 	UserID    uint
 	UserName  string
+	Type      models.InterventionType
 	Photos    []PhotoData
 	Controls  []struct {
 		Kind   string
@@ -40,7 +41,30 @@ type CreateArgs struct {
 	}
 }
 
-// Create creates a new intervention with controls and handles photo uploads
+type BaseInterventionCreateArgs struct {
+	Date      string
+	Summary   string
+	Signature string
+	PortalID  uint
+	UserID    uint
+	UserName  string
+	Photos    []PhotoData
+}
+
+type MaintenanceInterventionCreateArgs struct {
+	BaseInterventionCreateArgs
+	Controls []struct {
+		Kind   string
+		Result string
+	}
+}
+
+type RepairInterventionCreateArgs struct {
+	BaseInterventionCreateArgs
+}
+
+// Create creates a new intervention (maintenance or repair) and handles photo uploads
+// For maintenance interventions, controls are included; for repair interventions, they are omitted
 // All operations (intervention, controls, photo uploads) are done synchronously in a transaction
 // This ensures atomicity: either everything succeeds or everything rolls back
 func (s *CreateInterventionService) Create(args *CreateArgs) (*models.Intervention, error) {
@@ -77,18 +101,22 @@ func (s *CreateInterventionService) buildIntervention(args *CreateArgs) (*models
 		return nil, fmt.Errorf("invalid date format: %w", err)
 	}
 
-	controls := s.buildControls(args.Controls)
-
-	return &models.Intervention{
+	intervention := &models.Intervention{
 		Date:      date,
-		Type:      models.InterventionTypeMaintenance,
+		Type:      args.Type,
 		Summary:   &args.Summary,
 		Signature: args.Signature,
 		PortalID:  args.PortalID,
 		UserID:    args.UserID,
 		UserName:  args.UserName,
-		Controls:  controls,
-	}, nil
+	}
+
+	// Only build controls for maintenance interventions
+	if args.Type == models.InterventionTypeMaintenance {
+		intervention.Controls = s.buildControls(args.Controls)
+	}
+
+	return intervention, nil
 }
 
 // buildControls converts control arguments to control models
