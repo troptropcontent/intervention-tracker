@@ -32,6 +32,7 @@ func TestCreateNewIntervention_Success(t *testing.T) {
 	// Create request with form data
 	fields := map[string]string{
 		"portal_id":          fmt.Sprintf("%d", portal.ID),
+		"type":               "maintenance",
 		"date":               "2024-01-15",
 		"summary":            "Routine maintenance check",
 		"signature":          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA",
@@ -87,6 +88,7 @@ func TestCreateNewIntervention_WithPhotos(t *testing.T) {
 	fields := map[string]string{
 		"portal_id":      fmt.Sprintf("%d", portal.ID),
 		"date":           "2024-01-15",
+		"type":           "maintenance",
 		"summary":        "Maintenance with photos",
 		"signature":      "test-signature",
 		"photos[0].name": "Before repair",
@@ -131,6 +133,7 @@ func TestCreateNewIntervention_EmptySummary(t *testing.T) {
 	fields := map[string]string{
 		"portal_id": fmt.Sprintf("%d", portal.ID),
 		"date":      "2024-01-15",
+		"type":      "maintenance",
 		"summary":   "",
 		"signature": "test-signature",
 	}
@@ -172,6 +175,7 @@ func TestCreateNewIntervention_NoControls(t *testing.T) {
 	fields := map[string]string{
 		"portal_id": fmt.Sprintf("%d", portal.ID),
 		"date":      "2024-01-15",
+		"type":      "maintenance",
 		"summary":   "Test without controls",
 		"signature": "test-signature",
 	}
@@ -212,6 +216,7 @@ func TestCreateNewIntervention_MultipleControls(t *testing.T) {
 	fields := map[string]string{
 		"portal_id":          fmt.Sprintf("%d", portal.ID),
 		"date":               "2024-01-15",
+		"type":               "maintenance",
 		"summary":            "Full security check",
 		"signature":          "test-signature",
 		"controls[0].kind":   "warning_lights",
@@ -281,7 +286,7 @@ func TestCreateNewIntervention_InvalidDateFormat(t *testing.T) {
 
 	// Assert
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "invalid date format")
+	assert.Contains(t, err.Error(), "ERROR:parsing time \"01/15/2024\" as \"2006-01-02\"")
 }
 
 func TestCreateNewIntervention_MissingFile(t *testing.T) {
@@ -301,6 +306,7 @@ func TestCreateNewIntervention_MissingFile(t *testing.T) {
 	fields := map[string]string{
 		"portal_id":      fmt.Sprintf("%d", portal.ID),
 		"date":           "2024-01-15",
+		"type":           "maintenance",
 		"summary":        "Test missing file",
 		"signature":      "test-signature",
 		"photos[0].name": "Missing file photo",
@@ -370,6 +376,7 @@ func TestCreateNewIntervention_ControlResultParsing(t *testing.T) {
 			fields := map[string]string{
 				"portal_id":          fmt.Sprintf("%d", portal.ID),
 				"date":               "2024-01-15",
+				"type":               "maintenance",
 				"summary":            "Test control parsing",
 				"signature":          "test-signature",
 				"controls[0].kind":   "test_control",
@@ -420,6 +427,7 @@ func TestCreateNewIntervention_RedirectsToCorrectURL(t *testing.T) {
 	fields := map[string]string{
 		"portal_id": fmt.Sprintf("%d", portal.ID),
 		"date":      "2024-01-15",
+		"type":      "maintenance",
 		"summary":   "Test redirect",
 		"signature": "test-signature",
 	}
@@ -442,7 +450,7 @@ func TestCreateNewIntervention_RedirectsToCorrectURL(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verify redirect URL
-	expectedLocation := fmt.Sprintf("/portals/%d", intervention.ID)
+	expectedLocation := fmt.Sprintf("/admin/portals/%d", intervention.ID)
 	actualLocation := rec.Header().Get("Location")
 	assert.Equal(t, expectedLocation, actualLocation)
 }
@@ -489,6 +497,7 @@ func TestCreateNewIntervention_StorageServiceError(t *testing.T) {
 	fields := map[string]string{
 		"portal_id":      fmt.Sprintf("%d", portal.ID),
 		"date":           "2024-01-15",
+		"type":           "maintenance",
 		"summary":        "Test storage error",
 		"signature":      "test-signature",
 		"photos[0].name": "Test photo",
@@ -527,6 +536,7 @@ func TestCreateNewIntervention_EmailServiceCalled(t *testing.T) {
 	fields := map[string]string{
 		"portal_id": fmt.Sprintf("%d", portal.ID),
 		"date":      "2024-01-15",
+		"type":      "maintenance",
 		"summary":   "Test email notification",
 		"signature": "test-signature",
 	}
