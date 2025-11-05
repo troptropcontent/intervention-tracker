@@ -81,6 +81,7 @@ func (s *CreateInterventionService) buildIntervention(args *CreateArgs) (*models
 
 	return &models.Intervention{
 		Date:      date,
+		Type:      models.InterventionTypeMaintenance,
 		Summary:   &args.Summary,
 		Signature: args.Signature,
 		PortalID:  args.PortalID,

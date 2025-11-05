@@ -59,6 +59,9 @@ func TestCreateInterventionService_Create_Success(t *testing.T) {
 	expectedDate := time.Date(2024, 1, 15, 0, 0, 0, 0, time.UTC)
 	assert.Equal(t, expectedDate, intervention.Date, "Date should be parsed correctly")
 
+	// Verify intervention type
+	assert.Equal(t, models.InterventionTypeMaintenance, intervention.Type, "Type should be set to 'maintenance'")
+
 	// Verify summary
 	assert.NotNil(t, intervention.Summary, "Summary should not be nil")
 	assert.Equal(t, "Routine maintenance check", *intervention.Summary, "Summary should match")
