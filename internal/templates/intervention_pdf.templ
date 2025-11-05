@@ -125,7 +125,7 @@ templ InterventionReport(config InterventionReportConfig) {
 				<div>
 					<div class="bg-base-200 p-4 rounded-lg">
 						if config.Intervention.Summary != nil {
-							<p class="wrap-break-word">{ *config.Intervention.Summary }</p>
+							<p class="wrap-break-word whitespace-pre-wrap">{ *config.Intervention.Summary }</p>
 						}
 					</div>
 				</div>
@@ -141,9 +141,9 @@ templ InterventionReport(config InterventionReportConfig) {
 			</section>
 			if len(config.Intervention.Attachments) > 0 {
 				for _, photo := range config.Intervention.Attachments {
-					<section class="px-6 py-4 flex flex-col items-center justify-center min-h-screen print:break-before-page">
+					<section class="px-6 py-4 flex flex-col items-center justify-center min-h-screen print:min-h-0 print:break-before-page">
 						<div class="flex flex-col items-center gap-4 w-full">
-							<img src={ photo.SignedUrl } alt={ photo.FileName } class="max-h-[70vh] max-w-full object-contain"/>
+							<img src={ photo.SignedUrl } alt={ photo.FileName } class="max-h-[70vh] print:max-h-[90vh] max-w-full object-contain"/>
 							<p class="text-sm text-gray-600 italic">{ photo.FileName }</p>
 						</div>
 					</section>

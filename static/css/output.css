@@ -3788,6 +3788,9 @@
   .whitespace-nowrap {
     white-space: nowrap;
   }
+  .whitespace-pre-wrap {
+    white-space: pre-wrap;
+  }
   .text-base-content {
     color: var(--color-base-content);
   }
@@ -4136,6 +4139,16 @@
   .md\:grid-cols-2 {
     @media (width >= 48rem) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .print\:max-h-\[90vh\] {
+    @media print {
+      max-height: 90vh;
+    }
+  }
+  .print\:min-h-0 {
+    @media print {
+      min-height: calc(var(--spacing) * 0);
     }
   }
   .print\:break-before-page {
