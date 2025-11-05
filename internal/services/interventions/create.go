@@ -27,7 +27,7 @@ type PhotoData struct {
 }
 
 type CreateArgs struct {
-	Date      string
+	Date      time.Time
 	Summary   string
 	Signature string
 	PortalID  uint
@@ -96,13 +96,8 @@ func (s *CreateInterventionService) Create(args *CreateArgs) (*models.Interventi
 
 // buildIntervention constructs an intervention model from the provided arguments
 func (s *CreateInterventionService) buildIntervention(args *CreateArgs) (*models.Intervention, error) {
-	date, err := time.Parse("2006-01-02", args.Date)
-	if err != nil {
-		return nil, fmt.Errorf("invalid date format: %w", err)
-	}
-
 	intervention := &models.Intervention{
-		Date:      date,
+		Date:      args.Date,
 		Type:      args.Type,
 		Summary:   &args.Summary,
 		Signature: args.Signature,
