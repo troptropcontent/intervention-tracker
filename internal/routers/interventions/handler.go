@@ -17,10 +17,11 @@ import (
 )
 
 type CreateNewInterventionFormData struct {
-	PortalID  uint   `form:"portal_id"`
-	Date      string `form:"date"`
-	Summary   string `form:"summary"`
-	Signature string `form:"signature"`
+	Type      string    `form:"type"`
+	PortalID  uint      `form:"portal_id"`
+	Date      time.Time `form:"date"`
+	Summary   string    `form:"summary"`
+	Signature string    `form:"signature"`
 	Photos    []struct {
 		Name string `form:"name"`
 		File *multipart.FileHeader
@@ -33,7 +34,6 @@ type CreateNewInterventionFormData struct {
 
 func CreateNewIntervention(dependencies *routers.Dependencies) echo.HandlerFunc {
 	return func(c echo.Context) error {
-
 		user, err := routers.FindAuthenticatedUser(c, dependencies.DB)
 		if err != nil {
 			return err
@@ -44,6 +44,11 @@ func CreateNewIntervention(dependencies *routers.Dependencies) echo.HandlerFunc 
 		err = routers.ParseFormData(c, &formData)
 		if err != nil {
 			return err
+		}
+
+		interventionType := models.InterventionType(formData.Type)
+		if !interventionType.IsValid() {
+			return fmt.Errorf("invalid type: '%s'", formData.Type)
 		}
 
 		for i := range formData.Photos {
@@ -89,6 +94,7 @@ func CreateNewIntervention(dependencies *routers.Dependencies) echo.HandlerFunc 
 		}
 
 		args := &interventions.CreateArgs{
+			Type:      interventionType,
 			Date:      formData.Date,
 			Summary:   formData.Summary,
 			Signature: formData.Signature,
