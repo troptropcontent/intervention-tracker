@@ -69,6 +69,50 @@ func TestCreateNewIntervention_Success(t *testing.T) {
 	assert.Len(t, intervention.Controls, 2)
 }
 
+func TestCreateNewIntervention_RepairType_Success(t *testing.T) {
+	// Setup
+	db := tests.SetupTestDB(t)
+	mockStorage := &tests.MockStorageService{}
+	mockEmail := &tests.MockEmailService{}
+
+	deps := &routers.Dependencies{
+		DB:                       db,
+		StorageService:           mockStorage,
+		EmailNotificationService: mockEmail,
+	}
+
+	user := factories.NewUser().Create(db)
+	portal := factories.NewPortal().Create(db)
+
+	// Create request with type: "repair"
+	fields := map[string]string{
+		"portal_id": fmt.Sprintf("%d", portal.ID),
+		"type":      "repair",
+		"date":      "2024-01-15",
+		"summary":   "Door spring replacement",
+		"signature": "test-signature",
+	}
+
+	c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, nil).Build()
+	rec := c.Response().Writer.(*httptest.ResponseRecorder)
+
+	// Execute
+	handler := CreateNewIntervention(deps)
+	err := handler(c)
+
+	// Assert
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusSeeOther, rec.Code)
+
+	// Verify repair intervention was created with correct type
+	var intervention models.Intervention
+	err = db.First(&intervention).Error
+	require.NoError(t, err)
+	assert.Equal(t, "repair", string(intervention.Type))
+	assert.NotNil(t, intervention.Summary)
+	assert.Equal(t, "Door spring replacement", *intervention.Summary)
+}
+
 func TestCreateNewIntervention_WithPhotos(t *testing.T) {
 	// Setup
 	db := tests.SetupTestDB(t)
