@@ -1,0 +1,15 @@
+package templates
+
+templ InputString(label, name, placeholder string, required bool) {
+	<div>
+		<label for={ name } class="block text-sm font-medium text-gray-700 mb-1">{ label }</label>
+		<input
+			type="string"
+			id={ name }
+			name={ name }
+			placeholder={ placeholder }
+			class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+			required?={ required }
+		/>
+	</div>
+}

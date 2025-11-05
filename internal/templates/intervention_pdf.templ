@@ -17,7 +17,10 @@ func findControlResult(intervention *models.Intervention, controlKey string) str
 	var result = "na"
 	for _, control := range intervention.Controls {
 		if control.Kind == controlKey {
-			if *control.Result {
+			// Check if Result is nil (control was not checked)
+			if control.Result == nil {
+				result = "na"
+			} else if *control.Result {
 				result = "passed"
 			} else {
 				result = "fail"
@@ -59,7 +62,7 @@ templ controleTable(title string, intervention *models.Intervention, controls []
 }
 
 templ InterventionReportSection(title string) {
-	<section class="px-6">
+	<section class="px-6 print:break-inside-avoid">
 		<h2 class="text-l font-semibold text-primary mb-4">{ title }</h2>
 		{ children... }
 	</section>
@@ -121,7 +124,9 @@ templ InterventionReport(config InterventionReportConfig) {
 			@InterventionReportSection("Résumé") {
 				<div>
 					<div class="bg-base-200 p-4 rounded-lg">
-						<p class="whitespace-pre-wrap">{ *config.Intervention.Summary }</p>
+						if config.Intervention.Summary != nil {
+							<p class="wrap-break-word whitespace-pre-wrap">{ *config.Intervention.Summary }</p>
+						}
 					</div>
 				</div>
 			}
@@ -134,6 +139,16 @@ templ InterventionReport(config InterventionReportConfig) {
 					<img src={ config.Intervention.Signature } alt="Signature" class="h-20"/>
 				</div>
 			</section>
+			if len(config.Intervention.Attachments) > 0 {
+				for _, photo := range config.Intervention.Attachments {
+					<section class="px-6 py-4 flex flex-col items-center justify-center min-h-screen print:min-h-0 print:break-before-page">
+						<div class="flex flex-col items-center gap-4 w-full">
+							<img src={ photo.SignedUrl } alt={ photo.FileName } class="max-h-[70vh] print:max-h-[90vh] max-w-full object-contain"/>
+							<p class="text-sm text-gray-600 italic">{ photo.FileName }</p>
+						</div>
+					</section>
+				}
+			}
 		</body>
 	</html>
 }

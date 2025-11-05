@@ -1,0 +1,38 @@
+package templates
+
+templ InputFile(label string, name string, required bool, attributes ...templ.Attributes) {
+	<div>
+		if label != "" {
+			<label for={ name } class="block text-sm font-medium text-gray-700 mb-1">{ label }</label>
+		}
+		<input
+			type="file"
+			id={ name }
+			name={ name }
+			class="input-primary file-input border-gray-300"
+			required?={ required }
+			if len(attributes) > 0 {
+				{ attributes[0]... }
+			}
+		/>
+	</div>
+}
+
+templ InputText(label string, placeholder string, name string, required bool, attributes ...templ.Attributes) {
+	<div>
+		if label != "" {
+			<label for={ name } class="block text-sm font-medium text-gray-700 mb-1">{ label }</label>
+		}
+		<input
+			type="text"
+			id={ name }
+			name={ name }
+			class="input input-primary border-gray-300"
+			placeholder={ placeholder }
+			required?={ required }
+			if len(attributes) > 0 {
+				{ attributes[0]... }
+			}
+		/>
+	</div>
+}
