@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"strconv"
+	"time"
 )
 
 type InterventionInputGroupConfig struct {
@@ -92,7 +93,36 @@ templ controlTable(controls []string, baseInputIndex int) {
 	</div>
 }
 
-templ AdminInterventionNew(portal models.Portal, user models.User, context echo.Context) {
+templ MaintenanceSpecificSections() {
+	@InterventionInputGroup(InterventionInputGroupConfig{Label: "Contrôles d'intervention"}) {
+		<div class="mb-8">
+			<h4 class="text-md font-medium text-gray-800 mb-3">Sécurité</h4>
+			@controlTable(models.ControlTypesByKind[models.ControlKindSecurity], 0)
+		</div>
+		<!-- Other Controls Table -->
+		<div class="mb-8">
+			<h4 class="text-md font-medium text-gray-800 mb-3">Autres</h4>
+			@controlTable(models.ControlTypesByKind[models.ControlKindOther], len(models.ControlTypesByKind[models.ControlKindSecurity]))
+		</div>
+	}
+}
+
+templ RepairSpecificSections() {
+	@InterventionInputGroup(InterventionInputGroupConfig{Label: "Temps passé sur l'intervention (en heures)"}) {
+		@InputNumber(&InputNumberArgs{
+			Title:         "Doit etre compris entre 1 et 10",
+			Placeholder:   "Indiquer le nombre d'heures passées",
+			Name:          "time_spent",
+			Min:           0.5,
+			Max:           10,
+			Step:          0.5,
+			ValidatorHint: "La valeur doit etre comprise entre 0.5 et 10 et arrondie à la demie heure.",
+			Required:      true,
+		})
+	}
+}
+
+templ AdminInterventionNew(context echo.Context, portal *models.Portal, user *models.User, interventionType models.InterventionType) {
 	@MainLayout(MainLayoutConfig{Title: "Nouvelle intervention - " + portal.Name}, context) {
 		<div class="max-w-4xl mx-auto">
 			<div class="mb-6">
@@ -110,22 +140,28 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 					<!-- Intervention Details -->
 					@InterventionInputGroup(InterventionInputGroupConfig{Label: "Détails de l'intervention"}) {
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-							@InputCalendar("Date d'intervention", "date", "", true)
+							@InputDate(&InputDateArgs{
+								Title:         "Date de l'intervention",
+								Label:         "Date de l'intervention",
+								Name:          "date",
+								Required:      true,
+								Max:           time.Now(),
+								ValidatorHint: "La date ne peux pas etre dans le future",
+							})
 						</div>
 					}
-					@InterventionInputGroup(InterventionInputGroupConfig{Label: "Contrôles d'intervention"}) {
-						<div class="mb-8">
-							<h4 class="text-md font-medium text-gray-800 mb-3">Sécurité</h4>
-							@controlTable(models.ControlTypesByKind[models.ControlKindSecurity], 0)
-						</div>
-						<!-- Other Controls Table -->
-						<div class="mb-8">
-							<h4 class="text-md font-medium text-gray-800 mb-3">Autres</h4>
-							@controlTable(models.ControlTypesByKind[models.ControlKindOther], len(models.ControlTypesByKind[models.ControlKindSecurity]))
-						</div>
+					switch interventionType {
+						case models.InterventionTypeMaintenance:
+							@MaintenanceSpecificSections()
+						case models.InterventionTypeRepair:
+							@RepairSpecificSections()
 					}
 					@InterventionInputGroup(InterventionInputGroupConfig{Label: "Résumé de l'intervention"}) {
-						@InputTextarea(&InputTextareaConfig{Placeholder: "Description générale de l'intervention...", Name: "summary", Required: true, WraperClass: "mt-4"})
+						@TextAreaInput(&TextAreaInputArgs{
+							Placeholder: "Description générale de l'intervention...",
+							Name:        "summary",
+							Required:    true,
+						})
 					}
 					@InterventionInputGroup(InterventionInputGroupConfig{
 						Label:      "Photos",

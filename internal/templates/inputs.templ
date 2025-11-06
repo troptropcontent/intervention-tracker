@@ -11,7 +11,7 @@ templ InputFile(label string, name string, required bool, attributes ...templ.At
 			type="file"
 			id={ name }
 			name={ name }
-			class="input-primary file-input border-gray-300"
+			class="input-primary file-input"
 			required?={ required }
 			if len(attributes) > 0 {
 				{ attributes[0]... }
@@ -29,7 +29,7 @@ templ InputText(label string, placeholder string, name string, required bool, at
 			type="text"
 			id={ name }
 			name={ name }
-			class="input input-primary border-gray-300"
+			class="input input-primary"
 			placeholder={ placeholder }
 			required?={ required }
 			if len(attributes) > 0 {
@@ -59,7 +59,7 @@ templ InputNumber(args *InputNumberArgs) {
 		}
 		<input
 			type="number"
-			class={ "input input-primary border-gray-300", templ.KV("validator", args.ValidatorHint != "") }
+			class={ "input input-primary", templ.KV("validator", args.ValidatorHint != "") }
 			required={ args.Required }
 			placeholder={ args.Placeholder }
 			min={ args.Min }
@@ -94,7 +94,7 @@ templ InputDate(args *InputDateArgs) {
 		}
 		<input
 			type="date"
-			class={ "input input-primary border-gray-300", templ.KV("validator", args.ValidatorHint != "") }
+			class={ "input input-primary", templ.KV("validator", args.ValidatorHint != "") }
 			required={ args.Required }
 			title={ args.Title }
 			value={ time.Now().Format("2006-01-02") }
@@ -110,4 +110,29 @@ templ InputDate(args *InputDateArgs) {
 			<p class="validator-hint">{ args.ValidatorHint }</p>
 		}
 	</div>
+}
+
+type TextAreaInputArgs struct {
+	Label       string
+	Placeholder string
+	Hint        string
+	Name        string
+	Required    bool
+}
+
+templ TextAreaInput(args *TextAreaInputArgs) {
+	<fieldset class="fieldset">
+		if args.Label != "" {
+			<legend class="fieldset-legend text-sm font-medium text-gray-700">{ args.Label }</legend>
+		}
+		<textarea
+			class="textarea textarea-primary h-24 w-full"
+			name={ args.Name }
+			required={ args.Required }
+			placeholder={ args.Placeholder }
+		></textarea>
+		if args.Hint != "" {
+			<div class="label">{ args.Hint }</div>
+		}
+	</fieldset>
 }
