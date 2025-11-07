@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"mime/multipart"
 	"path/filepath"
-	"strconv"
 	"time"
 
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
@@ -26,6 +25,11 @@ type PhotoData struct {
 	File *multipart.FileHeader
 }
 
+type ControlData struct {
+	Kind   models.ControlKind
+	Result models.ControlResult
+}
+
 type CreateArgs struct {
 	Date      time.Time
 	Summary   string
@@ -35,10 +39,7 @@ type CreateArgs struct {
 	UserName  string
 	Type      models.InterventionType
 	Photos    []PhotoData
-	Controls  []struct {
-		Kind   string
-		Result string
-	}
+	Controls  []ControlData
 }
 
 type BaseInterventionCreateArgs struct {
@@ -115,23 +116,12 @@ func (s *CreateInterventionService) buildIntervention(args *CreateArgs) (*models
 }
 
 // buildControls converts control arguments to control models
-func (s *CreateInterventionService) buildControls(ctrlArgs []struct {
-	Kind   string
-	Result string
-}) []models.Control {
+func (s *CreateInterventionService) buildControls(ctrlArgs []ControlData) []models.Control {
 	controls := make([]models.Control, 0, len(ctrlArgs))
 	for _, ctrl := range ctrlArgs {
-		var result models.ControlResult
-		if ctrl.Result != "" {
-			if boolVal, err := strconv.ParseBool(ctrl.Result); err == nil {
-				result = &boolVal
-			}
-		}
-		// If Result is empty or invalid, result stays nil (not checked)
-
 		controls = append(controls, models.Control{
 			Kind:   ctrl.Kind,
-			Result: result,
+			Result: ctrl.Result,
 		})
 	}
 	return controls
