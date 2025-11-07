@@ -84,8 +84,6 @@ func main() {
 	admin_routes.POST("/portals/:id", h.UpdatePortal).Name = "admin-get-portal"
 	admin_routes.POST("/portals/:id/qr-code/associate", h.AssociateQRCode)
 	admin_routes.POST("/portals/:id/qr-code/remove", h.RemoveQRCode)
-	admin_routes.GET("/portals/:id/interventions/new", h.GetNewIntervention)
-	admin_routes.POST("/portals/:id/interventions", h.PostIntervention)
 	interventions.NewRouter(*admin_routes, &dependencies)
 	admin_routes.GET("/portals/scan", h.GetAdminPortalsScan)
 
