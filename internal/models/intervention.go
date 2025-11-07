@@ -6,13 +6,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type ControlKind string
-
-const (
-	ControlKindSecurity ControlKind = "security"
-	ControlKindOther    ControlKind = "other"
-)
-
 type InterventionType string
 
 const (
@@ -27,61 +20,6 @@ func (t InterventionType) IsValid() bool {
 	}
 	return false
 }
-
-type ControlTypesStruct struct {
-	Security []string
-	Other    []string
-}
-
-var ControleTypes = ControlTypesStruct{
-	Security: []string{
-		"warning_lights",
-		"area_lighting",
-		"safety_cells",
-		"pressure_bar",
-		"floor_loop",
-		"force_limiter",
-		"safety_springs",
-		"floor_markings",
-	},
-	Other: []string{
-		"apron_condition",
-		"horizontal_rails",
-		"vertical_rails",
-		"roller_condition",
-		"drive_system",
-		"limit_switches",
-		"control_devices",
-		"control_panel",
-		"manual_override",
-	},
-}
-
-var ControlTypesByKind = map[ControlKind][]string{
-	ControlKindSecurity: {
-		"warning_lights",
-		"area_lighting",
-		"safety_cells",
-		"pressure_bar",
-		"floor_loop",
-		"force_limiter",
-		"safety_springs",
-		"floor_markings",
-	},
-	ControlKindOther: {
-		"apron_condition",
-		"horizontal_rails",
-		"vertical_rails",
-		"roller_condition",
-		"drive_system",
-		"limit_switches",
-		"control_devices",
-		"control_panel",
-		"manual_override",
-	},
-}
-
-type ControlResult *bool
 
 type Intervention struct {
 	ID        uint             `json:"id" gorm:"primaryKey"`
@@ -103,23 +41,6 @@ type Intervention struct {
 	Attachments []Attachment `gorm:"polymorphic:Holder;"`
 }
 
-type Control struct {
-	ID             uint           `json:"id" gorm:"primaryKey"`
-	Kind           string         `json:"kind" gorm:"type:varchar(20);not null"`
-	Result         ControlResult  `json:"result"`
-	InterventionID uint           `json:"intervention_id" gorm:"not null"`
-	CreatedAt      time.Time      `json:"created_at"`
-	UpdatedAt      time.Time      `json:"updated_at"`
-	DeletedAt      gorm.DeletedAt `json:"-" gorm:"index"`
-
-	// Relationships
-	Intervention Intervention `json:"intervention,omitempty"`
-}
-
 func (Intervention) TableName() string {
 	return "interventions"
-}
-
-func (Control) TableName() string {
-	return "controls"
 }
