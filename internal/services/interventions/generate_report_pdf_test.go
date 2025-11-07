@@ -76,7 +76,7 @@ func TestPDFService_GenerateReportPDF_Success(t *testing.T) {
 func TestPDFService_GenerateReportPDF_EmptyData(t *testing.T) {
 	// Use invalid URL to simulate network error and test early failure
 	service := NewPDFService("http://invalid-url:9999")
-	intervention := &models.Intervention{}
+	intervention := createTestIntervention()
 
 	tempFile, err := service.GenerateReportPDF(intervention)
 
