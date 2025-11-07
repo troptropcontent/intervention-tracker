@@ -37,9 +37,9 @@ func TestCreateNewIntervention_Success(t *testing.T) {
 		"summary":            "Routine maintenance check",
 		"signature":          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA",
 		"controls[0].kind":   "warning_lights",
-		"controls[0].result": "true",
+		"controls[0].result": "compliant",
 		"controls[1].kind":   "area_lighting",
-		"controls[1].result": "false",
+		"controls[1].result": "non_compliant",
 	}
 
 	files := map[string][]byte{}
@@ -264,21 +264,21 @@ func TestCreateNewIntervention_MultipleControls(t *testing.T) {
 		"summary":            "Full security check",
 		"signature":          "test-signature",
 		"controls[0].kind":   "warning_lights",
-		"controls[0].result": "true",
+		"controls[0].result": "compliant",
 		"controls[1].kind":   "area_lighting",
-		"controls[1].result": "true",
+		"controls[1].result": "compliant",
 		"controls[2].kind":   "safety_cells",
-		"controls[2].result": "false",
+		"controls[2].result": "non_compliant",
 		"controls[3].kind":   "pressure_bar",
-		"controls[3].result": "true",
+		"controls[3].result": "compliant",
 		"controls[4].kind":   "floor_loop",
-		"controls[4].result": "",
+		"controls[4].result": "skipped",
 		"controls[5].kind":   "force_limiter",
-		"controls[5].result": "true",
+		"controls[5].result": "compliant",
 		"controls[6].kind":   "safety_springs",
-		"controls[6].result": "false",
+		"controls[6].result": "non_compliant",
 		"controls[7].kind":   "floor_markings",
-		"controls[7].result": "true",
+		"controls[7].result": "compliant",
 	}
 
 	user := factories.NewUser().Create(db)
@@ -371,34 +371,19 @@ func TestCreateNewIntervention_MissingFile(t *testing.T) {
 
 func TestCreateNewIntervention_ControlResultParsing(t *testing.T) {
 	testCases := []struct {
-		name           string
-		resultValue    string
-		expectedResult *bool
+		name        string
+		resultValue string
+		wantError   bool
 	}{
 		{
-			name:           "true string",
-			resultValue:    "true",
-			expectedResult: boolPtr(true),
+			name:        "valid result",
+			resultValue: "compliant",
+			wantError:   false,
 		},
 		{
-			name:           "false string",
-			resultValue:    "false",
-			expectedResult: boolPtr(false),
-		},
-		{
-			name:           "1 as true",
-			resultValue:    "1",
-			expectedResult: boolPtr(true),
-		},
-		{
-			name:           "0 as false",
-			resultValue:    "0",
-			expectedResult: boolPtr(false),
-		},
-		{
-			name:           "empty string",
-			resultValue:    "",
-			expectedResult: nil,
+			name:        "invalid result",
+			resultValue: "invalid",
+			wantError:   true,
 		},
 	}
 
@@ -423,32 +408,42 @@ func TestCreateNewIntervention_ControlResultParsing(t *testing.T) {
 				"type":               "maintenance",
 				"summary":            "Test control parsing",
 				"signature":          "test-signature",
-				"controls[0].kind":   "test_control",
+				"controls[0].kind":   "warning_lights",
 				"controls[0].result": tc.resultValue,
 			}
 
 			user := factories.NewUser().Create(db)
 			c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, nil).Build()
 
+			var numberOfInterventionBefore int64
+			db.Model(&models.Intervention{}).Count(&numberOfInterventionBefore)
+			require.Equal(t, int64(0), numberOfInterventionBefore, "no intervention should be recorded at this point")
+			var numberOfControlBefore int64
+			db.Model(&models.Control{}).Count(&numberOfControlBefore)
+			require.Equal(t, int64(0), numberOfInterventionBefore, "no control should be recorded at this point")
 			// Execute
 			handler := CreateNewIntervention(deps)
 			err := handler(c)
 
-			// Assert
-			require.NoError(t, err)
+			var numberOfInterventionAfter int64
+			db.Model(&models.Intervention{}).Count(&numberOfInterventionAfter)
+			var numberOfControlAfter int64
+			db.Model(&models.Control{}).Count(&numberOfControlAfter)
 
-			// Verify control result was parsed correctly
-			var intervention models.Intervention
-			err = db.Preload("Controls").First(&intervention).Error
-			require.NoError(t, err)
-			require.Len(t, intervention.Controls, 1)
-
-			control := intervention.Controls[0]
-			if tc.expectedResult == nil {
-				assert.Nil(t, control.Result)
+			if tc.wantError {
+				require.Error(t, err)
+				assert.Equal(t, int64(0), numberOfInterventionAfter, "no intervention should have been created")
+				assert.Equal(t, int64(0), numberOfControlAfter, "no control should have been created")
+				assert.Contains(t, err.Error(), "invalid control result: 'invalid'")
 			} else {
-				require.NotNil(t, control.Result)
-				assert.Equal(t, *tc.expectedResult, *control.Result)
+				require.NoError(t, err)
+				assert.Equal(t, int64(1), numberOfInterventionAfter, "an intervention should have been created")
+				assert.Equal(t, int64(1), numberOfControlAfter, "only one control should have been created")
+				// // Verify control result was parsed correctly
+				var intervention models.Intervention
+				err = db.Preload("Controls").First(&intervention).Error
+				require.NoError(t, err)
+				assert.Equal(t, tc.resultValue, string(intervention.Controls[0].Result))
 			}
 		})
 	}
@@ -603,9 +598,4 @@ func TestCreateNewIntervention_EmailServiceCalled(t *testing.T) {
 	if mockEmail.SendCalled {
 		assert.Greater(t, len(mockEmail.SentEmails), 0, "Should have sent at least one email")
 	}
-}
-
-// Helper function to create *bool
-func boolPtr(b bool) *bool {
-	return &b
 }

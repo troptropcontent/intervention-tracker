@@ -34,19 +34,16 @@ func TestCreateInterventionService_Create_Success(t *testing.T) {
 
 	args := &CreateArgs{
 		Type:      models.InterventionTypeMaintenance,
-		Date:      "2024-01-15",
+		Date:      tests.MustParseDate(t, "2024-01-15"),
 		Summary:   "Routine maintenance check",
 		Signature: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA",
 		PortalID:  fixture.portal.ID,
 		UserID:    fixture.user.ID,
 		UserName:  fixture.user.FullName(),
-		Controls: []struct {
-			Kind   string
-			Result string
-		}{
-			{Kind: "warning_lights", Result: "true"},
-			{Kind: "area_lighting", Result: "false"},
-			{Kind: "safety_cells", Result: ""},
+		Controls: []ControlData{
+			{Kind: models.ControlKindApronCondition, Result: models.ControlResultCompliant},
+			{Kind: models.ControlKindControlDevices, Result: models.ControlResultNeedsAttention},
+			{Kind: models.ControlKindAreaLighting, Result: models.ControlResultNonCompliant},
 		},
 	}
 
@@ -73,20 +70,18 @@ func TestCreateInterventionService_Create_Success(t *testing.T) {
 	// Verify controls were created
 	assert.Len(t, intervention.Controls, 3, "Should have 3 controls")
 
-	// Verify first control (true)
-	assert.Equal(t, "warning_lights", intervention.Controls[0].Kind)
-	assert.NotNil(t, intervention.Controls[0].Result, "Result should not be nil")
-	assert.True(t, *intervention.Controls[0].Result, "Result should be true")
+	// Verify first control (compliant)
+	assert.Equal(t, models.ControlKindApronCondition, intervention.Controls[0].Kind)
+	assert.Equal(t, models.ControlResultCompliant, intervention.Controls[0].Result, "Result should be compliant")
 	assert.NotZero(t, intervention.Controls[0].ID, "Control ID should be set")
 
-	// Verify second control (false)
-	assert.Equal(t, "area_lighting", intervention.Controls[1].Kind)
-	assert.NotNil(t, intervention.Controls[1].Result, "Result should not be nil")
-	assert.False(t, *intervention.Controls[1].Result, "Result should be false")
+	// Verify second control (needs attention)
+	assert.Equal(t, models.ControlKindControlDevices, intervention.Controls[1].Kind)
+	assert.Equal(t, models.ControlResultNeedsAttention, intervention.Controls[1].Result, "Result should be needs_attention")
 
-	// Verify third control (nil/unchecked)
-	assert.Equal(t, "safety_cells", intervention.Controls[2].Kind)
-	assert.Nil(t, intervention.Controls[2].Result, "Result should be nil for unchecked")
+	// Verify third control (non-compliant)
+	assert.Equal(t, models.ControlKindAreaLighting, intervention.Controls[2].Kind)
+	assert.Equal(t, models.ControlResultNonCompliant, intervention.Controls[2].Result, "Result should be non_compliant")
 }
 
 func TestCreateInterventionService_CreateRepair_Success(t *testing.T) {
@@ -96,7 +91,7 @@ func TestCreateInterventionService_CreateRepair_Success(t *testing.T) {
 
 	args := &CreateArgs{
 		Type:      models.InterventionTypeRepair,
-		Date:      "2024-01-15",
+		Date:      tests.MustParseDate(t, "2024-01-15"),
 		Summary:   "Routine maintenance check",
 		Signature: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA",
 		PortalID:  fixture.portal.ID,
@@ -126,111 +121,43 @@ func TestCreateInterventionService_CreateRepair_Success(t *testing.T) {
 
 	// Verify no controls were created
 	assert.Len(t, intervention.Controls, 0, "Should have 0 controls")
+
+	// Allow time for background goroutine to complete to avoid test interference
+	time.Sleep(100 * time.Millisecond)
 }
 
-func TestCreateInterventionService_Create_InvalidDateFormat(t *testing.T) {
-	db := tests.SetupTestDB(t)
-	service := &CreateInterventionService{DB: db}
+// Note: Date validation and control result parsing now happen at the handler/parsing level
+// before CreateArgs is constructed, so we don't test those conversions at the service level
 
-	testCases := []struct {
-		name        string
-		dateString  string
-		expectError string
-	}{
-		{
-			name:        "invalid format",
-			dateString:  "01/15/2024",
-			expectError: "invalid date format",
-		},
-		{
-			name:        "incomplete date",
-			dateString:  "2024-01",
-			expectError: "invalid date format",
-		},
-		{
-			name:        "invalid date",
-			dateString:  "2024-13-45",
-			expectError: "invalid date format",
-		},
-		{
-			name:        "empty date",
-			dateString:  "",
-			expectError: "invalid date format",
-		},
-		{
-			name:        "text instead of date",
-			dateString:  "not a date",
-			expectError: "invalid date format",
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			args := &CreateArgs{
-				Type:      models.InterventionTypeMaintenance,
-				Date:      tc.dateString,
-				Summary:   "Test summary",
-				Signature: "test-signature",
-			}
-
-			intervention, err := service.Create(args)
-
-			assert.Error(t, err, "Should return error for invalid date")
-			assert.Nil(t, intervention, "Intervention should be nil on error")
-			assert.Contains(t, err.Error(), tc.expectError, "Error message should mention invalid date")
-		})
-	}
-}
-
-func TestCreateInterventionService_Create_ControlResultParsing(t *testing.T) {
+func TestCreateInterventionService_Create_ControlResultTypes(t *testing.T) {
 	db := tests.SetupTestDB(t)
 	service := &CreateInterventionService{DB: db}
 	fixture := setupTestFixture(db)
 
 	testCases := []struct {
 		name           string
-		resultString   string
-		expectedResult *bool
+		result         models.ControlResult
+		expectedResult models.ControlResult
 	}{
 		{
-			name:           "true string",
-			resultString:   "true",
-			expectedResult: boolPtr(true),
+			name:           "compliant",
+			result:         models.ControlResultCompliant,
+			expectedResult: models.ControlResultCompliant,
 		},
 		{
-			name:           "false string",
-			resultString:   "false",
-			expectedResult: boolPtr(false),
+			name:           "non_compliant",
+			result:         models.ControlResultNonCompliant,
+			expectedResult: models.ControlResultNonCompliant,
 		},
 		{
-			name:           "1 as true",
-			resultString:   "1",
-			expectedResult: boolPtr(true),
+			name:           "needs_attention",
+			result:         models.ControlResultNeedsAttention,
+			expectedResult: models.ControlResultNeedsAttention,
 		},
 		{
-			name:           "0 as false",
-			resultString:   "0",
-			expectedResult: boolPtr(false),
-		},
-		{
-			name:           "empty string",
-			resultString:   "",
-			expectedResult: nil,
-		},
-		{
-			name:           "invalid string",
-			resultString:   "invalid",
-			expectedResult: nil,
-		},
-		{
-			name:           "T as true",
-			resultString:   "T",
-			expectedResult: boolPtr(true),
-		},
-		{
-			name:           "F as false",
-			resultString:   "F",
-			expectedResult: boolPtr(false),
+			name:           "skipped",
+			result:         models.ControlResultSkipped,
+			expectedResult: models.ControlResultSkipped,
 		},
 	}
 
@@ -238,17 +165,14 @@ func TestCreateInterventionService_Create_ControlResultParsing(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			args := &CreateArgs{
 				Type:      models.InterventionTypeMaintenance,
-				Date:      "2024-01-15",
+				Date:      tests.MustParseDate(t, "2024-01-15"),
 				Summary:   "Test",
 				Signature: "sig",
 				PortalID:  fixture.portal.ID,
 				UserID:    fixture.user.ID,
 				UserName:  fixture.user.FullName(),
-				Controls: []struct {
-					Kind   string
-					Result string
-				}{
-					{Kind: "test_control", Result: tc.resultString},
+				Controls: []ControlData{
+					{Kind: models.ControlKindWarningLights, Result: tc.result},
 				},
 			}
 
@@ -259,12 +183,7 @@ func TestCreateInterventionService_Create_ControlResultParsing(t *testing.T) {
 			require.Len(t, intervention.Controls, 1, "Should have 1 control")
 
 			control := intervention.Controls[0]
-			if tc.expectedResult == nil {
-				assert.Nil(t, control.Result, "Result should be nil")
-			} else {
-				require.NotNil(t, control.Result, "Result should not be nil")
-				assert.Equal(t, *tc.expectedResult, *control.Result, "Result should match expected value")
-			}
+			assert.Equal(t, tc.expectedResult, control.Result, "Result should match expected value")
 		})
 	}
 }
@@ -276,7 +195,7 @@ func TestCreateInterventionService_Create_EmptySummary(t *testing.T) {
 
 	args := &CreateArgs{
 		Type:      models.InterventionTypeMaintenance,
-		Date:      "2024-01-15",
+		Date:      tests.MustParseDate(t, "2024-01-15"),
 		Summary:   "",
 		Signature: "test-signature",
 		PortalID:  fixture.portal.ID,
@@ -299,16 +218,13 @@ func TestCreateInterventionService_Create_NoControls(t *testing.T) {
 
 	args := &CreateArgs{
 		Type:      models.InterventionTypeMaintenance,
-		Date:      "2024-01-15",
+		Date:      tests.MustParseDate(t, "2024-01-15"),
 		Summary:   "Test without controls",
 		Signature: "test-signature",
 		PortalID:  fixture.portal.ID,
 		UserID:    fixture.user.ID,
 		UserName:  fixture.user.FullName(),
-		Controls: []struct {
-			Kind   string
-			Result string
-		}{},
+		Controls:  []ControlData{},
 	}
 
 	intervention, err := service.Create(args)
@@ -324,23 +240,20 @@ func TestCreateInterventionService_Create_MultipleControls(t *testing.T) {
 	fixture := setupTestFixture(db)
 
 	// Create all security controls
-	securityControls := []struct {
-		Kind   string
-		Result string
-	}{
-		{Kind: "warning_lights", Result: "true"},
-		{Kind: "area_lighting", Result: "true"},
-		{Kind: "safety_cells", Result: "false"},
-		{Kind: "pressure_bar", Result: "true"},
-		{Kind: "floor_loop", Result: ""},
-		{Kind: "force_limiter", Result: "true"},
-		{Kind: "safety_springs", Result: "false"},
-		{Kind: "floor_markings", Result: "true"},
+	securityControls := []ControlData{
+		{Kind: models.ControlKindWarningLights, Result: models.ControlResultCompliant},
+		{Kind: models.ControlKindAreaLighting, Result: models.ControlResultCompliant},
+		{Kind: models.ControlKindSafetyCells, Result: models.ControlResultNonCompliant},
+		{Kind: models.ControlKindPressureBar, Result: models.ControlResultCompliant},
+		{Kind: models.ControlKindFloorLoop, Result: models.ControlResultSkipped},
+		{Kind: models.ControlKindForceLimiter, Result: models.ControlResultCompliant},
+		{Kind: models.ControlKindSafetySprings, Result: models.ControlResultNonCompliant},
+		{Kind: models.ControlKindFloorMarkings, Result: models.ControlResultCompliant},
 	}
 
 	args := &CreateArgs{
 		Type:      models.InterventionTypeMaintenance,
-		Date:      "2024-01-15",
+		Date:      tests.MustParseDate(t, "2024-01-15"),
 		Summary:   "Full security check",
 		Signature: "test-signature",
 		PortalID:  fixture.portal.ID,
@@ -358,6 +271,7 @@ func TestCreateInterventionService_Create_MultipleControls(t *testing.T) {
 	// Verify all controls were saved
 	for i, expected := range securityControls {
 		assert.Equal(t, expected.Kind, intervention.Controls[i].Kind, "Control kind should match")
+		assert.Equal(t, expected.Result, intervention.Controls[i].Result, "Control result should match")
 	}
 }
 
@@ -368,17 +282,14 @@ func TestCreateInterventionService_Create_DatabasePersistence(t *testing.T) {
 
 	args := &CreateArgs{
 		Type:      models.InterventionTypeMaintenance,
-		Date:      "2024-01-15",
+		Date:      tests.MustParseDate(t, "2024-01-15"),
 		Summary:   "Persistence test",
 		Signature: "test-signature",
 		PortalID:  fixture.portal.ID,
 		UserID:    fixture.user.ID,
 		UserName:  fixture.user.FullName(),
-		Controls: []struct {
-			Kind   string
-			Result string
-		}{
-			{Kind: "warning_lights", Result: "true"},
+		Controls: []ControlData{
+			{Kind: models.ControlKindWarningLights, Result: models.ControlResultCompliant},
 		},
 	}
 
@@ -398,7 +309,8 @@ func TestCreateInterventionService_Create_DatabasePersistence(t *testing.T) {
 	assert.Equal(t, *intervention.Summary, *savedIntervention.Summary)
 	assert.Equal(t, intervention.Signature, savedIntervention.Signature)
 	assert.Len(t, savedIntervention.Controls, 1)
-	assert.Equal(t, "warning_lights", savedIntervention.Controls[0].Kind)
+	assert.Equal(t, models.ControlKindWarningLights, savedIntervention.Controls[0].Kind)
+	assert.Equal(t, models.ControlResultCompliant, savedIntervention.Controls[0].Result)
 }
 
 func TestCreateInterventionService_Create_TimestampsSet(t *testing.T) {
@@ -410,7 +322,7 @@ func TestCreateInterventionService_Create_TimestampsSet(t *testing.T) {
 
 	args := &CreateArgs{
 		Type:      models.InterventionTypeMaintenance,
-		Date:      "2024-01-15",
+		Date:      tests.MustParseDate(t, "2024-01-15"),
 		Summary:   "Timestamp test",
 		Signature: "test-signature",
 		PortalID:  fixture.portal.ID,
@@ -428,9 +340,4 @@ func TestCreateInterventionService_Create_TimestampsSet(t *testing.T) {
 	assert.False(t, intervention.UpdatedAt.IsZero(), "UpdatedAt should be set")
 	assert.True(t, intervention.CreatedAt.After(beforeCreate) || intervention.CreatedAt.Equal(beforeCreate))
 	assert.True(t, intervention.CreatedAt.Before(afterCreate) || intervention.CreatedAt.Equal(afterCreate))
-}
-
-// Helper function to create *bool
-func boolPtr(b bool) *bool {
-	return &b
 }
