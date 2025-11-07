@@ -12,25 +12,40 @@ type ControlBuilder struct {
 func NewControl() *ControlBuilder {
 	return &ControlBuilder{
 		control: &models.Control{
-			Kind:           "warning_lights",
-			Result:         nil,
+			Kind:           models.ControlKindWarningLights,
+			Result:         models.ControlResultSkipped,
 			InterventionID: 1,
 		},
 	}
 }
 
-func (b *ControlBuilder) WithKind(kind string) *ControlBuilder {
+func (b *ControlBuilder) WithKind(kind models.ControlKind) *ControlBuilder {
 	b.control.Kind = kind
 	return b
 }
 
-func (b *ControlBuilder) WithResult(result bool) *ControlBuilder {
-	b.control.Result = &result
+func (b *ControlBuilder) WithResult(result models.ControlResult) *ControlBuilder {
+	b.control.Result = result
 	return b
 }
 
-func (b *ControlBuilder) WithNilResult() *ControlBuilder {
-	b.control.Result = nil
+func (b *ControlBuilder) WithCompliantResult() *ControlBuilder {
+	b.control.Result = models.ControlResultCompliant
+	return b
+}
+
+func (b *ControlBuilder) WithNonCompliantResult() *ControlBuilder {
+	b.control.Result = models.ControlResultNonCompliant
+	return b
+}
+
+func (b *ControlBuilder) WithNeedsAttentionResult() *ControlBuilder {
+	b.control.Result = models.ControlResultNeedsAttention
+	return b
+}
+
+func (b *ControlBuilder) WithSkippedResult() *ControlBuilder {
+	b.control.Result = models.ControlResultSkipped
 	return b
 }
 
@@ -50,44 +65,34 @@ func (b *ControlBuilder) Create(db *gorm.DB) *models.Control {
 
 // Helper functions for common control types
 
-func NewSecurityControl(kind string, result *bool) *ControlBuilder {
-	builder := NewControl().WithKind(kind)
-	if result != nil {
-		builder = builder.WithResult(*result)
-	} else {
-		builder = builder.WithNilResult()
-	}
-	return builder
+func NewWarningLightsControl(result models.ControlResult) *ControlBuilder {
+	return NewControl().WithKind(models.ControlKindWarningLights).WithResult(result)
 }
 
-func NewWarningLightsControl(result bool) *ControlBuilder {
-	return NewControl().WithKind("warning_lights").WithResult(result)
+func NewAreaLightingControl(result models.ControlResult) *ControlBuilder {
+	return NewControl().WithKind(models.ControlKindAreaLighting).WithResult(result)
 }
 
-func NewAreaLightingControl(result bool) *ControlBuilder {
-	return NewControl().WithKind("area_lighting").WithResult(result)
+func NewSafetyCellsControl(result models.ControlResult) *ControlBuilder {
+	return NewControl().WithKind(models.ControlKindSafetyCells).WithResult(result)
 }
 
-func NewSafetyCellsControl(result bool) *ControlBuilder {
-	return NewControl().WithKind("safety_cells").WithResult(result)
+func NewPressureBarControl(result models.ControlResult) *ControlBuilder {
+	return NewControl().WithKind(models.ControlKindPressureBar).WithResult(result)
 }
 
-func NewPressureBarControl(result bool) *ControlBuilder {
-	return NewControl().WithKind("pressure_bar").WithResult(result)
+func NewFloorLoopControl(result models.ControlResult) *ControlBuilder {
+	return NewControl().WithKind(models.ControlKindFloorLoop).WithResult(result)
 }
 
-func NewFloorLoopControl(result bool) *ControlBuilder {
-	return NewControl().WithKind("floor_loop").WithResult(result)
+func NewForceLimiterControl(result models.ControlResult) *ControlBuilder {
+	return NewControl().WithKind(models.ControlKindForceLimiter).WithResult(result)
 }
 
-func NewForceLimiterControl(result bool) *ControlBuilder {
-	return NewControl().WithKind("force_limiter").WithResult(result)
+func NewSafetySpringsControl(result models.ControlResult) *ControlBuilder {
+	return NewControl().WithKind(models.ControlKindSafetySprings).WithResult(result)
 }
 
-func NewSafetySpringsControl(result bool) *ControlBuilder {
-	return NewControl().WithKind("safety_springs").WithResult(result)
-}
-
-func NewFloorMarkingsControl(result bool) *ControlBuilder {
-	return NewControl().WithKind("floor_markings").WithResult(result)
+func NewFloorMarkingsControl(result models.ControlResult) *ControlBuilder {
+	return NewControl().WithKind(models.ControlKindFloorMarkings).WithResult(result)
 }

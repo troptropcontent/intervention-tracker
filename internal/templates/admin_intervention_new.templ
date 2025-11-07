@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"strconv"
 	"time"
 )
@@ -44,7 +45,7 @@ templ addNewPhotoInputGroupButton() {
 	</button>
 }
 
-templ controlTable(controls []string, baseInputIndex int) {
+templ controlTable(translator translation.TranslatorService, controls []models.ControlKind, baseInputIndex int) {
 	<div class="print:break-inside-avoid">
 		<table class="table w-full border-separate border-spacing-0 border-gray-300 text-sm">
 			<thead>
@@ -67,7 +68,7 @@ templ controlTable(controls []string, baseInputIndex int) {
 			<tbody>
 				for i, control := range controls {
 					<tr class={ templ.KV("bg-gray-50", i%2 == 0), "group" }>
-						<td class="group-last:rounded-bl-md border border-gray-300 border-b-0 group-last:border-b border-r-0 px-3 py-2 font-medium" data-label="Contrôle">{ GetControlTypeLabel(control) }</td>
+						<td class="group-last:rounded-bl-md border border-gray-300 border-b-0 group-last:border-b border-r-0 px-3 py-2 font-medium" data-label="Contrôle">{ translator.MustTranslate(fmt.Sprintf("models.control.kinds.%v", control)) }</td>
 						<td class="border border-gray-300 border-b-0 group-last:border-b border-r-0 px-2 py-1 text-center" data-label="Conforme">
 							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value="true" class="radio radio-xs radio-success"/>
 						</td>
@@ -93,21 +94,19 @@ templ controlTable(controls []string, baseInputIndex int) {
 	</div>
 }
 
-templ MaintenanceSpecificSections() {
+templ MaintenanceSpecificSections(translator translation.TranslatorService) {
 	@InterventionInputGroup(InterventionInputGroupConfig{Label: "Contrôles d'intervention"}) {
+		{{ firstHalf, secondHalf := SplitControlKindsForDisplay() }}
 		<div class="mb-8">
-			<h4 class="text-md font-medium text-gray-800 mb-3">Sécurité</h4>
-			@controlTable(models.ControlTypesByKind[models.ControlKindSecurity], 0)
+			@controlTable(translator, firstHalf, 0)
 		</div>
-		<!-- Other Controls Table -->
 		<div class="mb-8">
-			<h4 class="text-md font-medium text-gray-800 mb-3">Autres</h4>
-			@controlTable(models.ControlTypesByKind[models.ControlKindOther], len(models.ControlTypesByKind[models.ControlKindSecurity]))
+			@controlTable(translator, secondHalf, len(firstHalf))
 		</div>
 	}
 }
 
-templ RepairSpecificSections() {
+templ RepairSpecificSections(translator translation.TranslatorService) {
 	@InterventionInputGroup(InterventionInputGroupConfig{Label: "Temps passé sur l'intervention (en heures)"}) {
 		@InputNumber(&InputNumberArgs{
 			Title:         "Doit etre compris entre 1 et 10",
@@ -122,7 +121,7 @@ templ RepairSpecificSections() {
 	}
 }
 
-templ AdminInterventionNew(context echo.Context, portal *models.Portal, user *models.User, interventionType models.InterventionType) {
+templ AdminInterventionNew(context echo.Context, translator translation.TranslatorService, portal *models.Portal, user *models.User, interventionType models.InterventionType) {
 	@MainLayout(MainLayoutConfig{Title: "Nouvelle intervention - " + portal.Name}, context) {
 		<div class="max-w-4xl mx-auto">
 			<div class="mb-6">
@@ -152,9 +151,9 @@ templ AdminInterventionNew(context echo.Context, portal *models.Portal, user *mo
 					}
 					switch interventionType {
 						case models.InterventionTypeMaintenance:
-							@MaintenanceSpecificSections()
+							@MaintenanceSpecificSections(translator)
 						case models.InterventionTypeRepair:
-							@RepairSpecificSections()
+							@RepairSpecificSections(translator)
 					}
 					@InterventionInputGroup(InterventionInputGroupConfig{Label: "Résumé de l'intervention"}) {
 						@TextAreaInput(&TextAreaInputArgs{
@@ -207,31 +206,4 @@ templ AdminInterventionNew(context echo.Context, portal *models.Portal, user *mo
 			</div>
 		</div>
 	}
-}
-
-func GetControlTypeLabel(controlType string) string {
-	labels := map[string]string{
-		"warning_lights":   "Feux d'avertissement",
-		"area_lighting":    "Éclairage de zone",
-		"safety_cells":     "Cellules de sécurité",
-		"pressure_bar":     "Barre de pression",
-		"floor_loop":       "Boucle de sol",
-		"force_limiter":    "Limiteur d'effort",
-		"safety_springs":   "Ressorts de sécurité",
-		"floor_markings":   "Marquage au sol",
-		"apron_condition":  "État du tablier",
-		"horizontal_rails": "Rails horizontaux",
-		"vertical_rails":   "Rails verticaux",
-		"roller_condition": "État des galets",
-		"drive_system":     "Système d'entraînement",
-		"limit_switches":   "Interrupteurs de fin de course",
-		"control_devices":  "Organes de commande",
-		"control_panel":    "Coffret de commande",
-		"manual_override":  "Manœuvre de secours",
-	}
-
-	if label, exists := labels[controlType]; exists {
-		return label
-	}
-	return controlType
 }

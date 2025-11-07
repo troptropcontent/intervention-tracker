@@ -1225,6 +1225,32 @@
       }
     }
   }
+  .validator-hint {
+    @layer daisyui.component {
+      visibility: hidden;
+      margin-top: calc(0.25rem * 2);
+      font-size: 0.75rem;
+    }
+  }
+  .validator {
+    @layer daisyui.component {
+      &:user-valid, &:has(:user-valid) {
+        &, &:focus, &:checked, &[aria-checked="true"], &:focus-within {
+          --input-color: var(--color-success);
+        }
+      }
+      &:user-invalid, &:has(:user-invalid), &[aria-invalid]:not([aria-invalid="false"]), &:has([aria-invalid]:not([aria-invalid="false"])) {
+        &, &:focus, &:checked, &[aria-checked="true"], &:focus-within {
+          --input-color: var(--color-error);
+        }
+        & ~ .validator-hint {
+          visibility: visible;
+          display: block;
+          color: var(--color-error);
+        }
+      }
+    }
+  }
   .collapse-open {
     @layer daisyui.modifier {
       grid-template-rows: max-content 1fr;
@@ -2883,6 +2909,18 @@
   .mr-4 {
     margin-right: calc(var(--spacing) * 4);
   }
+  .fieldset-legend {
+    @layer daisyui.component {
+      margin-bottom: calc(0.25rem * -1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: calc(0.25rem * 2);
+      padding-block: calc(0.25rem * 2);
+      color: var(--color-base-content);
+      font-weight: 600;
+    }
+  }
   .mb-1 {
     margin-bottom: calc(var(--spacing) * 1);
   }
@@ -3063,6 +3101,16 @@
       }
     }
   }
+  .fieldset {
+    @layer daisyui.component {
+      display: grid;
+      gap: calc(0.25rem * 1.5);
+      padding-block: calc(0.25rem * 1);
+      font-size: 0.75rem;
+      grid-template-columns: 1fr;
+      grid-auto-rows: max-content;
+    }
+  }
   .card-title {
     @layer daisyui.component {
       display: flex;
@@ -3239,6 +3287,9 @@
   }
   .h-20 {
     height: calc(var(--spacing) * 20);
+  }
+  .h-24 {
+    height: calc(var(--spacing) * 24);
   }
   .h-80 {
     height: calc(var(--spacing) * 80);
@@ -3591,6 +3642,9 @@
   .border-green-400 {
     border-color: var(--color-green-400);
   }
+  .border-primary {
+    border-color: var(--color-primary);
+  }
   .border-red-200 {
     border-color: var(--color-red-200);
   }
@@ -3808,6 +3862,9 @@
   .text-blue-900 {
     color: var(--color-blue-900);
   }
+  .text-error {
+    color: var(--color-error);
+  }
   .text-gray-400 {
     color: var(--color-gray-400);
   }
@@ -3858,6 +3915,9 @@
   }
   .text-red-800 {
     color: var(--color-red-800);
+  }
+  .text-success {
+    color: var(--color-success);
   }
   .text-white {
     color: var(--color-white);
@@ -4001,6 +4061,13 @@
   .radio-success {
     @layer daisyui.modifier {
       --input-color: var(--color-success);
+    }
+  }
+  .textarea-primary {
+    @layer daisyui.modifier {
+      &, &:focus, &:focus-within {
+        --input-color: var(--color-primary);
+      }
     }
   }
   .group-last\:rounded-br-md {

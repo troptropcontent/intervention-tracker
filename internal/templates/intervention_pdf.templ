@@ -13,24 +13,26 @@ type InterventionReportConfig struct {
 	Translator     translation.TranslatorService
 }
 
-func findControlResult(intervention *models.Intervention, controlKey string) string {
+func findControlResult(intervention *models.Intervention, controlKey models.ControlKind) string {
 	var result = "na"
 	for _, control := range intervention.Controls {
 		if control.Kind == controlKey {
-			// Check if Result is nil (control was not checked)
-			if control.Result == nil {
-				result = "na"
-			} else if *control.Result {
+			switch control.Result {
+			case models.ControlResultCompliant:
 				result = "passed"
-			} else {
+			case models.ControlResultNonCompliant:
 				result = "fail"
+			case models.ControlResultNeedsAttention:
+				result = "attention"
+			case models.ControlResultSkipped:
+				result = "na"
 			}
 		}
 	}
 	return result
 }
 
-templ controleTable(title string, intervention *models.Intervention, controls []string, t translation.TranslatorService) {
+templ interventionPdfControlTable(title string, intervention *models.Intervention, controls []models.ControlKind, t translation.TranslatorService) {
 	<table class="table w-full border-separate border-spacing-0 rounded-lg border border-gray-300">
 		<thead class="bg-gray-100">
 			<tr>
@@ -62,7 +64,7 @@ templ controleTable(title string, intervention *models.Intervention, controls []
 }
 
 templ InterventionReportSection(title string) {
-	<section class="px-6 print:break-inside-avoid">
+	<section class="px-6">
 		<h2 class="text-l font-semibold text-primary mb-4">{ title }</h2>
 		{ children... }
 	</section>
@@ -113,20 +115,19 @@ templ InterventionReport(config InterventionReportConfig) {
 			}
 			@InterventionReportSection("Contrôles effectués") {
 				<div class="grid grid-cols-2 gap-x-4">
+					{{ firstHalf, secondHalf := SplitControlKindsForDisplay() }}
 					<div>
-						@controleTable("Controles de sécurité", config.Intervention, models.ControleTypes.Security, config.Translator)
+						@interventionPdfControlTable("Controles de sécurité", config.Intervention, firstHalf, config.Translator)
 					</div>
 					<div>
-						@controleTable("Autres contrôles", config.Intervention, models.ControleTypes.Other, config.Translator)
+						@interventionPdfControlTable("Controles de sécurité", config.Intervention, secondHalf, config.Translator)
 					</div>
 				</div>
 			}
 			@InterventionReportSection("Résumé") {
 				<div>
 					<div class="bg-base-200 p-4 rounded-lg">
-						if config.Intervention.Summary != nil {
-							<p class="wrap-break-word whitespace-pre-wrap">{ *config.Intervention.Summary }</p>
-						}
+						<p class="whitespace-pre-wrap">{ *config.Intervention.Summary }</p>
 					</div>
 				</div>
 			}
@@ -139,16 +140,6 @@ templ InterventionReport(config InterventionReportConfig) {
 					<img src={ config.Intervention.Signature } alt="Signature" class="h-20"/>
 				</div>
 			</section>
-			if len(config.Intervention.Attachments) > 0 {
-				for _, photo := range config.Intervention.Attachments {
-					<section class="px-6 py-4 flex flex-col items-center justify-center min-h-screen print:min-h-0 print:break-before-page">
-						<div class="flex flex-col items-center gap-4 w-full">
-							<img src={ photo.SignedUrl } alt={ photo.FileName } class="max-h-[70vh] print:max-h-[90vh] max-w-full object-contain"/>
-							<p class="text-sm text-gray-600 italic">{ photo.FileName }</p>
-						</div>
-					</section>
-				}
-			}
 		</body>
 	</html>
 }
