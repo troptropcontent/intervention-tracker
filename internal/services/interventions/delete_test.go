@@ -24,7 +24,7 @@ func setupDeleteTestFixture(t *testing.T, db *gorm.DB) (*models.Intervention, []
 		WithUserModel(user).
 		Create(db)
 
-	// Create attachments with storage keys
+	// Create attachments with storage keys using factory
 	storageKeys := []string{
 		"interventions/1/photo1.jpg",
 		"interventions/1/photo2.jpg",
@@ -32,16 +32,14 @@ func setupDeleteTestFixture(t *testing.T, db *gorm.DB) (*models.Intervention, []
 	}
 
 	for i, key := range storageKeys {
-		attachment := &models.Attachment{
-			HolderType:  "interventions",
-			HolderID:    intervention.ID,
-			Kind:        "photo",
-			StorageKey:  key,
-			FileName:    key,
-			ContentType: "image/jpeg",
-			FileSize:    1024 * (int64(i) + 1),
-		}
-		require.NoError(t, db.Create(attachment).Error)
+		factories.NewAttachment().
+			WithHolderType("interventions").
+			WithHolderID(intervention.ID).
+			WithKind("photo").
+			WithStorageKey(key).
+			WithFileName(key).
+			WithFileSize(1024 * (int64(i) + 1)).
+			Create(db)
 	}
 
 	return intervention, storageKeys
@@ -231,17 +229,13 @@ func TestDeleteInterventionService_Delete_TransactionRollback(t *testing.T) {
 		WithUserModel(user).
 		Create(db)
 
-	// Create an attachment
-	attachment := &models.Attachment{
-		HolderType:  "interventions",
-		HolderID:    intervention.ID,
-		Kind:        "photo",
-		StorageKey:  "test/key.jpg",
-		FileName:    "test.jpg",
-		ContentType: "image/jpeg",
-		FileSize:    1024,
-	}
-	require.NoError(t, db.Create(attachment).Error)
+	// Create an attachment using factory
+	factories.NewAttachment().
+		WithHolderType("interventions").
+		WithHolderID(intervention.ID).
+		WithStorageKey("test/key.jpg").
+		WithFileName("test.jpg").
+		Create(db)
 
 	// Close the DB connection to cause a failure during transaction
 	sqlDB, err := db.DB()
@@ -305,7 +299,7 @@ func TestDeleteInterventionService_Delete_MultipleAttachmentTypes(t *testing.T) 
 		WithUserModel(user).
 		Create(db)
 
-	// Create different types of attachments
+	// Create different types of attachments using factory
 	attachmentTypes := []struct {
 		kind        string
 		storageKey  string
@@ -317,16 +311,15 @@ func TestDeleteInterventionService_Delete_MultipleAttachmentTypes(t *testing.T) 
 	}
 
 	for _, att := range attachmentTypes {
-		attachment := &models.Attachment{
-			HolderType:  "interventions",
-			HolderID:    intervention.ID,
-			Kind:        att.kind,
-			StorageKey:  att.storageKey,
-			FileName:    att.storageKey,
-			ContentType: att.contentType,
-			FileSize:    2048,
-		}
-		require.NoError(t, db.Create(attachment).Error)
+		factories.NewAttachment().
+			WithHolderType("interventions").
+			WithHolderID(intervention.ID).
+			WithKind(att.kind).
+			WithStorageKey(att.storageKey).
+			WithFileName(att.storageKey).
+			WithContentType(att.contentType).
+			WithFileSize(2048).
+			Create(db)
 	}
 
 	ctx := context.Background()
