@@ -599,3 +599,50 @@ func TestCreateNewIntervention_EmailServiceCalled(t *testing.T) {
 		assert.Greater(t, len(mockEmail.SentEmails), 0, "Should have sent at least one email")
 	}
 }
+
+func TestGetNewInterventionForm(t *testing.T) {
+	// Shared setup
+	db := tests.SetupTestDB(t)
+	mockStorage := &tests.MockStorageService{}
+	mockEmail := &tests.MockEmailService{}
+
+	deps := &routers.Dependencies{
+		DB:                       db,
+		StorageService:           mockStorage,
+		EmailNotificationService: mockEmail,
+	}
+	user := factories.NewUser().Create(db)
+	portal := factories.NewPortal().Create(db)
+
+	t.Run("SuccessWithValidParams", func(t *testing.T) {
+		handler := GetNewInterventionForm(deps)
+		c := tests.NewContext().
+			WithAuthenticatedUser(user).
+			WithQueryParams(map[string]string{
+				"portal_id":         fmt.Sprintf("%d", portal.ID),
+				"intervention_type": "repair",
+			}).
+			Build()
+		err := handler(c)
+		require.NoError(t, err)
+	})
+
+	t.Run("ErrorWhenPortalIdIsNotProvided", func(t *testing.T) {
+		handler := GetNewInterventionForm(deps)
+		c := tests.NewContext().WithAuthenticatedUser(user).Build()
+		err := handler(c)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "query param portal_id is invalid or missing")
+	})
+
+	t.Run("ErrorWhenInterventionTypeIsNotProvided", func(t *testing.T) {
+		handler := GetNewInterventionForm(deps)
+		c := tests.NewContext().
+			WithAuthenticatedUser(user).
+			WithQueryParams(map[string]string{"portal_id": fmt.Sprintf("%d", portal.ID)}).
+			Build()
+		err := handler(c)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "query param intervention_type is invalid or missing")
+	})
+}

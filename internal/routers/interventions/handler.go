@@ -13,7 +13,6 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/routers"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/interventions"
 	"github.com/troptropcontent/qr_code_maintenance/internal/templates"
-	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 	"gorm.io/gorm"
 )
 
@@ -106,8 +105,6 @@ func CreateNewIntervention(dependencies *routers.Dependencies) echo.HandlerFunc 
 			})
 		}
 
-		utils.PP(formData.Controls)
-
 		// Create the intervention
 		_, err = createService.Create(args)
 		if err != nil {
@@ -167,7 +164,7 @@ func GetNewInterventionForm(dependencies *routers.Dependencies) echo.HandlerFunc
 
 		interventionType := models.InterventionType(c.QueryParam("intervention_type"))
 		if !interventionType.IsValid() {
-			return fmt.Errorf("query param intervention_type is invalid or missing")
+			return echo.NewHTTPError(http.StatusBadRequest, "query param intervention_type is invalid or missing")
 		}
 
 		var portal models.Portal
