@@ -33,6 +33,7 @@ type ControlData struct {
 type CreateArgs struct {
 	Date      time.Time
 	Summary   string
+	TimeSpent *int
 	Signature string
 	PortalID  uint
 	UserID    uint
@@ -62,6 +63,7 @@ type MaintenanceInterventionCreateArgs struct {
 
 type RepairInterventionCreateArgs struct {
 	BaseInterventionCreateArgs
+	TimeSpent *float64
 }
 
 // Create creates a new intervention (maintenance or repair) and handles photo uploads
@@ -101,6 +103,7 @@ func (s *CreateInterventionService) buildIntervention(args *CreateArgs) (*models
 		Date:      args.Date,
 		Type:      args.Type,
 		Summary:   &args.Summary,
+		TimeSpent: args.TimeSpent,
 		Signature: args.Signature,
 		PortalID:  args.PortalID,
 		UserID:    args.UserID,
@@ -110,6 +113,11 @@ func (s *CreateInterventionService) buildIntervention(args *CreateArgs) (*models
 	// Only build controls for maintenance interventions
 	if args.Type == models.InterventionTypeMaintenance {
 		intervention.Controls = s.buildControls(args.Controls)
+	}
+
+	validationError := intervention.Validate()
+	if validationError != nil {
+		return nil, validationError
 	}
 
 	return intervention, nil

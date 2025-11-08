@@ -104,6 +104,7 @@ templ MaintenanceSpecificSections(translator translation.TranslatorService) {
 			@controlTable(translator, secondHalf, len(firstHalf))
 		</div>
 	}
+	<input type="hidden" name="type" value={ models.InterventionTypeMaintenance }/>
 }
 
 templ RepairSpecificSections(translator translation.TranslatorService) {
@@ -111,7 +112,7 @@ templ RepairSpecificSections(translator translation.TranslatorService) {
 		@InputNumber(&InputNumberArgs{
 			Title:         "Doit etre compris entre 1 et 10",
 			Placeholder:   "Indiquer le nombre d'heures passées",
-			Name:          "time_spent",
+			Name:          "time_spent_hours",
 			Min:           0.5,
 			Max:           10,
 			Step:          0.5,
@@ -119,6 +120,7 @@ templ RepairSpecificSections(translator translation.TranslatorService) {
 			Required:      true,
 		})
 	}
+	<input type="hidden" name="type" value={ models.InterventionTypeRepair }/>
 }
 
 templ AdminInterventionNew(context echo.Context, translator translation.TranslatorService, portal *models.Portal, user *models.User, interventionType models.InterventionType) {

@@ -9,6 +9,7 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/tests"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/tests/factories"
+	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 	"gorm.io/gorm"
 )
 
@@ -92,6 +93,7 @@ func TestCreateInterventionService_CreateRepair_Success(t *testing.T) {
 	args := &CreateArgs{
 		Type:      models.InterventionTypeRepair,
 		Date:      tests.MustParseDate(t, "2024-01-15"),
+		TimeSpent: utils.Ptr(120),
 		Summary:   "Routine maintenance check",
 		Signature: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA",
 		PortalID:  fixture.portal.ID,

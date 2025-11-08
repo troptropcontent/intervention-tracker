@@ -58,6 +58,7 @@ templ InputNumber(args *InputNumberArgs) {
 			<label for={ args.Name } class="block text-sm font-medium text-gray-700 mb-1">{ args.Label }</label>
 		}
 		<input
+			name={ args.Name }
 			type="number"
 			class={ "input input-primary", templ.KV("validator", args.ValidatorHint != "") }
 			required={ args.Required }

@@ -3,6 +3,7 @@ package interventions
 import (
 	"context"
 	"fmt"
+	"math"
 	"mime/multipart"
 	"net/http"
 	"strconv"
@@ -13,16 +14,18 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/routers"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/interventions"
 	"github.com/troptropcontent/qr_code_maintenance/internal/templates"
+	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 	"gorm.io/gorm"
 )
 
 type CreateNewInterventionFormData struct {
-	Type      string    `form:"type"`
-	PortalID  uint      `form:"portal_id"`
-	Date      time.Time `form:"date"`
-	Summary   string    `form:"summary"`
-	Signature string    `form:"signature"`
-	Photos    []struct {
+	Type           string    `form:"type"`
+	PortalID       uint      `form:"portal_id"`
+	Date           time.Time `form:"date"`
+	Summary        string    `form:"summary"`
+	TimeSpentHours *float64  `form:"time_spent_hours"`
+	Signature      string    `form:"signature"`
+	Photos         []struct {
 		Name string `form:"name"`
 		File *multipart.FileHeader
 	} `form:"photos"`
@@ -61,6 +64,11 @@ func CreateNewIntervention(dependencies *routers.Dependencies) echo.HandlerFunc 
 			}
 		}
 
+		var timeSpentMinutes *int
+		if formData.TimeSpentHours != nil {
+			timeSpentMinutes = utils.Ptr(int(math.Round(*formData.TimeSpentHours * 60)))
+		}
+
 		// Initialize the create service
 		createService := &interventions.CreateInterventionService{
 			DB:                       dependencies.DB,
@@ -73,6 +81,7 @@ func CreateNewIntervention(dependencies *routers.Dependencies) echo.HandlerFunc 
 			Date:      formData.Date,
 			Summary:   formData.Summary,
 			Signature: formData.Signature,
+			TimeSpent: timeSpentMinutes,
 			UserID:    user.ID,
 			UserName:  user.FullName(),
 			PortalID:  formData.PortalID,

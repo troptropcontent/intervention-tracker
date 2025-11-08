@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"time"
 
 	"gorm.io/gorm"
@@ -26,6 +27,7 @@ type Intervention struct {
 	Date      time.Time        `json:"date" gorm:"not null"`
 	Type      InterventionType `json:"type" gorm:"not null"`
 	Summary   *string          `json:"summary"`
+	TimeSpent *int             `json:"time_spent,omitempty" gorm:"comment:Time spent in minutes (repair only)"`
 	UserID    uint             `json:"user_id" gorm:"not null"`
 	UserName  string           `json:"user_name" gorm:"not null"`
 	PortalID  uint             `json:"portal_id" gorm:"not null"`
@@ -43,4 +45,11 @@ type Intervention struct {
 
 func (Intervention) TableName() string {
 	return "interventions"
+}
+
+func (i *Intervention) Validate() error {
+	if i.Type == InterventionTypeRepair && i.TimeSpent == nil {
+		return errors.New("time_spent required for repairs")
+	}
+	return nil
 }

@@ -86,11 +86,12 @@ func TestCreateNewIntervention_RepairType_Success(t *testing.T) {
 
 	// Create request with type: "repair"
 	fields := map[string]string{
-		"portal_id": fmt.Sprintf("%d", portal.ID),
-		"type":      "repair",
-		"date":      "2024-01-15",
-		"summary":   "Door spring replacement",
-		"signature": "test-signature",
+		"portal_id":        fmt.Sprintf("%d", portal.ID),
+		"type":             "repair",
+		"date":             "2024-01-15",
+		"summary":          "Door spring replacement",
+		"signature":        "test-signature",
+		"time_spent_hours": "2.5",
 	}
 
 	c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, nil).Build()
