@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"mime/multipart"
+	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
@@ -16,7 +17,17 @@ type EchoContextBuilder struct {
 	Context echo.Context
 }
 
-func NewContext(method string, path string) *EchoContextBuilder {
+func NewContext(args ...string) *EchoContextBuilder {
+	method := http.MethodGet
+	path := "/"
+
+	if len(args) > 0 {
+		method = args[0]
+	}
+	if len(args) > 1 {
+		path = args[1]
+	}
+
 	e := echo.New()
 	req := httptest.NewRequest(method, path, strings.NewReader(""))
 	rec := httptest.NewRecorder()
@@ -57,6 +68,16 @@ func (b *EchoContextBuilder) WithMultiPartData(formData map[string]string, files
 	req := b.Context.Request()
 	req.Header.Set(echo.HeaderContentType, writer.FormDataContentType())
 	req.Body = io.NopCloser(body)
+	return b
+}
+
+func (b *EchoContextBuilder) WithQueryParams(params map[string]string) *EchoContextBuilder {
+	q := make(url.Values)
+	for key, value := range params {
+		q.Set(key, value)
+	}
+	req := b.Context.Request()
+	req.URL.RawQuery = q.Encode()
 	return b
 }
 

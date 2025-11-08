@@ -1,10 +1,10 @@
 package templates
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
-	"strconv"
 )
 
 templ AdminPortal(context echo.Context, translator translation.TranslatorService, portal models.Portal, qrCode *models.QRCode, interventions []models.Intervention) {
@@ -18,12 +18,13 @@ templ AdminPortal(context echo.Context, translator translation.TranslatorService
 					<h1 class="text-3xl font-bold text-gray-900">{ portal.Name }</h1>
 				</div>
 				<div class="space-x-2">
-					<a href={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID)) + "/edit") } class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg inline-block">
-						Modifier
-					</a>
-					<a href={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID)) + "/interventions/new") } class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
-						Nouvelle intervention
-					</a>
+					<details class="dropdown dropdown-end">
+						<summary class="btn m-1">Nouvelle intervention</summary>
+						<ul class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+							<li><a href={ templ.URL(fmt.Sprintf("/admin/interventions/new?intervention_type=maintenance&portal_id=%d", portal.ID)) }>Maintenance</a></li>
+							<li><a href={ templ.URL(fmt.Sprintf("/admin/interventions/new?intervention_type=repair&portal_id=%d", portal.ID)) }>Dépannage</a></li>
+						</ul>
+					</details>
 				</div>
 			</div>
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

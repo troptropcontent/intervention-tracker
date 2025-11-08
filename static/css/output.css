@@ -2462,6 +2462,58 @@
   .inset-0 {
     inset: calc(var(--spacing) * 0);
   }
+  .dropdown-right {
+    @layer daisyui.modifier {
+      --anchor-h: right;
+      --anchor-v: span-bottom;
+      .dropdown-content {
+        inset-inline-start: 100%;
+        top: calc(0.25rem * 0);
+        bottom: auto;
+        transform-origin: 0;
+      }
+    }
+  }
+  .dropdown-left {
+    @layer daisyui.modifier {
+      --anchor-h: left;
+      --anchor-v: span-bottom;
+      .dropdown-content {
+        inset-inline-end: 100%;
+        top: calc(0.25rem * 0);
+        bottom: auto;
+        transform-origin: 100%;
+      }
+    }
+  }
+  .dropdown-end {
+    @layer daisyui.modifier {
+      --anchor-h: span-left;
+      :where(.dropdown-content) {
+        inset-inline-end: calc(0.25rem * 0);
+        translate: 0 0;
+        [dir="rtl"] & {
+          translate: 0 0;
+        }
+      }
+      &.dropdown-left {
+        --anchor-h: left;
+        --anchor-v: span-top;
+        .dropdown-content {
+          top: auto;
+          bottom: calc(0.25rem * 0);
+        }
+      }
+      &.dropdown-right {
+        --anchor-h: right;
+        --anchor-v: span-top;
+        .dropdown-content {
+          top: auto;
+          bottom: calc(0.25rem * 0);
+        }
+      }
+    }
+  }
   .file-input {
     @layer daisyui.component {
       cursor: pointer;
@@ -2728,6 +2780,9 @@
       }
     }
   }
+  .z-1 {
+    z-index: 1;
+  }
   .z-50 {
     z-index: 50;
   }
@@ -2795,6 +2850,9 @@
     @media (width >= 96rem) {
       max-width: 96rem;
     }
+  }
+  .m-1 {
+    margin: calc(var(--spacing) * 1);
   }
   .filter {
     @layer daisyui.component {
@@ -3330,6 +3388,9 @@
   .w-12 {
     width: calc(var(--spacing) * 12);
   }
+  .w-52 {
+    width: calc(var(--spacing) * 52);
+  }
   .w-80 {
     width: calc(var(--spacing) * 80);
   }
@@ -3561,6 +3622,12 @@
   }
   .rounded {
     border-radius: 0.25rem;
+  }
+  .rounded-box {
+    border-radius: var(--radius-box);
+  }
+  .rounded-box {
+    border-radius: var(--radius-box);
   }
   .rounded-full {
     border-radius: calc(infinity * 1px);

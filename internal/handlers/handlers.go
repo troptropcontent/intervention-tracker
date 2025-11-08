@@ -82,7 +82,8 @@ func (h *Handlers) GetAdminPortal(c echo.Context) error {
 
 	result = h.DB.Preload("Controls").Order("date desc").Find(&interventions, "portal_id = ?", portal.ID)
 	if result.Error != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "Failed to fetch interventions")
+		message := fmt.Errorf("failed to fetch interventions : %v", result.Error.Error())
+		return echo.NewHTTPError(http.StatusNotFound, message)
 	}
 
 	return templates.AdminPortal(c, h.TranslationService, portal, qrCodePtr, interventions).Render(c.Request().Context(), c.Response().Writer)
