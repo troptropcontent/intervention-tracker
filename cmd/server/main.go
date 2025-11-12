@@ -13,6 +13,7 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/routers"
 	"github.com/troptropcontent/qr_code_maintenance/internal/routers/interventions"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
@@ -38,6 +39,8 @@ func main() {
 
 	translator := translation.NewTranslator()
 
+	backgroundJobRunner := jobs.NewAsyncJobRunner()
+
 	// Initialize handlers
 	h := &handlers.Handlers{
 		DB:                       db,
@@ -45,11 +48,9 @@ func main() {
 		StorageService:           storageService,
 		TranslationService:       translator}
 
-	dependencies := routers.Dependencies{
-		DB:                       db,
-		EmailNotificationService: emailService,
-		StorageService:           storageService,
-		TranslationService:       translator,
+	dependencies, err := routers.NewRouterDependencies(db, emailService, storageService, translator, backgroundJobRunner)
+	if err != nil {
+		log.Fatalf("failed to initialize router dependencies: %v", err)
 	}
 
 	e := echo.New()
@@ -84,7 +85,7 @@ func main() {
 	admin_routes.POST("/portals/:id", h.UpdatePortal).Name = "admin-get-portal"
 	admin_routes.POST("/portals/:id/qr-code/associate", h.AssociateQRCode)
 	admin_routes.POST("/portals/:id/qr-code/remove", h.RemoveQRCode)
-	interventions.NewRouter(*admin_routes, &dependencies)
+	interventions.NewRouter(*admin_routes, dependencies)
 	admin_routes.GET("/portals/scan", h.GetAdminPortalsScan)
 
 	// 404 handler
