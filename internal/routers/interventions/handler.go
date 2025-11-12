@@ -70,10 +70,14 @@ func CreateNewIntervention(dependencies *routers.Dependencies) echo.HandlerFunc 
 		}
 
 		// Initialize the create service
-		createService := &interventions.CreateInterventionService{
-			DB:                       dependencies.DB,
-			StorageService:           dependencies.StorageService,
-			EmailNotificationService: dependencies.EmailNotificationService,
+		createService, err := interventions.NewCreateInterventionService(
+			dependencies.DB,
+			dependencies.StorageService,
+			dependencies.EmailNotificationService,
+			dependencies.BackGroundJobRunner,
+		)
+		if err != nil {
+			return err
 		}
 
 		args := &interventions.CreateArgs{

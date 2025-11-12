@@ -10,7 +10,9 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/attachments"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
+	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 	"gorm.io/gorm"
 )
 
@@ -18,6 +20,35 @@ type CreateInterventionService struct {
 	DB                       *gorm.DB
 	StorageService           storage.StorageService
 	EmailNotificationService email.EmailService
+	JobRunner                jobs.BackgroundJobRunner
+}
+
+// NewInterventionService creates a new intervention service with validation
+func NewCreateInterventionService(
+	db *gorm.DB,
+	storageService storage.StorageService,
+	emailNotificationService email.EmailService,
+	jobRunner jobs.BackgroundJobRunner,
+) (*CreateInterventionService, error) {
+	if db == nil {
+		return nil, fmt.Errorf("db cannot be nil")
+	}
+	if storageService == nil {
+		return nil, fmt.Errorf("storageService cannot be nil")
+	}
+	if emailNotificationService == nil {
+		return nil, fmt.Errorf("emailNotificationService cannot be nil")
+	}
+	if jobRunner == nil {
+		return nil, fmt.Errorf("jobRunner cannot be nil")
+	}
+
+	return &CreateInterventionService{
+		DB:                       db,
+		StorageService:           storageService,
+		EmailNotificationService: emailNotificationService,
+		JobRunner:                jobRunner,
+	}, nil
 }
 
 type PhotoData struct {
@@ -81,6 +112,8 @@ func (s *CreateInterventionService) Create(args *CreateArgs) (*models.Interventi
 			return fmt.Errorf("failed to create intervention: %w", err)
 		}
 
+		utils.PP(args.Photos)
+
 		if err := s.attachPhotos(tx, intervention.ID, args.Photos); err != nil {
 			return err
 		}
@@ -92,7 +125,7 @@ func (s *CreateInterventionService) Create(args *CreateArgs) (*models.Interventi
 		return nil, err
 	}
 
-	go AttachReportPdf(s.DB, s.StorageService, s.EmailNotificationService, intervention.ID)
+	s.JobRunner.Perform(func() { AttachReportPdf(s.DB, s.StorageService, s.EmailNotificationService, intervention.ID) })
 
 	return intervention, nil
 }
