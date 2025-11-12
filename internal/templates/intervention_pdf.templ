@@ -140,6 +140,16 @@ templ InterventionReport(config InterventionReportConfig) {
 					<img src={ config.Intervention.Signature } alt="Signature" class="h-20"/>
 				</div>
 			</section>
+			if len(config.Intervention.Attachments) > 0 {
+				for _, photo := range config.Intervention.Attachments {
+					<section class="px-6 py-4 flex flex-col items-center justify-center min-h-screen print:min-h-0 print:break-before-page">
+						<div class="flex flex-col items-center gap-4 w-full">
+							<img src={ photo.SignedUrl } alt={ photo.FileName } class="max-h-[70vh] print:max-h-[90vh] max-w-full object-contain"/>
+							<p class="text-sm text-gray-600 italic">{ photo.FileName }</p>
+						</div>
+					</section>
+				}
+			}
 		</body>
 	</html>
 }
