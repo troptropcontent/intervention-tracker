@@ -12,7 +12,6 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
-	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 	"gorm.io/gorm"
 )
 
@@ -111,8 +110,6 @@ func (s *CreateInterventionService) Create(args *CreateArgs) (*models.Interventi
 		if err := tx.Create(intervention).Error; err != nil {
 			return fmt.Errorf("failed to create intervention: %w", err)
 		}
-
-		utils.PP(args.Photos)
 
 		if err := s.attachPhotos(tx, intervention.ID, args.Photos); err != nil {
 			return err

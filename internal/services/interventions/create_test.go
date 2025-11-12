@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/tests"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/tests/factories"
 	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
@@ -28,9 +29,14 @@ func setupTestFixture(db *gorm.DB) *testFixture {
 	}
 }
 
+func setupService(db *gorm.DB) *CreateInterventionService {
+	service, _ := NewCreateInterventionService(db, &tests.MockStorageService{}, &tests.MockEmailService{}, jobs.NewSyncJobRunner())
+	return service
+}
+
 func TestCreateInterventionService_Create_Success(t *testing.T) {
 	db := tests.SetupTestDB(t)
-	service := &CreateInterventionService{DB: db}
+	service := setupService(db)
 	fixture := setupTestFixture(db)
 
 	args := &CreateArgs{
@@ -87,7 +93,7 @@ func TestCreateInterventionService_Create_Success(t *testing.T) {
 
 func TestCreateInterventionService_CreateRepair_Success(t *testing.T) {
 	db := tests.SetupTestDB(t)
-	service := &CreateInterventionService{DB: db}
+	service := setupService(db)
 	fixture := setupTestFixture(db)
 
 	args := &CreateArgs{
@@ -123,9 +129,6 @@ func TestCreateInterventionService_CreateRepair_Success(t *testing.T) {
 
 	// Verify no controls were created
 	assert.Len(t, intervention.Controls, 0, "Should have 0 controls")
-
-	// Allow time for background goroutine to complete to avoid test interference
-	time.Sleep(100 * time.Millisecond)
 }
 
 // Note: Date validation and control result parsing now happen at the handler/parsing level
@@ -133,7 +136,7 @@ func TestCreateInterventionService_CreateRepair_Success(t *testing.T) {
 
 func TestCreateInterventionService_Create_ControlResultTypes(t *testing.T) {
 	db := tests.SetupTestDB(t)
-	service := &CreateInterventionService{DB: db}
+	service := setupService(db)
 	fixture := setupTestFixture(db)
 
 	testCases := []struct {
@@ -192,7 +195,7 @@ func TestCreateInterventionService_Create_ControlResultTypes(t *testing.T) {
 
 func TestCreateInterventionService_Create_EmptySummary(t *testing.T) {
 	db := tests.SetupTestDB(t)
-	service := &CreateInterventionService{DB: db}
+	service := setupService(db)
 	fixture := setupTestFixture(db)
 
 	args := &CreateArgs{
@@ -215,7 +218,7 @@ func TestCreateInterventionService_Create_EmptySummary(t *testing.T) {
 
 func TestCreateInterventionService_Create_NoControls(t *testing.T) {
 	db := tests.SetupTestDB(t)
-	service := &CreateInterventionService{DB: db}
+	service := setupService(db)
 	fixture := setupTestFixture(db)
 
 	args := &CreateArgs{
@@ -238,7 +241,7 @@ func TestCreateInterventionService_Create_NoControls(t *testing.T) {
 
 func TestCreateInterventionService_Create_MultipleControls(t *testing.T) {
 	db := tests.SetupTestDB(t)
-	service := &CreateInterventionService{DB: db}
+	service := setupService(db)
 	fixture := setupTestFixture(db)
 
 	// Create all security controls
@@ -279,7 +282,7 @@ func TestCreateInterventionService_Create_MultipleControls(t *testing.T) {
 
 func TestCreateInterventionService_Create_DatabasePersistence(t *testing.T) {
 	db := tests.SetupTestDB(t)
-	service := &CreateInterventionService{DB: db}
+	service := setupService(db)
 	fixture := setupTestFixture(db)
 
 	args := &CreateArgs{
@@ -317,7 +320,7 @@ func TestCreateInterventionService_Create_DatabasePersistence(t *testing.T) {
 
 func TestCreateInterventionService_Create_TimestampsSet(t *testing.T) {
 	db := tests.SetupTestDB(t)
-	service := &CreateInterventionService{DB: db}
+	service := setupService(db)
 	fixture := setupTestFixture(db)
 
 	beforeCreate := time.Now()
