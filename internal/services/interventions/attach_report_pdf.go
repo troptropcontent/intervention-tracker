@@ -2,6 +2,7 @@ package interventions
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/attachments"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"gorm.io/gorm"
 )
@@ -18,18 +20,48 @@ const GotenbergUrl = "http://gotemberg:3000"
 // AttachReportPdf generates a PDF report for an intervention, uploads it to S3,
 // creates an Attachment record, and sends a notification email to the user.
 // This function is designed to be called asynchronously (in a goroutine).
-func AttachReportPdf(db *gorm.DB, storageService storage.StorageService, emailService email.EmailService, interventionId uint) {
+
+type AttachReportPdfService struct {
+	DB             *gorm.DB
+	StorageService storage.StorageService
+	EmailService   email.EmailService
+	JobRunner      jobs.BackgroundJobRunner
+}
+
+func NewAttachReportPdfService(db *gorm.DB, storageService storage.StorageService, emailService email.EmailService, jobRunner jobs.BackgroundJobRunner) (*AttachReportPdfService, error) {
+	if db == nil {
+		return nil, fmt.Errorf("db cannot be nil")
+	}
+	if storageService == nil {
+		return nil, fmt.Errorf("storageService cannot be nil")
+	}
+	if emailService == nil {
+		return nil, fmt.Errorf("emailService cannot be nil")
+	}
+	if jobRunner == nil {
+		return nil, fmt.Errorf("jobRunner cannot be nil")
+	}
+
+	return &AttachReportPdfService{
+		DB:             db,
+		StorageService: storageService,
+		EmailService:   emailService,
+		JobRunner:      jobRunner,
+	}, nil
+}
+
+func (s *AttachReportPdfService) AttachReportPdf(interventionId uint) {
 	ctx := context.Background()
 
 	// Load intervention with all relationships
 	var intervention models.Intervention
-	if err := db.Preload("User").Preload("Attachments", "kind = ?", "photo").Preload("Portal").Preload("Controls").First(&intervention, interventionId).Error; err != nil {
+	if err := s.DB.Preload("User").Preload("Attachments", "kind = ?", "photo").Preload("Portal").Preload("Controls").First(&intervention, interventionId).Error; err != nil {
 		log.Printf("Failed to load intervention %d: %v", interventionId, err)
 		return
 	}
 
 	for i, photo := range intervention.Attachments {
-		url, err := storageService.GetFileURL(
+		url, err := s.StorageService.GetFileURL(
 			ctx,
 			photo.StorageKey,
 			15*time.Minute, // URL valid for 15 minutes
@@ -58,17 +90,17 @@ func AttachReportPdf(db *gorm.DB, storageService storage.StorageService, emailSe
 		return
 	}
 
-	var attachmentService attachments.Attacher = attachments.NewAttachmentService(db, storageService)
+	var attachmentService attachments.Attacher = attachments.NewAttachmentService(s.DB, s.StorageService)
 
 	attachmentService.Attach(ctx, pdfFile, fileInfo.Name(), intervention.ID, "interventions", "report")
 
 	// Send notification email in a separate goroutine
-	go func() {
-		notificationService := NewNotificationService(pdfService, emailService)
+	s.JobRunner.Perform(func() {
+		notificationService := NewNotificationService(pdfService, s.EmailService)
 		if err := notificationService.SendInterventionReport(&intervention); err != nil {
 			log.Printf("Failed to send notification email for intervention %d: %v", interventionId, err)
 		} else {
 			log.Printf("Successfully sent notification email for intervention %d", interventionId)
 		}
-	}()
+	})
 }
