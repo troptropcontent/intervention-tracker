@@ -113,16 +113,35 @@ templ InterventionReport(config InterventionReportConfig) {
 					</div>
 				</div>
 			}
-			@InterventionReportSection("Contrôles effectués") {
-				<div class="grid grid-cols-2 gap-x-4">
-					{{ firstHalf, secondHalf := SplitControlKindsForDisplay() }}
-					<div>
-						@interventionPdfControlTable("Controles de sécurité", config.Intervention, firstHalf, config.Translator)
-					</div>
-					<div>
-						@interventionPdfControlTable("Controles de sécurité", config.Intervention, secondHalf, config.Translator)
-					</div>
-				</div>
+			switch config.Intervention.Type {
+				case models.InterventionTypeMaintenance:
+					@InterventionReportSection("Contrôles effectués") {
+						<div class="grid grid-cols-2 gap-x-4">
+							{{ firstHalf, secondHalf := SplitControlKindsForDisplay() }}
+							<div>
+								@interventionPdfControlTable("Controles de sécurité", config.Intervention, firstHalf, config.Translator)
+							</div>
+							<div>
+								@interventionPdfControlTable("Controles de sécurité", config.Intervention, secondHalf, config.Translator)
+							</div>
+						</div>
+					}
+				case models.InterventionTypeRepair:
+					@InterventionReportSection("Temps passé") {
+						<div class="bg-base-200 p-4 rounded-lg">
+							if config.Intervention.TimeSpent != nil {
+								{{ hours := float64(*config.Intervention.TimeSpent) / 60.0 }}
+								<p class="text-lg">
+									{ 
+									config.Translator.MustTranslate("common.hours", map[string]interface{}{
+										"Count": FormatFloat(hours, 2),
+									}) }
+								</p>
+							} else {
+								<p class="text-lg text-gray-500">Non renseigné</p>
+							}
+						</div>
+					}
 			}
 			@InterventionReportSection("Résumé") {
 				<div>

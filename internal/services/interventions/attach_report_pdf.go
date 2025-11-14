@@ -12,6 +12,7 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
+	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 	"gorm.io/gorm"
 )
 
@@ -94,8 +95,10 @@ func (s *AttachReportPdfService) AttachReportPdf(interventionId uint) {
 
 	attachmentService.Attach(ctx, pdfFile, fileInfo.Name(), intervention.ID, "interventions", "report")
 
+	utils.PP("COUCOUUUUUUUUUUUUUU")
 	// Send notification email in a separate goroutine
 	s.JobRunner.Perform(func() {
+		utils.PP("Inside RUNNER")
 		notificationService := NewNotificationService(pdfService, s.EmailService)
 		if err := notificationService.SendInterventionReport(&intervention); err != nil {
 			log.Printf("Failed to send notification email for intervention %d: %v", interventionId, err)

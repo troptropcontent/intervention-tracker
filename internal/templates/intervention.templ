@@ -44,9 +44,11 @@ templ Intervention(translator translation.TranslatorService, intervention *model
 									models.ControlResultSkipped:        "text-gray-800",
 								}
 							}}
-							<span class={ "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100", colors[control.Result] }>
-								{ translator.MustTranslate(fmt.Sprintf("models.control.results.%v.icon", control.Result)) }
-							</span>
+							if models.ControlResult(control.Result).IsValid() == true {
+								<span class={ "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100", colors[control.Result] }>
+									{ translator.MustTranslate(fmt.Sprintf("models.control.results.%v.icon", control.Result)) }
+								</span>
+							}
 						</div>
 					}
 				</div>

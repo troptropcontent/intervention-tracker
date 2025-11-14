@@ -31,3 +31,6 @@
 "models.control.results.skipped.icon" = "-"
 "models.control.results.needs_attention.label" = "À surveiller"
 "models.control.results.needs_attention.icon" = "⚠"
+[common.hours]
+one = "{{.Count}} heure"
+other = "{{.Count}} heures"
