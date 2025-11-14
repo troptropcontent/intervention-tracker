@@ -15,7 +15,7 @@ import (
 )
 
 // setupDeleteTestFixture creates an intervention with attachments for deletion tests
-func setupDeleteTestFixture(t *testing.T, db *gorm.DB) (*models.Intervention, []string) {
+func setupDeleteTestFixture(db *gorm.DB) (*models.Intervention, []string) {
 	portal := factories.NewPortal().Create(db)
 	user := factories.NewUser().Create(db)
 
@@ -54,7 +54,7 @@ func TestDeleteInterventionService_Delete_Success(t *testing.T) {
 		StorageService: mockStorage,
 	}
 
-	intervention, storageKeys := setupDeleteTestFixture(t, db)
+	intervention, storageKeys := setupDeleteTestFixture(db)
 	ctx := context.Background()
 
 	// Execute delete
@@ -154,7 +154,7 @@ func TestDeleteInterventionService_Delete_StorageFailureDoesNotRollback(t *testi
 		StorageService: mockStorage,
 	}
 
-	intervention, _ := setupDeleteTestFixture(t, db)
+	intervention, _ := setupDeleteTestFixture(db)
 	ctx := context.Background()
 
 	// Execute delete
@@ -180,7 +180,7 @@ func TestDeleteInterventionService_Delete_StorageFailureDoesNotRollback(t *testi
 func TestDeleteInterventionService_Delete_PartialStorageFailure(t *testing.T) {
 	db := tests.SetupTestDB(t)
 
-	intervention, storageKeys := setupDeleteTestFixture(t, db)
+	intervention, storageKeys := setupDeleteTestFixture(db)
 
 	// Setup mock storage that fails on specific file
 	mockStorage := &tests.MockStorageService{
@@ -266,7 +266,7 @@ func TestDeleteInterventionService_Delete_ContextPropagation(t *testing.T) {
 		StorageService: mockStorage,
 	}
 
-	intervention, _ := setupDeleteTestFixture(t, db)
+	intervention, _ := setupDeleteTestFixture(db)
 
 	// Create a context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
