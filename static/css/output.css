@@ -3905,9 +3905,6 @@
   .text-wrap {
     text-wrap: wrap;
   }
-  .wrap-break-word {
-    overflow-wrap: break-word;
-  }
   .whitespace-nowrap {
     white-space: nowrap;
   }
@@ -3974,9 +3971,6 @@
   .text-red-500 {
     color: var(--color-red-500);
   }
-  .text-red-600 {
-    color: var(--color-red-600);
-  }
   .text-red-700 {
     color: var(--color-red-700);
   }
@@ -3985,6 +3979,9 @@
   }
   .text-success {
     color: var(--color-success);
+  }
+  .text-warning {
+    color: var(--color-warning);
   }
   .text-white {
     color: var(--color-white);
@@ -4128,6 +4125,11 @@
   .radio-success {
     @layer daisyui.modifier {
       --input-color: var(--color-success);
+    }
+  }
+  .radio-warning {
+    @layer daisyui.modifier {
+      --input-color: var(--color-warning);
     }
   }
   .textarea-primary {
