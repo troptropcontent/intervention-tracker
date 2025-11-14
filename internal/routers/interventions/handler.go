@@ -46,12 +46,12 @@ func CreateNewIntervention(dependencies *routers.Dependencies) echo.HandlerFunc 
 
 		err = routers.ParseFormData(c, &formData)
 		if err != nil {
-			return err
+			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("failed to parse form data: %v", err))
 		}
 
 		interventionType := models.InterventionType(formData.Type)
 		if !interventionType.IsValid() {
-			return fmt.Errorf("invalid type: '%s'", formData.Type)
+			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("invalid type: '%s'", formData.Type))
 		}
 
 		for i := range formData.Photos {
@@ -101,21 +101,57 @@ func CreateNewIntervention(dependencies *routers.Dependencies) echo.HandlerFunc 
 			}
 		}
 
-		for _, control := range formData.Controls {
-			kind := models.ControlKind(control.Kind)
-			if !kind.IsValid() {
-				return fmt.Errorf("invalid control kind: '%s'", kind)
+		// For maintenance interventions, validate all required controls are present
+		if interventionType == models.InterventionTypeMaintenance {
+			// Early length check - fail fast if wrong number of controls
+			if len(formData.Controls) != len(models.ControlKinds) {
+				return echo.NewHTTPError(
+					http.StatusBadRequest,
+					fmt.Sprintf("maintenance requires exactly %d control checks, received %d",
+						len(models.ControlKinds),
+						len(formData.Controls)),
+				)
 			}
 
-			result := models.ControlResult(control.Result)
-			if !result.IsValid() {
-				return fmt.Errorf("invalid control result: '%s'", result)
+			// Track which control kinds we've seen (for O(1) lookups)
+			seenControlKinds := make(map[models.ControlKind]bool, len(models.ControlKinds))
+
+			for _, control := range formData.Controls {
+				kind := models.ControlKind(control.Kind)
+
+				// Validate this is a recognized control kind
+				if !kind.IsValid() {
+					return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("invalid control kind: '%s'", kind))
+				}
+
+				// Check for duplicates
+				if seenControlKinds[kind] {
+					return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("duplicate control kind: '%s'", kind))
+				}
+				seenControlKinds[kind] = true
+
+				result := models.ControlResult(control.Result)
+				if !result.IsValid() {
+					return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("invalid control result: '%s'", result))
+				}
+
+				args.Controls = append(args.Controls, interventions.ControlData{
+					Kind:   kind,
+					Result: result,
+				})
 			}
 
-			args.Controls = append(args.Controls, interventions.ControlData{
-				Kind:   kind,
-				Result: result,
-			})
+			// Verify all required control kinds are present
+			var missingControls []models.ControlKind
+			for _, requiredKind := range models.ControlKinds {
+				if !seenControlKinds[requiredKind] {
+					missingControls = append(missingControls, requiredKind)
+				}
+			}
+
+			if len(missingControls) > 0 {
+				return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("missing required controls: %v", missingControls))
+			}
 		}
 
 		// Create the intervention
