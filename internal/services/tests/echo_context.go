@@ -81,6 +81,17 @@ func (b *EchoContextBuilder) WithQueryParams(params map[string]string) *EchoCont
 	return b
 }
 
+// WithInvalidFormData sets up a request that will fail when ParseFormData is called.
+// This creates a scenario with malformed URL-encoded data that cannot be parsed.
+// Useful for testing error handling in handlers that call routers.ParseFormData.
+func (b *EchoContextBuilder) WithInvalidFormData() *EchoContextBuilder {
+	req := b.Context.Request()
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
+	// Invalid percent-encoding that will cause ParseForm() to fail
+	req.Body = io.NopCloser(strings.NewReader("key=%ZZ"))
+	return b
+}
+
 func (b *EchoContextBuilder) WithAuthenticatedUser(user *models.User) *EchoContextBuilder {
 	b.Context.Set("user_id", user.ID)
 	b.Context.Set("user_email", user.Email)
