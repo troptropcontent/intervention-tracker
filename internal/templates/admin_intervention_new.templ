@@ -52,16 +52,20 @@ templ controlTable(translator translation.TranslatorService, controls []models.C
 				<tr class="bg-gray-100">
 					<th class="rounded-tl-md border border-gray-300 border-b-0 border-r-0 px-3 py-2 text-left font-medium w-1/2">Contrôle</th>
 					<th class="border border-gray-300 border-b-0  border-r-0 px-2 py-1 text-center font-medium w-2/12">
-						<span class="hidden sm:inline">Conforme</span>
-						<span class="sm:hidden text-green-500">C</span>
+						<span class="hidden sm:inline">{ translator.MustTranslate("models.control.results.compliant.label") }</span>
+						<span class="sm:hidden text-success">{ translator.MustTranslate("models.control.results.compliant.icon") }</span>
 					</th>
 					<th class="border border-gray-300 border-b-0  border-r-0 px-2 py-1 text-center font-medium w-2/12">
-						<span class="hidden sm:inline">Non conforme</span>
-						<span class="sm:hidden text-red-500">NC</span>
+						<span class="hidden sm:inline">{ translator.MustTranslate("models.control.results.needs_attention.label") }</span>
+						<span class="sm:hidden text-warning">{ translator.MustTranslate("models.control.results.needs_attention.icon") }</span>
+					</th>
+					<th class="border border-gray-300 border-b-0  border-r-0 px-2 py-1 text-center font-medium w-2/12">
+						<span class="hidden sm:inline">{ translator.MustTranslate("models.control.results.non_compliant.label") }</span>
+						<span class="sm:hidden text-error">{ translator.MustTranslate("models.control.results.non_compliant.icon") }</span>
 					</th>
 					<th class="rounded-tr-md border border-gray-300 border-b-0  px-2 py-1 text-center font-medium w-2/12">
-						<span class="hidden sm:inline">Non contrôlé</span>
-						<span class="sm:hidden">NA</span>
+						<span class="hidden sm:inline">{ translator.MustTranslate("models.control.results.skipped.label") }</span>
+						<span class="sm:hidden">{ translator.MustTranslate("models.control.results.skipped.icon") }</span>
 					</th>
 				</tr>
 			</thead>
@@ -70,13 +74,16 @@ templ controlTable(translator translation.TranslatorService, controls []models.C
 					<tr class={ templ.KV("bg-gray-50", i%2 == 0), "group" }>
 						<td class="group-last:rounded-bl-md border border-gray-300 border-b-0 group-last:border-b border-r-0 px-3 py-2 font-medium" data-label="Contrôle">{ translator.MustTranslate(fmt.Sprintf("models.control.kinds.%v", control)) }</td>
 						<td class="border border-gray-300 border-b-0 group-last:border-b border-r-0 px-2 py-1 text-center" data-label="Conforme">
-							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value="true" class="radio radio-xs radio-success"/>
+							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value={ models.ControlResultCompliant } class="radio radio-xs radio-success"/>
 						</td>
 						<td class="border border-gray-300 border-b-0 group-last:border-b border-r-0 px-2 py-1 text-center" data-label="Non conforme">
-							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value="false" class="radio radio-xs radio-error"/>
+							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value={ models.ControlResultNeedsAttention } class="radio radio-xs radio-warning"/>
+						</td>
+						<td class="border border-gray-300 border-b-0 group-last:border-b border-r-0 px-2 py-1 text-center" data-label="Non conforme">
+							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value={ models.ControlResultNonCompliant } class="radio radio-xs radio-error"/>
 						</td>
 						<td class="group-last:rounded-br-md border border-gray-300 border-b-0 group-last:border-b px-2 py-1 text-center" data-label="Non contrôlé">
-							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value="" checked class="radio radio-xs radio-primary"/>
+							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value={ models.ControlResultSkipped } checked class="radio radio-xs radio-primary"/>
 						</td>
 						<input type="hidden" name={ fmt.Sprintf("controls[%v].kind", baseInputIndex+i) } value={ control } checked class="h-4 w-4 text-gray-400"/>
 					</tr>
