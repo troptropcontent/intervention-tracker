@@ -3,8 +3,8 @@ package routers
 import (
 	"fmt"
 
+	"github.com/troptropcontent/qr_code_maintenance/internal/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
-	"github.com/troptropcontent/qr_code_maintenance/internal/services/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"gorm.io/gorm"

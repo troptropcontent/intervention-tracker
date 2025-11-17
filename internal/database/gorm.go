@@ -14,7 +14,7 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 )
 
-func ConnectGORM() (*gorm.DB, error) {
+func GetDatabaseDSN() string {
 	// Database configuration from environment variables
 	host := utils.GetEnv("DB_HOST", "db")
 	port := utils.GetEnv("DB_PORT", "5432")
@@ -24,9 +24,12 @@ func ConnectGORM() (*gorm.DB, error) {
 	sslmode := utils.GetEnv("DB_SSLMODE", "disable")
 
 	// Build connection string
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s TimeZone=UTC",
+	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s TimeZone=UTC",
 		host, port, user, password, dbname, sslmode)
+}
 
+func ConnectGORM() (*gorm.DB, error) {
+	dsn := GetDatabaseDSN()
 	// GORM configuration
 	config := &gorm.Config{
 		Logger: logger.New(
@@ -55,8 +58,6 @@ func ConnectGORM() (*gorm.DB, error) {
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(time.Hour)
-
-	log.Printf("Connected to database: %s@%s:%s/%s", user, host, port, dbname)
 
 	return db, nil
 }

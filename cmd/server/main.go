@@ -9,11 +9,12 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/troptropcontent/qr_code_maintenance/internal/database"
 	"github.com/troptropcontent/qr_code_maintenance/internal/handlers"
+	"github.com/troptropcontent/qr_code_maintenance/internal/jobs"
 	authmiddleware "github.com/troptropcontent/qr_code_maintenance/internal/middleware"
 	"github.com/troptropcontent/qr_code_maintenance/internal/routers"
 	"github.com/troptropcontent/qr_code_maintenance/internal/routers/interventions"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
-	"github.com/troptropcontent/qr_code_maintenance/internal/services/jobs"
+
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
@@ -39,7 +40,8 @@ func main() {
 
 	translator := translation.NewTranslator()
 
-	backgroundJobRunner := jobs.NewAsyncJobRunner()
+	backgroundJobRunner := jobs.NewEnqueuer()
+	defer backgroundJobRunner.Close()
 
 	// Initialize handlers
 	h := &handlers.Handlers{
