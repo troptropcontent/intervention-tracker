@@ -29,7 +29,7 @@ func setupTestFixture(db *gorm.DB) *testFixture {
 }
 
 func setupService(db *gorm.DB) *CreateInterventionService {
-	service, _ := NewCreateInterventionService(db, &tests.MockStorageService{}, &tests.MockEmailService{}, jobs.NewSyncJobRunner())
+	service, _ := NewCreateInterventionService(db, &tests.MockStorageService{}, &tests.MockEmailService{}, &tests.MockBackgroundJobRunner{})
 	return service
 }
 

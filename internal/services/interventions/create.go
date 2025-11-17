@@ -102,6 +102,7 @@ type RepairInterventionCreateArgs struct {
 // All operations (intervention, controls, photo uploads) are done synchronously in a transaction
 // This ensures atomicity: either everything succeeds or everything rolls back
 func (s *CreateInterventionService) Create(args *CreateArgs) (*models.Intervention, error) {
+	ctx := context.Background()
 	intervention, err := s.buildIntervention(args)
 	if err != nil {
 		return nil, err
@@ -124,9 +125,7 @@ func (s *CreateInterventionService) Create(args *CreateArgs) (*models.Interventi
 	}
 
 	// Enqueue background job to attach PDF report
-	if err := s.JobRunner.Enqueue(ctx, attachmentsJobs.UploadArgs{
-		InterventionId: intervention.ID,
-	}); err != nil {
+	if err := s.JobRunner.Enqueue(ctx, attachmentsJobs.UploadArgs{}); err != nil {
 		return nil, fmt.Errorf("failed to enqueue attachment job: %w", err)
 	}
 
@@ -193,7 +192,7 @@ func (s *CreateInterventionService) attachPhotos(tx *gorm.DB, interventionID uin
 	}
 
 	ctx := context.Background() // TODO: Pass context from handler when available
-	attachmentService := attachments.NewAttachmentService(tx, s.StorageService)
+	attachmentService := attachments.NewAttachmentService(tx, s.StorageService, s.JobRunner)
 
 	for _, photo := range photos {
 		if err := s.attachSinglePhoto(ctx, attachmentService, photo, interventionID); err != nil {
@@ -215,7 +214,7 @@ func (s *CreateInterventionService) attachSinglePhoto(ctx context.Context, attac
 	ext := filepath.Ext(photo.File.Filename)
 	fileName := fmt.Sprintf("%s%s", photo.Name, ext)
 
-	if err := attachmentService.Attach(ctx, src, fileName, interventionID, "interventions", "photo"); err != nil {
+	if _, err := attachmentService.Attach(ctx, src, fileName, interventionID, "interventions", "photo"); err != nil {
 		// This will rollback the entire transaction AND cleanup the S3 upload
 		return fmt.Errorf("failed to attach photo %s: %w", fileName, err)
 	}
