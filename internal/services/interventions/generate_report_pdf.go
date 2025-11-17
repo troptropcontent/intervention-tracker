@@ -14,13 +14,20 @@ import (
 
 // PDFService handles PDF generation for interventions
 type PDFService struct {
-	gotenbergService *services.GotenbergService
+	gotenbergService services.HtmlToPdfConverter
 }
 
 // NewPDFService creates a new intervention PDF service
-func NewPDFService() *PDFService {
+func NewPDFService(gotembergService ...services.HtmlToPdfConverter) *PDFService {
+	var service services.HtmlToPdfConverter
+	if len(gotembergService) > 0 {
+		service = gotembergService[0]
+	} else {
+		service = services.NewGotenbergService()
+	}
+
 	return &PDFService{
-		gotenbergService: services.NewGotenbergService(),
+		gotenbergService: service,
 	}
 }
 

@@ -33,6 +33,10 @@ type ConvertHtmlToPdfFiles struct {
 	ContentBytes []byte
 }
 
+type HtmlToPdfConverter interface {
+	ConvertHTMLToPDF(files []ConvertHtmlToPdfFiles, filenamePrefix string) (*os.File, error)
+}
+
 // ConvertHTMLToPDF converts HTML string to PDF and returns a temporary file
 func (s *GotenbergService) ConvertHTMLToPDF(files []ConvertHtmlToPdfFiles, filenamePrefix string) (*os.File, error) {
 	// Create temporary file for PDF
