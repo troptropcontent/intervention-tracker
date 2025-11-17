@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"strings"
@@ -16,8 +17,8 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: database <subcommand>")
-		fmt.Println("Available subcommands: migrate")
+		fmt.Println("Usage: background_jobs <subcommand>")
+		fmt.Println("Available subcommands: migrate, start")
 		os.Exit(1)
 	}
 
@@ -26,16 +27,21 @@ func main() {
 
 	switch subcommand {
 	case "migrate":
-		dbPool := jobs.GetDbPool(ctx)
-		migrator, err := rivermigrate.New(riverpgxv5.New(dbPool), nil)
+		// For migrations, we only need the DB pool
+		cfg, err := jobs.NewConfig(ctx)
 		if err != nil {
-			panic(err)
+			log.Fatalf("Failed to initialize configuration: %v", err)
 		}
-		defer dbPool.Close()
+		defer cfg.Close()
+
+		migrator, err := rivermigrate.New(riverpgxv5.New(cfg.DBPool), nil)
+		if err != nil {
+			log.Fatalf("Failed to create migrator: %v", err)
+		}
 
 		res, err := migrator.Migrate(ctx, rivermigrate.DirectionUp, &rivermigrate.MigrateOpts{})
 		if err != nil {
-			panic(err)
+			log.Fatalf("Failed to run migrations: %v", err)
 		}
 
 		printVersions := func(res *rivermigrate.MigrateResult) {
@@ -49,10 +55,29 @@ func main() {
 		} else {
 			fmt.Println("Database already up to date")
 		}
+
 	case "start":
-		runner := jobs.NewRunner(ctx)
-		if err := runner.RiverClient.Start(ctx); err != nil {
-			panic(err)
+		// Create shared configuration
+		cfg, err := jobs.NewConfig(ctx)
+		if err != nil {
+			log.Fatalf("Failed to initialize configuration: %v", err)
+		}
+		defer cfg.Close()
+
+		// Create the job runner
+		runner, err := jobs.NewRunner(ctx, cfg)
+		if err != nil {
+			log.Fatalf("Failed to create job runner: %v", err)
+		}
+		defer func() {
+			stopCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+			defer cancel()
+			runner.Stop(stopCtx)
+		}()
+
+		// Start the runner
+		if err := runner.Start(ctx); err != nil {
+			log.Fatalf("Failed to start job runner: %v", err)
 		}
 
 		fmt.Println("Background job runner started. Press Ctrl+C to stop.")
@@ -66,11 +91,12 @@ func main() {
 		stopCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 		defer cancel()
 
-		if err := runner.RiverClient.Stop(stopCtx); err != nil {
+		if err := runner.Stop(stopCtx); err != nil {
 			fmt.Printf("Error during shutdown: %v\n", err)
 		} else {
 			fmt.Println("Shutdown complete")
 		}
+
 	default:
 		fmt.Printf("Unknown subcommand: %s\n", subcommand)
 		os.Exit(1)

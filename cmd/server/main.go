@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 
 	"github.com/gorilla/sessions"
@@ -14,13 +15,14 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/routers"
 	"github.com/troptropcontent/qr_code_maintenance/internal/routers/interventions"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
-
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 )
 
 func main() {
+	ctx := context.Background()
+
 	// Connect to database with GORM
 	db, err := database.InitializeDatabase()
 	if err != nil {
@@ -29,7 +31,7 @@ func main() {
 
 	emailService, err := email.NewSMTPServiceFromEnv(&email.NewSMTPServiceFromEnvOptions{})
 	if err != nil {
-		log.Fatalf("failed to instanciate email service: %v", err)
+		log.Fatalf("failed to instantiate email service: %v", err)
 	}
 
 	// Initialize S3 storage service (reads config from environment variables)
@@ -40,7 +42,11 @@ func main() {
 
 	translator := translation.NewTranslator()
 
-	backgroundJobRunner := jobs.NewEnqueuer()
+	// Create job enqueuer for the web application (only creates the pgx pool, not duplicating services)
+	backgroundJobRunner, err := jobs.NewEnqueuer(ctx)
+	if err != nil {
+		log.Fatalf("Failed to create job enqueuer: %v", err)
+	}
 	defer backgroundJobRunner.Close()
 
 	// Initialize handlers

@@ -40,6 +40,9 @@ func (w *AttachReportPdfWorker) Work(ctx context.Context, job *river.Job[types.A
 
 	// Get signed URLs for all photo attachments
 	for i, photo := range intervention.Attachments {
+		if photo.UploadStatus != models.AttachmentUploadStatusCompleted {
+			return fmt.Errorf("photo %s has not been uploaded yet (status: %s), cannot generate report", photo.FileName, photo.UploadStatus)
+		}
 		url, err := w.StorageService.GetFileURL(
 			ctx,
 			photo.StorageKey,
