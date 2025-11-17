@@ -17,7 +17,7 @@ import (
 
 func TestNewGotenbergService(t *testing.T) {
 	baseURL := "http://localhost:3000"
-	service := NewGotenbergService(baseURL)
+	service := NewGotenbergService()
 
 	assert.Equal(t, baseURL, service.BaseURL)
 	assert.NotNil(t, service.Client)
@@ -61,7 +61,7 @@ func TestConvertHTMLToPDF_Success(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGotenbergService(server.URL)
+	service := NewGotenbergService()
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
 
 	files := []ConvertHtmlToPdfFiles{
@@ -96,7 +96,7 @@ func TestConvertHTMLToPDF_GotenbergError(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGotenbergService(server.URL)
+	service := NewGotenbergService()
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
 
 	files := []ConvertHtmlToPdfFiles{
@@ -115,7 +115,7 @@ func TestConvertHTMLToPDF_GotenbergError(t *testing.T) {
 
 func TestConvertHTMLToPDF_NetworkError(t *testing.T) {
 	// Use invalid URL to simulate network error
-	service := NewGotenbergService("http://invalid-gotenberg-url:9999")
+	service := NewGotenbergService()
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
 
 	files := []ConvertHtmlToPdfFiles{
@@ -134,7 +134,7 @@ func TestConvertHTMLToPDF_NetworkError(t *testing.T) {
 func TestConvertHTMLToPDF_TempFileCreationError(t *testing.T) {
 	// This test is harder to implement without mocking os.CreateTemp
 	// but we can test with invalid directory paths in some cases
-	service := NewGotenbergService("http://localhost:3000")
+	service := NewGotenbergService()
 
 	// Use very long filename prefix that might cause issues
 	longPrefix := strings.Repeat("a", 300)
@@ -163,7 +163,7 @@ func TestConvertHTML_Success(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGotenbergService(server.URL)
+	service := NewGotenbergService()
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
 
 	files := []ConvertHtmlToPdfFiles{
@@ -187,7 +187,7 @@ func TestConvertHTML_HTTPError(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGotenbergService(server.URL)
+	service := NewGotenbergService()
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
 
 	files := []ConvertHtmlToPdfFiles{
@@ -204,7 +204,7 @@ func TestConvertHTML_HTTPError(t *testing.T) {
 }
 
 func TestConvertHTML_InvalidURL(t *testing.T) {
-	service := NewGotenbergService("http://invalid-url:9999")
+	service := NewGotenbergService()
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
 
 	files := []ConvertHtmlToPdfFiles{
@@ -245,7 +245,7 @@ func TestConvertHTML_MultipartFormOptions(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGotenbergService(server.URL)
+	service := NewGotenbergService()
 
 	files := []ConvertHtmlToPdfFiles{
 		{
@@ -280,7 +280,7 @@ func TestConvertHTML_HTMLFileContent(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGotenbergService(server.URL)
+	service := NewGotenbergService()
 
 	files := []ConvertHtmlToPdfFiles{
 		{
@@ -305,7 +305,7 @@ func TestGotenbergService_Integration_EndToEnd(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGotenbergService(server.URL)
+	service := NewGotenbergService()
 	htmlContent := `
 <!DOCTYPE html>
 <html>
@@ -368,7 +368,7 @@ func TestGotenbergService_RealEndToEnd(t *testing.T) {
 		gotenbergURL = "http://gotemberg:3000"
 	}
 
-	service := NewGotenbergService(gotenbergURL)
+	service := NewGotenbergService()
 
 	// Test HTML content with various elements to ensure proper rendering
 	htmlContent := `

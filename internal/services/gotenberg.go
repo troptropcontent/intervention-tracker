@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+const DefaultGotenbergURL = "http://gotemberg:3000"
+
 // GotenbergService handles PDF generation via Gotenberg
 type GotenbergService struct {
 	BaseURL string
@@ -17,9 +19,9 @@ type GotenbergService struct {
 }
 
 // NewGotenbergService creates a new Gotenberg service instance
-func NewGotenbergService(baseURL string) *GotenbergService {
+func NewGotenbergService() *GotenbergService {
 	return &GotenbergService{
-		BaseURL: baseURL,
+		BaseURL: DefaultGotenbergURL,
 		Client: &http.Client{
 			Timeout: 30 * time.Second,
 		},
