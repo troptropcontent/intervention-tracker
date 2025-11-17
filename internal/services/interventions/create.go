@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/troptropcontent/qr_code_maintenance/internal/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/jobs/types"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/attachments"
@@ -20,7 +19,7 @@ type CreateInterventionService struct {
 	DB                       *gorm.DB
 	StorageService           storage.StorageService
 	EmailNotificationService email.EmailService
-	JobRunner                jobs.BackgroundJobRunner
+	JobRunner                types.BackgroundJobRunner
 }
 
 // NewInterventionService creates a new intervention service with validation
@@ -28,7 +27,7 @@ func NewCreateInterventionService(
 	db *gorm.DB,
 	storageService storage.StorageService,
 	emailNotificationService email.EmailService,
-	jobRunner jobs.BackgroundJobRunner,
+	jobRunner types.BackgroundJobRunner,
 ) (*CreateInterventionService, error) {
 	if db == nil {
 		return nil, fmt.Errorf("db cannot be nil")

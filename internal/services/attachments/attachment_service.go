@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 
-	"github.com/troptropcontent/qr_code_maintenance/internal/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/jobs/types"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
@@ -17,11 +16,11 @@ import (
 type AttachmentService struct {
 	db             *gorm.DB
 	storageService storage.StorageService
-	jobRunner      jobs.BackgroundJobRunner
+	jobRunner      types.BackgroundJobRunner
 }
 
 // NewAttachmentService creates a new attachment service instance
-func NewAttachmentService(db *gorm.DB, storageService storage.StorageService, jobRunner jobs.BackgroundJobRunner) *AttachmentService {
+func NewAttachmentService(db *gorm.DB, storageService storage.StorageService, jobRunner types.BackgroundJobRunner) *AttachmentService {
 	return &AttachmentService{
 		db:             db,
 		storageService: storageService,

@@ -10,6 +10,7 @@ import (
 	"github.com/riverqueue/river/riverdriver/riverpgxv5"
 	"github.com/troptropcontent/qr_code_maintenance/internal/database"
 	attachementsJobs "github.com/troptropcontent/qr_code_maintenance/internal/jobs/attachements"
+	interventionsJobs "github.com/troptropcontent/qr_code_maintenance/internal/jobs/interventions"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 )
 
@@ -27,6 +28,10 @@ func Workers() *river.Workers {
 	workers := river.NewWorkers()
 
 	river.AddWorker(workers, &attachementsJobs.UploadWorker{
+		DB:             db,
+		StorageService: storageService,
+	})
+	river.AddWorker(workers, &interventionsJobs.AttachReportPdfWorker{
 		DB:             db,
 		StorageService: storageService,
 	})

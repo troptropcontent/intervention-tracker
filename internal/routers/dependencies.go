@@ -3,7 +3,7 @@ package routers
 import (
 	"fmt"
 
-	"github.com/troptropcontent/qr_code_maintenance/internal/jobs"
+	"github.com/troptropcontent/qr_code_maintenance/internal/jobs/types"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
@@ -15,10 +15,10 @@ type Dependencies struct {
 	EmailNotificationService email.EmailService
 	StorageService           storage.StorageService
 	TranslationService       translation.TranslatorService
-	BackGroundJobRunner      jobs.BackgroundJobRunner
+	BackGroundJobRunner      types.BackgroundJobRunner
 }
 
-func NewRouterDependencies(db *gorm.DB, emailService email.EmailService, storageService storage.StorageService, translationService translation.TranslatorService, backGroundJobRunner jobs.BackgroundJobRunner) (d *Dependencies, err error) {
+func NewRouterDependencies(db *gorm.DB, emailService email.EmailService, storageService storage.StorageService, translationService translation.TranslatorService, backGroundJobRunner types.BackgroundJobRunner) (d *Dependencies, err error) {
 	if db == nil {
 		return nil, fmt.Errorf("db can not be nil")
 	}

@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/riverqueue/river"
-	"github.com/troptropcontent/qr_code_maintenance/internal/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/jobs/types"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/attachments"
@@ -24,7 +23,7 @@ type AttachReportPdfWorker struct {
 	DB                 *gorm.DB
 	StorageService     storage.StorageService
 	EmailService       email.EmailService
-	JobRunner          jobs.BackgroundJobRunner
+	JobRunner          types.BackgroundJobRunner
 	HtmlToPdfConverter pdf.HtmlToPdfConverter
 }
 

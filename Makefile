@@ -49,3 +49,9 @@ db:
 
 sandbox:
 	go run cmd/sandbox/main.go
+
+river:
+	go run cmd/background_jobs/main.go start
+
+migrate:
+	go run cmd/database/main.go migrate

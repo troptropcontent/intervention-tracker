@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/troptropcontent/qr_code_maintenance/internal/jobs"
+	"github.com/troptropcontent/qr_code_maintenance/internal/jobs/types"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/attachments"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
@@ -14,7 +14,7 @@ import (
 type DeleteInterventionService struct {
 	DB             *gorm.DB
 	StorageService storage.StorageService
-	JobRunner      jobs.BackgroundJobRunner
+	JobRunner      types.BackgroundJobRunner
 }
 
 // Delete removes an intervention and all its associated attachments.

@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/troptropcontent/qr_code_maintenance/internal/jobs"
+	"github.com/troptropcontent/qr_code_maintenance/internal/jobs/types"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/attachments"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
@@ -23,10 +23,10 @@ type AttachReportPdfService struct {
 	DB             *gorm.DB
 	StorageService storage.StorageService
 	EmailService   email.EmailService
-	JobRunner      jobs.BackgroundJobRunner
+	JobRunner      types.BackgroundJobRunner
 }
 
-func NewAttachReportPdfService(db *gorm.DB, storageService storage.StorageService, emailService email.EmailService, jobRunner jobs.BackgroundJobRunner) (*AttachReportPdfService, error) {
+func NewAttachReportPdfService(db *gorm.DB, storageService storage.StorageService, emailService email.EmailService, jobRunner types.BackgroundJobRunner) (*AttachReportPdfService, error) {
 	if db == nil {
 		return nil, fmt.Errorf("db cannot be nil")
 	}
