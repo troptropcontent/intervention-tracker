@@ -7,7 +7,7 @@ import (
 	"log"
 
 	"github.com/troptropcontent/qr_code_maintenance/internal/jobs"
-	jobsAttachments "github.com/troptropcontent/qr_code_maintenance/internal/jobs/attachements"
+	"github.com/troptropcontent/qr_code_maintenance/internal/jobs/types"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
@@ -82,7 +82,7 @@ func (a *AttachmentService) Attach(ctx context.Context, file io.ReadSeeker, file
 		return 0, fmt.Errorf("failed to create attachment record: %w", err)
 	}
 
-	job := jobsAttachments.UploadArgs{
+	job := types.UploadArgs{
 		AttachmentID: attachment.ID,
 	}
 

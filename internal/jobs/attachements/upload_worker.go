@@ -8,21 +8,14 @@ import (
 	"time"
 
 	"github.com/riverqueue/river"
+	"github.com/troptropcontent/qr_code_maintenance/internal/jobs/types"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"gorm.io/gorm"
 )
 
-// UploadArgs contains the attachment ID to process
-// The attachment record contains a temporary file path in StorageKey until the upload completes
-type UploadArgs struct {
-	AttachmentID uint `json:"attachment_id"`
-}
-
-func (UploadArgs) Kind() string { return "attachment_upload" }
-
 type UploadWorker struct {
-	river.WorkerDefaults[UploadArgs]
+	river.WorkerDefaults[types.UploadArgs]
 	DB             *gorm.DB
 	StorageService storage.StorageService
 }
@@ -32,7 +25,7 @@ type UploadWorker struct {
 // 2. Uploading to S3
 // 3. Updating the attachment record with the final S3 key
 // 4. Cleaning up the temporary file
-func (w *UploadWorker) Work(ctx context.Context, job *river.Job[UploadArgs]) error {
+func (w *UploadWorker) Work(ctx context.Context, job *river.Job[types.UploadArgs]) error {
 	// Fetch the attachment record
 	var attachment models.Attachment
 	if err := w.DB.First(&attachment, job.Args.AttachmentID).Error; err != nil {

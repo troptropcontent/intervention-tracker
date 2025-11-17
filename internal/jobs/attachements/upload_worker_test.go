@@ -10,6 +10,7 @@ import (
 	"github.com/riverqueue/river"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/troptropcontent/qr_code_maintenance/internal/jobs/types"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/tests"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/tests/factories"
@@ -50,8 +51,8 @@ func TestUploadWorker_Work_Success(t *testing.T) {
 	}
 
 	// Execute worker
-	job := &river.Job[UploadArgs]{
-		Args: UploadArgs{
+	job := &river.Job[types.UploadArgs]{
+		Args: types.UploadArgs{
 			AttachmentID: attachment.ID,
 		},
 	}
@@ -105,8 +106,8 @@ func TestUploadWorker_Work_AlreadyCompleted(t *testing.T) {
 	}
 
 	// Execute worker
-	job := &river.Job[UploadArgs]{
-		Args: UploadArgs{
+	job := &river.Job[types.UploadArgs]{
+		Args: types.UploadArgs{
 			AttachmentID: attachment.ID,
 		},
 	}
@@ -134,8 +135,8 @@ func TestUploadWorker_Work_AttachmentNotFound(t *testing.T) {
 	}
 
 	// Execute worker with non-existent attachment ID
-	job := &river.Job[UploadArgs]{
-		Args: UploadArgs{
+	job := &river.Job[types.UploadArgs]{
+		Args: types.UploadArgs{
 			AttachmentID: 99999,
 		},
 	}
@@ -163,8 +164,8 @@ func TestUploadWorker_Work_TempFileNotFound(t *testing.T) {
 	}
 
 	// Execute worker
-	job := &river.Job[UploadArgs]{
-		Args: UploadArgs{
+	job := &river.Job[types.UploadArgs]{
+		Args: types.UploadArgs{
 			AttachmentID: attachment.ID,
 		},
 	}
@@ -206,8 +207,8 @@ func TestUploadWorker_Work_S3UploadFails(t *testing.T) {
 	}
 
 	// Execute worker
-	job := &river.Job[UploadArgs]{
-		Args: UploadArgs{
+	job := &river.Job[types.UploadArgs]{
+		Args: types.UploadArgs{
 			AttachmentID: attachment.ID,
 		},
 	}
@@ -258,8 +259,8 @@ func TestUploadWorker_Work_TempFileCleanupFails(t *testing.T) {
 	}
 
 	// Execute worker
-	job := &river.Job[UploadArgs]{
-		Args: UploadArgs{
+	job := &river.Job[types.UploadArgs]{
+		Args: types.UploadArgs{
 			AttachmentID: attachment.ID,
 		},
 	}
@@ -303,8 +304,8 @@ func TestUploadWorker_Work_StorageKeyPattern(t *testing.T) {
 	}
 
 	// Execute worker
-	job := &river.Job[UploadArgs]{
-		Args: UploadArgs{
+	job := &river.Job[types.UploadArgs]{
+		Args: types.UploadArgs{
 			AttachmentID: attachment.ID,
 		},
 	}
@@ -343,8 +344,8 @@ func TestUploadWorker_Work_MultipleRetries(t *testing.T) {
 		StorageService: mockStorage,
 	}
 
-	job := &river.Job[UploadArgs]{
-		Args: UploadArgs{
+	job := &river.Job[types.UploadArgs]{
+		Args: types.UploadArgs{
 			AttachmentID: attachment.ID,
 		},
 	}
@@ -404,8 +405,8 @@ func TestUploadWorker_Work_PreservesFileMetadata(t *testing.T) {
 	}
 
 	// Execute worker
-	job := &river.Job[UploadArgs]{
-		Args: UploadArgs{
+	job := &river.Job[types.UploadArgs]{
+		Args: types.UploadArgs{
 			AttachmentID: attachment.ID,
 		},
 	}

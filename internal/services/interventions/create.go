@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/troptropcontent/qr_code_maintenance/internal/jobs"
-	attachmentsJobs "github.com/troptropcontent/qr_code_maintenance/internal/jobs/attachements"
+	"github.com/troptropcontent/qr_code_maintenance/internal/jobs/types"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/attachments"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
@@ -125,7 +125,7 @@ func (s *CreateInterventionService) Create(args *CreateArgs) (*models.Interventi
 	}
 
 	// Enqueue background job to attach PDF report
-	if err := s.JobRunner.Enqueue(ctx, attachmentsJobs.UploadArgs{}); err != nil {
+	if err := s.JobRunner.Enqueue(ctx, types.AttachReportPdfArgs{InterventionID: intervention.ID}); err != nil {
 		return nil, fmt.Errorf("failed to enqueue attachment job: %w", err)
 	}
 

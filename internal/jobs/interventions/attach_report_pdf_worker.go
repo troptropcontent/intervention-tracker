@@ -9,6 +9,7 @@ import (
 
 	"github.com/riverqueue/river"
 	"github.com/troptropcontent/qr_code_maintenance/internal/jobs"
+	"github.com/troptropcontent/qr_code_maintenance/internal/jobs/types"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/attachments"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
@@ -17,15 +18,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// AttachReportPdfArgs contains the intervention ID to process
-type AttachReportPdfArgs struct {
-	InterventionID uint `json:"intervention_id"`
-}
-
-func (AttachReportPdfArgs) Kind() string { return "attach_report_pdf" }
-
 type AttachReportPdfWorker struct {
-	river.WorkerDefaults[AttachReportPdfArgs]
+	river.WorkerDefaults[types.AttachReportPdfArgs]
 	DB             *gorm.DB
 	StorageService storage.StorageService
 	EmailService   email.EmailService
@@ -34,7 +28,7 @@ type AttachReportPdfWorker struct {
 
 // Work generates a PDF report for an intervention, uploads it to S3,
 // creates an Attachment record, and sends a notification email to the user.
-func (w *AttachReportPdfWorker) Work(ctx context.Context, job *river.Job[AttachReportPdfArgs]) error {
+func (w *AttachReportPdfWorker) Work(ctx context.Context, job *river.Job[types.AttachReportPdfArgs]) error {
 	interventionID := job.Args.InterventionID
 
 	// Load intervention with all relationships
