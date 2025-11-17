@@ -3,19 +3,19 @@ package mocks
 import (
 	"os"
 
-	"github.com/troptropcontent/qr_code_maintenance/internal/services"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/pdf"
 )
 
 // GotenbergService is a mock implementation of services.GotenbergService for testing
 type GotenbergService struct {
-	ConvertCalled    bool
-	ConvertError     error
-	PDFContent       []byte
-	CapturedFiles    []services.ConvertHtmlToPdfFiles
-	CapturedPrefix   string
+	ConvertCalled  bool
+	ConvertError   error
+	PDFContent     []byte
+	CapturedFiles  []pdf.HtmlToPdfConverterFiles
+	CapturedPrefix string
 }
 
-func (m *GotenbergService) ConvertHTMLToPDF(files []services.ConvertHtmlToPdfFiles, filenamePrefix string) (*os.File, error) {
+func (m *GotenbergService) ConvertHTMLToPDF(files []pdf.HtmlToPdfConverterFiles, filenamePrefix string) (*os.File, error) {
 	m.ConvertCalled = true
 	m.CapturedFiles = files
 	m.CapturedPrefix = filenamePrefix

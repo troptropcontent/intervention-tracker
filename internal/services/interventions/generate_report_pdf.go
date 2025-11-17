@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
-	"github.com/troptropcontent/qr_code_maintenance/internal/services"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/pdf"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"github.com/troptropcontent/qr_code_maintenance/internal/templates"
 	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
@@ -14,16 +14,16 @@ import (
 
 // PDFService handles PDF generation for interventions
 type PDFService struct {
-	gotenbergService services.HtmlToPdfConverter
+	gotenbergService pdf.HtmlToPdfConverter
 }
 
 // NewPDFService creates a new intervention PDF service
-func NewPDFService(gotembergService ...services.HtmlToPdfConverter) *PDFService {
-	var service services.HtmlToPdfConverter
+func NewPDFService(gotembergService ...pdf.HtmlToPdfConverter) *PDFService {
+	var service pdf.HtmlToPdfConverter
 	if len(gotembergService) > 0 {
 		service = gotembergService[0]
 	} else {
-		service = services.NewGotenbergService()
+		service = pdf.NewGotenbergService()
 	}
 
 	return &PDFService{
@@ -59,14 +59,14 @@ func (s *PDFService) GenerateReportPDF(intervention *models.Intervention) (*os.F
 		return nil, fmt.Errorf("failed to read logo file: %w", err)
 	}
 
-	var files []services.ConvertHtmlToPdfFiles
-	files = append(files, services.ConvertHtmlToPdfFiles{
+	var files []pdf.HtmlToPdfConverterFiles
+	files = append(files, pdf.HtmlToPdfConverterFiles{
 		Name:         "index.html",
 		ContentBytes: []byte(html_string),
-	}, services.ConvertHtmlToPdfFiles{
+	}, pdf.HtmlToPdfConverterFiles{
 		Name:         "output.css",
 		ContentBytes: css_bytes,
-	}, services.ConvertHtmlToPdfFiles{
+	}, pdf.HtmlToPdfConverterFiles{
 		Name:         "logo.png",
 		ContentBytes: logo_bytes,
 	})

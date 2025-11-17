@@ -1,4 +1,4 @@
-package services
+package pdf
 
 import (
 	"bytes"
@@ -19,26 +19,23 @@ type GotenbergService struct {
 }
 
 // NewGotenbergService creates a new Gotenberg service instance
-func NewGotenbergService() *GotenbergService {
+func NewGotenbergService(gotenbergUrl ...string) *GotenbergService {
+	var baseUrl string
+	if len(gotenbergUrl) > 0 {
+		baseUrl = gotenbergUrl[0]
+	} else {
+		baseUrl = DefaultGotenbergURL
+	}
 	return &GotenbergService{
-		BaseURL: DefaultGotenbergURL,
+		BaseURL: baseUrl,
 		Client: &http.Client{
 			Timeout: 30 * time.Second,
 		},
 	}
 }
 
-type ConvertHtmlToPdfFiles struct {
-	Name         string
-	ContentBytes []byte
-}
-
-type HtmlToPdfConverter interface {
-	ConvertHTMLToPDF(files []ConvertHtmlToPdfFiles, filenamePrefix string) (*os.File, error)
-}
-
 // ConvertHTMLToPDF converts HTML string to PDF and returns a temporary file
-func (s *GotenbergService) ConvertHTMLToPDF(files []ConvertHtmlToPdfFiles, filenamePrefix string) (*os.File, error) {
+func (s *GotenbergService) ConvertHTMLToPDF(files []HtmlToPdfConverterFiles, filenamePrefix string) (*os.File, error) {
 	// Create temporary file for PDF
 	tempFile, err := os.CreateTemp("", fmt.Sprintf("%s_*.pdf", filenamePrefix))
 	if err != nil {
@@ -63,7 +60,7 @@ func (s *GotenbergService) ConvertHTMLToPDF(files []ConvertHtmlToPdfFiles, filen
 }
 
 // convertHTML sends HTML to Gotenberg and writes PDF response to writer
-func (s *GotenbergService) convertHTML(files []ConvertHtmlToPdfFiles, writer io.Writer) error {
+func (s *GotenbergService) convertHTML(files []HtmlToPdfConverterFiles, writer io.Writer) error {
 	// Create multipart form
 	var body bytes.Buffer
 	w := multipart.NewWriter(&body)
@@ -121,7 +118,7 @@ func (s *GotenbergService) convertHTML(files []ConvertHtmlToPdfFiles, writer io.
 	return nil
 }
 
-func (s *GotenbergService) writeFilesFormData(files []ConvertHtmlToPdfFiles, writer *multipart.Writer) error {
+func (s *GotenbergService) writeFilesFormData(files []HtmlToPdfConverterFiles, writer *multipart.Writer) error {
 	for _, file := range files {
 		htmlPart, err := writer.CreateFormFile("files", file.Name)
 		if err != nil {

@@ -1,4 +1,4 @@
-package services
+package pdf
 
 import (
 	"bytes"
@@ -16,10 +16,9 @@ import (
 )
 
 func TestNewGotenbergService(t *testing.T) {
-	baseURL := "http://localhost:3000"
 	service := NewGotenbergService()
 
-	assert.Equal(t, baseURL, service.BaseURL)
+	assert.Equal(t, DefaultGotenbergURL, service.BaseURL)
 	assert.NotNil(t, service.Client)
 	assert.Equal(t, 30*time.Second, service.Client.Timeout)
 }
@@ -61,10 +60,10 @@ func TestConvertHTMLToPDF_Success(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGotenbergService()
+	service := NewGotenbergService(server.URL)
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
 
-	files := []ConvertHtmlToPdfFiles{
+	files := []HtmlToPdfConverterFiles{
 		{
 			Name:         "index.html",
 			ContentBytes: []byte(htmlContent),
@@ -96,10 +95,10 @@ func TestConvertHTMLToPDF_GotenbergError(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGotenbergService()
+	service := NewGotenbergService(server.URL)
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
 
-	files := []ConvertHtmlToPdfFiles{
+	files := []HtmlToPdfConverterFiles{
 		{
 			Name:         "index.html",
 			ContentBytes: []byte(htmlContent),
@@ -115,10 +114,10 @@ func TestConvertHTMLToPDF_GotenbergError(t *testing.T) {
 
 func TestConvertHTMLToPDF_NetworkError(t *testing.T) {
 	// Use invalid URL to simulate network error
-	service := NewGotenbergService()
+	service := NewGotenbergService("http://invalid-host-that-does-not-exist:9999")
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
 
-	files := []ConvertHtmlToPdfFiles{
+	files := []HtmlToPdfConverterFiles{
 		{
 			Name:         "index.html",
 			ContentBytes: []byte(htmlContent),
@@ -138,7 +137,7 @@ func TestConvertHTMLToPDF_TempFileCreationError(t *testing.T) {
 
 	// Use very long filename prefix that might cause issues
 	longPrefix := strings.Repeat("a", 300)
-	files := []ConvertHtmlToPdfFiles{
+	files := []HtmlToPdfConverterFiles{
 		{
 			Name:         "index.html",
 			ContentBytes: []byte("<html></html>"),
@@ -163,10 +162,10 @@ func TestConvertHTML_Success(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGotenbergService()
+	service := NewGotenbergService(server.URL)
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
 
-	files := []ConvertHtmlToPdfFiles{
+	files := []HtmlToPdfConverterFiles{
 		{
 			Name:         "index.html",
 			ContentBytes: []byte(htmlContent),
@@ -187,10 +186,10 @@ func TestConvertHTML_HTTPError(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGotenbergService()
+	service := NewGotenbergService(server.URL)
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
 
-	files := []ConvertHtmlToPdfFiles{
+	files := []HtmlToPdfConverterFiles{
 		{
 			Name:         "index.html",
 			ContentBytes: []byte(htmlContent),
@@ -204,10 +203,10 @@ func TestConvertHTML_HTTPError(t *testing.T) {
 }
 
 func TestConvertHTML_InvalidURL(t *testing.T) {
-	service := NewGotenbergService()
+	service := NewGotenbergService("http://invalid-host-that-does-not-exist:9999")
 	htmlContent := "<html><body><h1>Test</h1></body></html>"
 
-	files := []ConvertHtmlToPdfFiles{
+	files := []HtmlToPdfConverterFiles{
 		{
 			Name:         "index.html",
 			ContentBytes: []byte(htmlContent),
@@ -245,9 +244,9 @@ func TestConvertHTML_MultipartFormOptions(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGotenbergService()
+	service := NewGotenbergService(server.URL)
 
-	files := []ConvertHtmlToPdfFiles{
+	files := []HtmlToPdfConverterFiles{
 		{
 			Name:         "index.html",
 			ContentBytes: []byte("<html></html>"),
@@ -280,9 +279,9 @@ func TestConvertHTML_HTMLFileContent(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGotenbergService()
+	service := NewGotenbergService(server.URL)
 
-	files := []ConvertHtmlToPdfFiles{
+	files := []HtmlToPdfConverterFiles{
 		{
 			Name:         "index.html",
 			ContentBytes: []byte(expectedHTML),
@@ -305,7 +304,7 @@ func TestGotenbergService_Integration_EndToEnd(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewGotenbergService()
+	service := NewGotenbergService(server.URL)
 	htmlContent := `
 <!DOCTYPE html>
 <html>
@@ -327,7 +326,7 @@ func TestGotenbergService_Integration_EndToEnd(t *testing.T) {
 </body>
 </html>`
 
-	files := []ConvertHtmlToPdfFiles{
+	files := []HtmlToPdfConverterFiles{
 		{
 			Name:         "index.html",
 			ContentBytes: []byte(htmlContent),
@@ -473,7 +472,7 @@ func TestGotenbergService_RealEndToEnd(t *testing.T) {
 </body>
 </html>`
 
-	files := []ConvertHtmlToPdfFiles{
+	files := []HtmlToPdfConverterFiles{
 		{
 			Name:         "index.html",
 			ContentBytes: []byte(htmlContent),
