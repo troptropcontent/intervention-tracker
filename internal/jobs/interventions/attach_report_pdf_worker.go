@@ -14,16 +14,18 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/attachments"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/interventions"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/pdf"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"gorm.io/gorm"
 )
 
 type AttachReportPdfWorker struct {
 	river.WorkerDefaults[types.AttachReportPdfArgs]
-	DB             *gorm.DB
-	StorageService storage.StorageService
-	EmailService   email.EmailService
-	JobRunner      jobs.BackgroundJobRunner
+	DB                 *gorm.DB
+	StorageService     storage.StorageService
+	EmailService       email.EmailService
+	JobRunner          jobs.BackgroundJobRunner
+	HtmlToPdfConverter pdf.HtmlToPdfConverter
 }
 
 // Work generates a PDF report for an intervention, uploads it to S3,
@@ -51,7 +53,7 @@ func (w *AttachReportPdfWorker) Work(ctx context.Context, job *river.Job[types.A
 	}
 
 	// Generate PDF report
-	pdfService := interventions.NewPDFService()
+	pdfService := interventions.NewPDFService(w.HtmlToPdfConverter)
 	pdfFile, err := pdfService.GenerateReportPDF(&intervention)
 	if err != nil {
 		return fmt.Errorf("failed to generate PDF for intervention %d: %w", interventionID, err)
