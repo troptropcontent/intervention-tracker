@@ -164,22 +164,12 @@ func (s *CreateInterventionService) buildIntervention(args *CreateArgs) (*models
 // This prevents malicious users from omitting required controls by tampering with
 // form data. Controls not provided by the frontend are marked as 'skipped'.
 func (s *CreateInterventionService) buildControls(ctrlArgs []ControlData) []models.Control {
-	// Create a map of provided controls for quick lookup
-	providedControls := make(map[models.ControlKind]models.ControlResult)
-	for _, ctrl := range ctrlArgs {
-		providedControls[ctrl.Kind] = ctrl.Result
-	}
-
 	// Ensure all control kinds are present
 	controls := make([]models.Control, 0, len(models.ControlKinds))
-	for _, kind := range models.ControlKinds {
-		result := models.ControlResultSkipped // default
-		if provided, exists := providedControls[kind]; exists {
-			result = provided
-		}
+	for _, ctrl := range ctrlArgs {
 		controls = append(controls, models.Control{
-			Kind:   kind,
-			Result: result,
+			Kind:   ctrl.Kind,
+			Result: ctrl.Result,
 		})
 	}
 	return controls

@@ -74,7 +74,7 @@ func TestCreateInterventionService_Create_Success(t *testing.T) {
 	assert.Equal(t, "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA", intervention.Signature, "Signature should match")
 
 	// Verify controls were created
-	assert.Len(t, intervention.Controls, 3, "Should have 3 controls")
+	require.Len(t, intervention.Controls, 3, "Should have 3 controls")
 
 	// Verify first control (compliant)
 	assert.Equal(t, models.ControlKindApronCondition, intervention.Controls[0].Kind)
