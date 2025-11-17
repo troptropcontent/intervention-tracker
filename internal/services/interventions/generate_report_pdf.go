@@ -18,9 +18,9 @@ type PDFService struct {
 }
 
 // NewPDFService creates a new intervention PDF service
-func NewPDFService(gotenbergURL string) *PDFService {
+func NewPDFService() *PDFService {
 	return &PDFService{
-		gotenbergService: services.NewGotenbergService(gotenbergURL),
+		gotenbergService: services.NewGotenbergService(),
 	}
 }
 

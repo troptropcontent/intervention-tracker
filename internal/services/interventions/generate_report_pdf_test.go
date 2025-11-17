@@ -15,7 +15,7 @@ import (
 
 func TestNewPDFService(t *testing.T) {
 	gotenbergURL := "http://localhost:3000"
-	service := NewPDFService(gotenbergURL)
+	service := NewPDFService()
 
 	assert.NotNil(t, service)
 	assert.NotNil(t, service.gotenbergService)
@@ -53,7 +53,7 @@ func TestPDFService_GenerateReportPDF_Success(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewPDFService(server.URL)
+	service := NewPDFService()
 	intervention := createTestIntervention()
 
 	tempFile, err := service.GenerateReportPDF(intervention)
@@ -75,7 +75,7 @@ func TestPDFService_GenerateReportPDF_Success(t *testing.T) {
 
 func TestPDFService_GenerateReportPDF_EmptyData(t *testing.T) {
 	// Use invalid URL to simulate network error and test early failure
-	service := NewPDFService("http://invalid-url:9999")
+	service := NewPDFService()
 	intervention := createTestIntervention()
 
 	tempFile, err := service.GenerateReportPDF(intervention)
@@ -93,7 +93,7 @@ func TestPDFService_GenerateReportPDF_GotenbergError(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewPDFService(server.URL)
+	service := NewPDFService()
 	intervention := createTestIntervention()
 
 	tempFile, err := service.GenerateReportPDF(intervention)
@@ -105,7 +105,7 @@ func TestPDFService_GenerateReportPDF_GotenbergError(t *testing.T) {
 
 func TestPDFService_GenerateReportPDF_NetworkError(t *testing.T) {
 	// Use invalid URL to simulate network error
-	service := NewPDFService("http://invalid-gotenberg-url:9999")
+	service := NewPDFService()
 	intervention := createTestIntervention()
 
 	tempFile, err := service.GenerateReportPDF(intervention)
@@ -154,7 +154,7 @@ func TestPDFService_Integration_EndToEnd(t *testing.T) {
 	}))
 	defer server.Close()
 
-	service := NewPDFService(server.URL)
+	service := NewPDFService()
 	intervention := createTestIntervention()
 
 	tempFile, err := service.GenerateReportPDF(intervention)

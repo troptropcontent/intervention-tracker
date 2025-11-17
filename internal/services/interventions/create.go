@@ -7,10 +7,11 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/troptropcontent/qr_code_maintenance/internal/jobs"
+	attachmentsJobs "github.com/troptropcontent/qr_code_maintenance/internal/jobs/attachements"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/attachments"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
-	"github.com/troptropcontent/qr_code_maintenance/internal/services/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"gorm.io/gorm"
 )
@@ -122,11 +123,12 @@ func (s *CreateInterventionService) Create(args *CreateArgs) (*models.Interventi
 		return nil, err
 	}
 
-	attachReportService, err := NewAttachReportPdfService(s.DB, s.StorageService, s.EmailNotificationService, s.JobRunner)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create attach report service: %w", err)
+	// Enqueue background job to attach PDF report
+	if err := s.JobRunner.Enqueue(ctx, attachmentsJobs.UploadArgs{
+		InterventionId: intervention.ID,
+	}); err != nil {
+		return nil, fmt.Errorf("failed to enqueue attachment job: %w", err)
 	}
-	s.JobRunner.Perform(func() { attachReportService.AttachReportPdf(intervention.ID) })
 
 	return intervention, nil
 }

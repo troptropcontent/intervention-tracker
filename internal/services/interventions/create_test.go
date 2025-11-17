@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
-	"github.com/troptropcontent/qr_code_maintenance/internal/services/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/tests"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/tests/factories"
 	"github.com/troptropcontent/qr_code_maintenance/internal/utils"

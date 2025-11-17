@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/troptropcontent/qr_code_maintenance/internal/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/attachments"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
@@ -13,6 +14,7 @@ import (
 type DeleteInterventionService struct {
 	DB             *gorm.DB
 	StorageService storage.StorageService
+	JobRunner      jobs.BackgroundJobRunner
 }
 
 // Delete removes an intervention and all its associated attachments.
@@ -31,7 +33,7 @@ func (s *DeleteInterventionService) Delete(ctx context.Context, interventionID u
 	// Delete in transaction for atomicity
 	return s.DB.Transaction(func(tx *gorm.DB) error {
 		// Create attachment service with the transaction DB
-		attachmentService := attachments.NewAttachmentService(tx, s.StorageService)
+		attachmentService := attachments.NewAttachmentService(tx, s.StorageService, s.JobRunner)
 
 		// Delete all attachments (DB + storage)
 		if err := attachmentService.DeleteByHolder(ctx, "interventions", interventionID); err != nil {

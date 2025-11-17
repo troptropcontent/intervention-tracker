@@ -7,16 +7,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/troptropcontent/qr_code_maintenance/internal/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/attachments"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
-	"github.com/troptropcontent/qr_code_maintenance/internal/services/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
-	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 	"gorm.io/gorm"
 )
-
-const GotenbergUrl = "http://gotemberg:3000"
 
 // AttachReportPdf generates a PDF report for an intervention, uploads it to S3,
 // creates an Attachment record, and sends a notification email to the user.
@@ -51,14 +48,13 @@ func NewAttachReportPdfService(db *gorm.DB, storageService storage.StorageServic
 	}, nil
 }
 
-func (s *AttachReportPdfService) AttachReportPdf(interventionId uint) {
+func (s *AttachReportPdfService) AttachReportPdf(interventionId uint) error {
 	ctx := context.Background()
 
 	// Load intervention with all relationships
 	var intervention models.Intervention
 	if err := s.DB.Preload("User").Preload("Attachments", "kind = ?", "photo").Preload("Portal").Preload("Controls").First(&intervention, interventionId).Error; err != nil {
-		log.Printf("Failed to load intervention %d: %v", interventionId, err)
-		return
+		return fmt.Errorf("failed to load intervention %d: %w", interventionId, err)
 	}
 
 	for i, photo := range intervention.Attachments {
@@ -68,18 +64,16 @@ func (s *AttachReportPdfService) AttachReportPdf(interventionId uint) {
 			15*time.Minute, // URL valid for 15 minutes
 		)
 		if err != nil {
-			log.Printf("Could not retrieve signed url for %v: %v", photo.FileName, err)
-			return
+			return fmt.Errorf("failed to retrieve signed URL for %s: %w", photo.FileName, err)
 		}
 		intervention.Attachments[i].SignedUrl = url
 	}
 
 	// Generate PDF report
-	pdfService := NewPDFService(GotenbergUrl)
+	pdfService := NewPDFService()
 	pdfFile, err := pdfService.GenerateReportPDF(&intervention)
 	if err != nil {
-		log.Printf("Failed to generate PDF for intervention %d: %v", interventionId, err)
-		return
+		return fmt.Errorf("failed to generate PDF for intervention %d: %w", interventionId, err)
 	}
 	defer pdfFile.Close()
 	defer os.Remove(pdfFile.Name()) // Clean up temporary file
@@ -87,23 +81,24 @@ func (s *AttachReportPdfService) AttachReportPdf(interventionId uint) {
 	// Get file info for metadata
 	fileInfo, err := pdfFile.Stat()
 	if err != nil {
-		log.Printf("Failed to get file info for intervention %d: %v", interventionId, err)
-		return
+		return fmt.Errorf("failed to get file info for intervention %d: %w", interventionId, err)
 	}
 
-	var attachmentService attachments.Attacher = attachments.NewAttachmentService(s.DB, s.StorageService)
+	attachmentService := attachments.NewAttachmentService(s.DB, s.StorageService, s.JobRunner)
 
-	attachmentService.Attach(ctx, pdfFile, fileInfo.Name(), intervention.ID, "interventions", "report")
+	// Attach the PDF report
+	if _, err := attachmentService.Attach(ctx, pdfFile, fileInfo.Name(), intervention.ID, "interventions", "report"); err != nil {
+		return fmt.Errorf("failed to attach PDF for intervention %d: %w", interventionId, err)
+	}
 
-	utils.PP("COUCOUUUUUUUUUUUUUU")
-	// Send notification email in a separate goroutine
-	s.JobRunner.Perform(func() {
-		utils.PP("Inside RUNNER")
-		notificationService := NewNotificationService(pdfService, s.EmailService)
-		if err := notificationService.SendInterventionReport(&intervention); err != nil {
-			log.Printf("Failed to send notification email for intervention %d: %v", interventionId, err)
-		} else {
-			log.Printf("Successfully sent notification email for intervention %d", interventionId)
-		}
-	})
+	// Send notification email
+	notificationService := NewNotificationService(pdfService, s.EmailService)
+	if err := notificationService.SendInterventionReport(&intervention); err != nil {
+		// Log but don't fail - the important part (PDF generation and attachment) is already done
+		log.Printf("WARNING: Failed to send notification email for intervention %d: %v", interventionId, err)
+	} else {
+		log.Printf("Successfully sent notification email for intervention %d", interventionId)
+	}
+
+	return nil
 }
