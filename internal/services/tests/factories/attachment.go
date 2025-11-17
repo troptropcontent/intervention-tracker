@@ -12,13 +12,14 @@ type AttachmentBuilder struct {
 func NewAttachment() *AttachmentBuilder {
 	return &AttachmentBuilder{
 		attachment: &models.Attachment{
-			HolderType:  "interventions",
-			HolderID:    1,
-			Kind:        "photo",
-			StorageKey:  "test/default.jpg",
-			FileName:    "default.jpg",
-			ContentType: "image/jpeg",
-			FileSize:    1024,
+			HolderType:   "interventions",
+			HolderID:     1,
+			Kind:         "photo",
+			StorageKey:   "test/default.jpg",
+			FileName:     "default.jpg",
+			ContentType:  "image/jpeg",
+			FileSize:     1024,
+			UploadStatus: models.AttachmentUploadStatusPending,
 		},
 	}
 }
@@ -55,6 +56,11 @@ func (b *AttachmentBuilder) WithContentType(contentType string) *AttachmentBuild
 
 func (b *AttachmentBuilder) WithFileSize(fileSize int64) *AttachmentBuilder {
 	b.attachment.FileSize = fileSize
+	return b
+}
+
+func (b *AttachmentBuilder) WithUploadStatus(status models.AttachmentUploadStatus) *AttachmentBuilder {
+	b.attachment.UploadStatus = status
 	return b
 }
 

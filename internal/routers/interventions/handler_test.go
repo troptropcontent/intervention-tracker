@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/routers"
-	"github.com/troptropcontent/qr_code_maintenance/internal/services/jobs"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/tests"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/tests/factories"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
@@ -21,7 +20,7 @@ import (
 func setupDependencies(db *gorm.DB) *routers.Dependencies {
 	mockStorage := &tests.MockStorageService{}
 	mockEmail := &tests.MockEmailService{}
-	jobRunner := jobs.NewSyncJobRunner()
+	jobRunner := &tests.MockBackgroundJobRunner{}
 	translator := translation.NewTranslator()
 	deps, _ := routers.NewRouterDependencies(db, mockEmail, mockStorage, translator, jobRunner)
 	return deps
@@ -38,8 +37,8 @@ func setup(t *testing.T, args ...SetupArgs) (deps *routers.Dependencies, db *gor
 	db = tests.SetupTestDB(t)
 	storageService = &tests.MockStorageService{}
 	emailService = &tests.MockEmailService{}
+	jobRunner := &tests.MockBackgroundJobRunner{}
 	translator := translation.NewTranslator()
-	jobRunner := jobs.NewSyncJobRunner()
 
 	// Override with provided args if present
 	if len(args) > 0 {

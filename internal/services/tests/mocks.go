@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"time"
+
+	"github.com/riverqueue/river"
 )
 
 // MockStorageService is a mock implementation of storage.StorageService for testing
@@ -90,4 +92,18 @@ type MockTranslationService struct{}
 
 func (m *MockTranslationService) Translate(key string, args ...interface{}) string {
 	return key
+}
+
+// MockBackgroundJobRunner is a mock implementation of jobs.BackgroundJobRunner for testing
+type MockBackgroundJobRunner struct {
+	EnqueueCalled bool
+	EnqueueError  error
+	EnqueuedJobs  []river.JobArgs
+}
+
+func (m *MockBackgroundJobRunner) Enqueue(ctx context.Context, args river.JobArgs) error {
+	m.EnqueueCalled = true
+	m.EnqueuedJobs = append(m.EnqueuedJobs, args)
+
+	return m.EnqueueError
 }
