@@ -18,7 +18,8 @@ import (
 func TestAttachmentService_Delete_Success(t *testing.T) {
 	db := tests.SetupTestDB(t)
 	mockStorage := &tests.MockStorageService{}
-	service := NewAttachmentService(db, mockStorage)
+	mockRunner := &tests.MockBackgroundJobRunner{}
+	service := NewAttachmentService(db, mockStorage, mockRunner)
 
 	// Create an attachment using factory
 	attachment := factories.NewAttachment().
@@ -47,7 +48,8 @@ func TestAttachmentService_Delete_Success(t *testing.T) {
 func TestAttachmentService_Delete_NotFound(t *testing.T) {
 	db := tests.SetupTestDB(t)
 	mockStorage := &tests.MockStorageService{}
-	service := NewAttachmentService(db, mockStorage)
+	mockRunner := &tests.MockBackgroundJobRunner{}
+	service := NewAttachmentService(db, mockStorage, mockRunner)
 
 	ctx := context.Background()
 
@@ -67,7 +69,8 @@ func TestAttachmentService_Delete_StorageFailure(t *testing.T) {
 	mockStorage := &tests.MockStorageService{
 		DeleteError: errors.New("storage unavailable"),
 	}
-	service := NewAttachmentService(db, mockStorage)
+	mockRunner := &tests.MockBackgroundJobRunner{}
+	service := NewAttachmentService(db, mockStorage, mockRunner)
 
 	// Create an attachment
 	attachment := factories.NewAttachment().
@@ -96,7 +99,8 @@ func TestAttachmentService_Delete_StorageFailure(t *testing.T) {
 func TestAttachmentService_DeleteByHolder_Success(t *testing.T) {
 	db := tests.SetupTestDB(t)
 	mockStorage := &tests.MockStorageService{}
-	service := NewAttachmentService(db, mockStorage)
+	mockRunner := &tests.MockBackgroundJobRunner{}
+	service := NewAttachmentService(db, mockStorage, mockRunner)
 
 	// Create multiple attachments for the same holder using factory
 	factories.NewAttachment().
@@ -147,7 +151,8 @@ func TestAttachmentService_DeleteByHolder_Success(t *testing.T) {
 func TestAttachmentService_DeleteByHolder_NoAttachments(t *testing.T) {
 	db := tests.SetupTestDB(t)
 	mockStorage := &tests.MockStorageService{}
-	service := NewAttachmentService(db, mockStorage)
+	mockRunner := &tests.MockBackgroundJobRunner{}
+	service := NewAttachmentService(db, mockStorage, mockRunner)
 
 	ctx := context.Background()
 
@@ -168,7 +173,8 @@ func TestAttachmentService_DeleteByHolder_PartialStorageFailure(t *testing.T) {
 			"test/file2.jpg": errors.New("permission denied"),
 		},
 	}
-	service := NewAttachmentService(db, mockStorage)
+	mockRunner := &tests.MockBackgroundJobRunner{}
+	service := NewAttachmentService(db, mockStorage, mockRunner)
 
 	// Create multiple attachments
 	factories.NewAttachment().
@@ -201,7 +207,8 @@ func TestAttachmentService_DeleteByHolder_PartialStorageFailure(t *testing.T) {
 func TestAttachmentService_DeleteByHolder_MultipleHolders(t *testing.T) {
 	db := tests.SetupTestDB(t)
 	mockStorage := &tests.MockStorageService{}
-	service := NewAttachmentService(db, mockStorage)
+	mockRunner := &tests.MockBackgroundJobRunner{}
+	service := NewAttachmentService(db, mockStorage, mockRunner)
 
 	// Create attachments for two different holders
 	factories.NewAttachment().
@@ -236,6 +243,7 @@ func TestAttachmentService_DeleteByHolder_MultipleHolders(t *testing.T) {
 func TestAttachmentService_DeleteByHolder_WithTransaction(t *testing.T) {
 	db := tests.SetupTestDB(t)
 	mockStorage := &tests.MockStorageService{}
+	mockRunner := &tests.MockBackgroundJobRunner{}
 
 	// Create an attachment
 	attachment := factories.NewAttachment().
@@ -247,7 +255,7 @@ func TestAttachmentService_DeleteByHolder_WithTransaction(t *testing.T) {
 
 	// Use a transaction and roll it back
 	err := db.Transaction(func(tx *gorm.DB) error {
-		service := NewAttachmentService(tx, mockStorage)
+		service := NewAttachmentService(db, mockStorage, mockRunner)
 
 		// Delete within transaction
 		if err := service.DeleteByHolder(ctx, "interventions", 1); err != nil {
