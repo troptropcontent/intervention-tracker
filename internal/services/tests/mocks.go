@@ -5,16 +5,23 @@ import (
 	"fmt"
 	"io"
 	"time"
+
+	"github.com/riverqueue/river"
 )
 
 // MockStorageService is a mock implementation of storage.StorageService for testing
 type MockStorageService struct {
-	UploadCalled bool
-	UploadError  error
+	UploadCalled  bool
+	UploadError   error
 	UploadedFiles []struct {
 		Key         string
 		ContentType string
 	}
+
+	DeleteCalled bool
+	DeleteError  error
+	DeletedFiles []string
+	DeleteErrors map[string]error // Map storage keys to specific errors for individual file failures
 }
 
 func (m *MockStorageService) UploadFile(ctx context.Context, key string, file io.Reader, contentType string) (string, error) {
@@ -35,7 +42,17 @@ func (m *MockStorageService) DownloadFile(ctx context.Context, key string) (io.R
 }
 
 func (m *MockStorageService) DeleteFile(ctx context.Context, key string) error {
-	return nil
+	m.DeleteCalled = true
+	m.DeletedFiles = append(m.DeletedFiles, key)
+
+	// Check for specific error for this key
+	if m.DeleteErrors != nil {
+		if err, exists := m.DeleteErrors[key]; exists {
+			return err
+		}
+	}
+
+	return m.DeleteError
 }
 
 func (m *MockStorageService) GetFileURL(ctx context.Context, key string, expiration time.Duration) (string, error) {
@@ -75,4 +92,18 @@ type MockTranslationService struct{}
 
 func (m *MockTranslationService) Translate(key string, args ...interface{}) string {
 	return key
+}
+
+// MockBackgroundJobRunner is a mock implementation of jobs.BackgroundJobRunner for testing
+type MockBackgroundJobRunner struct {
+	EnqueueCalled bool
+	EnqueueError  error
+	EnqueuedJobs  []river.JobArgs
+}
+
+func (m *MockBackgroundJobRunner) Enqueue(ctx context.Context, args river.JobArgs) error {
+	m.EnqueueCalled = true
+	m.EnqueuedJobs = append(m.EnqueuedJobs, args)
+
+	return m.EnqueueError
 }

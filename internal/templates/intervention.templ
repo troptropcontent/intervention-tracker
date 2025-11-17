@@ -1,11 +1,13 @@
 package templates
 
 import (
-	"strconv"
+	"fmt"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
+	"strconv"
 )
 
-templ Intervention(intervention *models.Intervention) {
+templ Intervention(translator translation.TranslatorService, intervention *models.Intervention) {
 	<div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
 		<div class="flex justify-between items-start mb-3">
 			<div class="flex-1">
@@ -25,7 +27,6 @@ templ Intervention(intervention *models.Intervention) {
 				#{ strconv.Itoa(int(intervention.ID)) }
 			</div>
 		</div>
-		
 		if len(intervention.Controls) > 0 {
 			<div class="border-t border-gray-100 pt-3">
 				<h4 class="text-sm font-medium text-gray-700 mb-2">
@@ -34,20 +35,18 @@ templ Intervention(intervention *models.Intervention) {
 				<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
 					for _, control := range intervention.Controls {
 						<div class="flex items-center justify-between gap-2 text-sm">
-							<span class="text-gray-600">{ GetControlTypeLabel(control.Kind) }:</span>
-							if control.Result != nil {
-								if *control.Result {
-									<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-										✓
-									</span>
-								} else {
-									<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-										✗
-									</span>
+							<span class="text-gray-600">{ translator.MustTranslate(fmt.Sprintf("models.control.kinds.%v", control.Kind)) }:</span>
+							{{
+								colors := map[models.ControlResult]string{
+									models.ControlResultCompliant:      "text-success",
+									models.ControlResultNonCompliant:   "text-error",
+									models.ControlResultNeedsAttention: "test-warning",
+									models.ControlResultSkipped:        "text-gray-800",
 								}
-							} else {
-								<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-									- Non testé
+							}}
+							if models.ControlResult(control.Result).IsValid() == true {
+								<span class={ "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100", colors[control.Result] }>
+									{ translator.MustTranslate(fmt.Sprintf("models.control.results.%v.icon", control.Result)) }
 								</span>
 							}
 						</div>
@@ -55,7 +54,6 @@ templ Intervention(intervention *models.Intervention) {
 				</div>
 			</div>
 		}
-		
 		<div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
 			<div class="text-xs text-gray-500">
 				Créée le { intervention.CreatedAt.Format("02/01/2006 à 15:04") }

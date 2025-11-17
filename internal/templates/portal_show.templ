@@ -1,9 +1,12 @@
 package templates
 
-import "github.com/troptropcontent/qr_code_maintenance/internal/models"
-import "github.com/labstack/echo/v4"
+import (
+	"github.com/labstack/echo/v4"
+	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
+)
 
-templ PortalShow(portal models.Portal, context echo.Context) {
+templ PortalShow(context echo.Context, translator translation.TranslatorService, portal models.Portal) {
 	@MainLayout(MainLayoutConfig{Title: "Portail - " + portal.Name}, context) {
 		<div class="max-w-4xl mx-auto">
 			<div class="bg-white shadow rounded-lg p-6">
@@ -11,7 +14,8 @@ templ PortalShow(portal models.Portal, context echo.Context) {
 					<div>
 						<h1 class="text-3xl font-bold text-gray-900">{ portal.Name }</h1>
 						<p class="text-gray-600 mt-2">
-							{ portal.AddressStreet }<br/>
+							{ portal.AddressStreet }
+							<br/>
 							{ portal.AddressZipcode } { portal.AddressCity }
 						</p>
 					</div>
@@ -21,7 +25,6 @@ templ PortalShow(portal models.Portal, context echo.Context) {
 						</span>
 					</div>
 				</div>
-
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 					<div>
 						<h3 class="text-lg font-medium text-gray-900 mb-4">Informations du portail</h3>
@@ -36,7 +39,6 @@ templ PortalShow(portal models.Portal, context echo.Context) {
 							</div>
 						</dl>
 					</div>
-
 					<div>
 						<h3 class="text-lg font-medium text-gray-900 mb-4">Contact maintenance</h3>
 						<dl class="space-y-3">
@@ -59,7 +61,6 @@ templ PortalShow(portal models.Portal, context echo.Context) {
 						</dl>
 					</div>
 				</div>
-
 				<div class="mt-8 pt-6 border-t border-gray-200">
 					<div class="flex justify-between items-center">
 						<h3 class="text-lg font-medium text-gray-900">Interventions récentes</h3>
@@ -68,7 +69,7 @@ templ PortalShow(portal models.Portal, context echo.Context) {
 						if len(portal.Interventions) > 0 {
 							<div class="space-y-4">
 								for _, intervention := range portal.Interventions {
-									@Intervention(&intervention)
+									@Intervention(translator, &intervention)
 								}
 							</div>
 						} else {

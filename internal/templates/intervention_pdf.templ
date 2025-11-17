@@ -13,24 +13,26 @@ type InterventionReportConfig struct {
 	Translator     translation.TranslatorService
 }
 
-func findControlResult(intervention *models.Intervention, controlKey string) string {
+func findControlResult(intervention *models.Intervention, controlKey models.ControlKind) string {
 	var result = "na"
 	for _, control := range intervention.Controls {
 		if control.Kind == controlKey {
-			// Check if Result is nil (control was not checked)
-			if control.Result == nil {
-				result = "na"
-			} else if *control.Result {
+			switch control.Result {
+			case models.ControlResultCompliant:
 				result = "passed"
-			} else {
+			case models.ControlResultNonCompliant:
 				result = "fail"
+			case models.ControlResultNeedsAttention:
+				result = "attention"
+			case models.ControlResultSkipped:
+				result = "na"
 			}
 		}
 	}
 	return result
 }
 
-templ controleTable(title string, intervention *models.Intervention, controls []string, t translation.TranslatorService) {
+templ interventionPdfControlTable(title string, intervention *models.Intervention, controls []models.ControlKind, t translation.TranslatorService) {
 	<table class="table w-full border-separate border-spacing-0 rounded-lg border border-gray-300">
 		<thead class="bg-gray-100">
 			<tr>
@@ -62,7 +64,7 @@ templ controleTable(title string, intervention *models.Intervention, controls []
 }
 
 templ InterventionReportSection(title string) {
-	<section class="px-6 print:break-inside-avoid">
+	<section class="px-6">
 		<h2 class="text-l font-semibold text-primary mb-4">{ title }</h2>
 		{ children... }
 	</section>
@@ -111,22 +113,40 @@ templ InterventionReport(config InterventionReportConfig) {
 					</div>
 				</div>
 			}
-			@InterventionReportSection("Contrôles effectués") {
-				<div class="grid grid-cols-2 gap-x-4">
-					<div>
-						@controleTable("Controles de sécurité", config.Intervention, models.ControleTypes.Security, config.Translator)
-					</div>
-					<div>
-						@controleTable("Autres contrôles", config.Intervention, models.ControleTypes.Other, config.Translator)
-					</div>
-				</div>
+			switch config.Intervention.Type {
+				case models.InterventionTypeMaintenance:
+					@InterventionReportSection("Contrôles effectués") {
+						<div class="grid grid-cols-2 gap-x-4">
+							{{ firstHalf, secondHalf := SplitControlKindsForDisplay() }}
+							<div>
+								@interventionPdfControlTable("Controles de sécurité", config.Intervention, firstHalf, config.Translator)
+							</div>
+							<div>
+								@interventionPdfControlTable("Controles de sécurité", config.Intervention, secondHalf, config.Translator)
+							</div>
+						</div>
+					}
+				case models.InterventionTypeRepair:
+					@InterventionReportSection("Temps passé") {
+						<div class="bg-base-200 p-4 rounded-lg">
+							if config.Intervention.TimeSpent != nil {
+								{{ hours := float64(*config.Intervention.TimeSpent) / 60.0 }}
+								<p class="text-lg">
+									{ 
+									config.Translator.MustTranslate("common.hours", map[string]interface{}{
+										"Count": FormatFloat(hours, 2),
+									}) }
+								</p>
+							} else {
+								<p class="text-lg text-gray-500">Non renseigné</p>
+							}
+						</div>
+					}
 			}
 			@InterventionReportSection("Résumé") {
 				<div>
 					<div class="bg-base-200 p-4 rounded-lg">
-						if config.Intervention.Summary != nil {
-							<p class="wrap-break-word whitespace-pre-wrap">{ *config.Intervention.Summary }</p>
-						}
+						<p class="whitespace-pre-wrap">{ *config.Intervention.Summary }</p>
 					</div>
 				</div>
 			}

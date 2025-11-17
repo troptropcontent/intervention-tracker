@@ -1,6 +1,6 @@
 # QR Code Maintenance - Build Commands
 
-.PHONY: tailwind tailwind-watch tailwind-build server live db
+.PHONY: tailwind tailwind-watch tailwind-build server live dbsandbox
 
 # Build Tailwind CSS once
 tailwind:
@@ -46,3 +46,12 @@ live:
 
 db:
 	PGPASSWORD=postgres psql -h db -p 5432 -U postgres -d qr_maintenance
+
+sandbox:
+	go run cmd/sandbox/main.go
+
+river:
+	go run cmd/background_jobs/main.go start
+
+migrate:
+	go run cmd/database/main.go migrate

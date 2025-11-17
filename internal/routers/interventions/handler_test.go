@@ -6,42 +6,72 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/routers"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/tests"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/tests/factories"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
+	"gorm.io/gorm"
 )
+
+func setupDependencies(db *gorm.DB) *routers.Dependencies {
+	mockStorage := &tests.MockStorageService{}
+	mockEmail := &tests.MockEmailService{}
+	jobRunner := &tests.MockBackgroundJobRunner{}
+	translator := translation.NewTranslator()
+	deps, _ := routers.NewRouterDependencies(db, mockEmail, mockStorage, translator, jobRunner)
+	return deps
+}
+
+type SetupArgs struct {
+	DB             *gorm.DB
+	StorageService *tests.MockStorageService
+	EmailService   *tests.MockEmailService
+}
+
+func setup(t *testing.T, args ...SetupArgs) (deps *routers.Dependencies, db *gorm.DB, storageService *tests.MockStorageService, emailService *tests.MockEmailService) {
+	// Set defaults
+	db = tests.SetupTestDB(t)
+	storageService = &tests.MockStorageService{}
+	emailService = &tests.MockEmailService{}
+	jobRunner := &tests.MockBackgroundJobRunner{}
+	translator := translation.NewTranslator()
+
+	// Override with provided args if present
+	if len(args) > 0 {
+		if args[0].DB != nil {
+			db = args[0].DB
+		}
+		if args[0].StorageService != nil {
+			// Use provided storage service instead of mock
+			storageService = args[0].StorageService
+		}
+		if args[0].EmailService != nil {
+			emailService = args[0].EmailService
+		}
+	}
+
+	deps = &routers.Dependencies{
+		DB:                       db,
+		StorageService:           storageService,
+		EmailNotificationService: emailService,
+		TranslationService:       translator,
+		BackGroundJobRunner:      jobRunner,
+	}
+
+	return deps, db, storageService, emailService
+}
 
 func TestCreateNewIntervention_Success(t *testing.T) {
 	// Setup
-	db := tests.SetupTestDB(t)
-	mockStorage := &tests.MockStorageService{}
-	mockEmail := &tests.MockEmailService{}
-
-	deps := &routers.Dependencies{
-		DB:                       db,
-		StorageService:           mockStorage,
-		EmailNotificationService: mockEmail,
-	}
+	deps, db, _, _ := setup(t)
 
 	user := factories.NewUser().Create(db)
 	portal := factories.NewPortal().Create(db)
-
-	// Create request with form data
-	fields := map[string]string{
-		"portal_id":          fmt.Sprintf("%d", portal.ID),
-		"date":               "2024-01-15",
-		"summary":            "Routine maintenance check",
-		"signature":          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA",
-		"controls[0].kind":   "warning_lights",
-		"controls[0].result": "true",
-		"controls[1].kind":   "area_lighting",
-		"controls[1].result": "false",
-	}
-
-	files := map[string][]byte{}
+	fields, files := NewCreateInterventionFormBuilder(fmt.Sprintf("%d", portal.ID)).Build()
 
 	c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, files).Build()
 	rec := c.Response().Writer.(*httptest.ResponseRecorder)
@@ -64,39 +94,59 @@ func TestCreateNewIntervention_Success(t *testing.T) {
 	err = db.Preload("Controls").First(&intervention).Error
 	require.NoError(t, err)
 	assert.NotNil(t, intervention.Summary)
-	assert.Equal(t, "Routine maintenance check", *intervention.Summary)
-	assert.Len(t, intervention.Controls, 2)
+	assert.Equal(t, "Test intervention", *intervention.Summary)
+	assert.Len(t, intervention.Controls, 17)
+}
+
+func TestCreateNewIntervention_RepairType_Success(t *testing.T) {
+	// Setup
+	db := tests.SetupTestDB(t)
+
+	deps := setupDependencies(db)
+
+	user := factories.NewUser().Create(db)
+	portal := factories.NewPortal().Create(db)
+
+	// Create request with type: "repair"
+	fields := map[string]string{
+		"portal_id":        fmt.Sprintf("%d", portal.ID),
+		"type":             "repair",
+		"date":             "2024-01-15",
+		"summary":          "Door spring replacement",
+		"signature":        "test-signature",
+		"time_spent_hours": "2.5",
+	}
+
+	c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, nil).Build()
+	rec := c.Response().Writer.(*httptest.ResponseRecorder)
+
+	// Execute
+	handler := CreateNewIntervention(deps)
+	err := handler(c)
+
+	// Assert
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusSeeOther, rec.Code)
+
+	// Verify repair intervention was created with correct type
+	var intervention models.Intervention
+	err = db.First(&intervention).Error
+	require.NoError(t, err)
+	assert.Equal(t, "repair", string(intervention.Type))
+	assert.NotNil(t, intervention.Summary)
+	assert.Equal(t, "Door spring replacement", *intervention.Summary)
 }
 
 func TestCreateNewIntervention_WithPhotos(t *testing.T) {
 	// Setup
-	db := tests.SetupTestDB(t)
-	mockStorage := &tests.MockStorageService{}
-	mockEmail := &tests.MockEmailService{}
-
-	deps := &routers.Dependencies{
-		DB:                       db,
-		StorageService:           mockStorage,
-		EmailNotificationService: mockEmail,
-	}
+	deps, db, mockedStorageService, _ := setup(t)
 
 	user := factories.NewUser().Create(db)
 
 	// Create request with form data and photo files
 	portal := factories.NewPortal().Create(db)
-	fields := map[string]string{
-		"portal_id":      fmt.Sprintf("%d", portal.ID),
-		"date":           "2024-01-15",
-		"summary":        "Maintenance with photos",
-		"signature":      "test-signature",
-		"photos[0].name": "Before repair",
-		"photos[1].name": "After repair",
-	}
-
-	files := map[string][]byte{
-		"photos[0].file": []byte("fake-image-data-1"),
-		"photos[1].file": []byte("fake-image-data-2"),
-	}
+	portalIDString := fmt.Sprintf("%d", portal.ID)
+	fields, files := NewCreateInterventionFormBuilder(portalIDString).WithPhoto(0, "Before repair", []byte("fake-image-data-1")).WithPhoto(1, "After repair", []byte("fake-image-data-2")).Build()
 
 	c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, files).Build()
 	rec := c.Response().Writer.(*httptest.ResponseRecorder)
@@ -110,30 +160,18 @@ func TestCreateNewIntervention_WithPhotos(t *testing.T) {
 	assert.Equal(t, http.StatusSeeOther, rec.Code)
 
 	// Verify storage service was called
-	assert.True(t, mockStorage.UploadCalled, "Storage service should be called for photos")
-	assert.Len(t, mockStorage.UploadedFiles, 2, "Should have uploaded 2 files")
+	assert.True(t, mockedStorageService.UploadCalled, "Storage service should be called for photos")
+	assert.Len(t, mockedStorageService.UploadedFiles, 3, "Should have uploaded 3 files 2 photos and 1 report")
 }
 
 func TestCreateNewIntervention_EmptySummary(t *testing.T) {
 	// Setup
-	db := tests.SetupTestDB(t)
-	mockStorage := &tests.MockStorageService{}
-	mockEmail := &tests.MockEmailService{}
-
-	deps := &routers.Dependencies{
-		DB:                       db,
-		StorageService:           mockStorage,
-		EmailNotificationService: mockEmail,
-	}
+	deps, db, _, _ := setup(t)
 
 	// Create request with empty summary
 	portal := factories.NewPortal().Create(db)
-	fields := map[string]string{
-		"portal_id": fmt.Sprintf("%d", portal.ID),
-		"date":      "2024-01-15",
-		"summary":   "",
-		"signature": "test-signature",
-	}
+	portalIDString := fmt.Sprintf("%d", portal.ID)
+	fields, _ := NewCreateInterventionFormBuilder(portalIDString).WithSummary("").Build()
 
 	user := factories.NewUser().Create(db)
 	c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, nil).Build()
@@ -157,120 +195,12 @@ func TestCreateNewIntervention_EmptySummary(t *testing.T) {
 
 func TestCreateNewIntervention_NoControls(t *testing.T) {
 	// Setup
-	db := tests.SetupTestDB(t)
-	mockStorage := &tests.MockStorageService{}
-	mockEmail := &tests.MockEmailService{}
-
-	deps := &routers.Dependencies{
-		DB:                       db,
-		StorageService:           mockStorage,
-		EmailNotificationService: mockEmail,
-	}
+	deps, db, _, _ := setup(t)
 
 	// Create request without controls
 	portal := factories.NewPortal().Create(db)
-	fields := map[string]string{
-		"portal_id": fmt.Sprintf("%d", portal.ID),
-		"date":      "2024-01-15",
-		"summary":   "Test without controls",
-		"signature": "test-signature",
-	}
-
-	user := factories.NewUser().Create(db)
-	c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, nil).Build()
-	rec := c.Response().Writer.(*httptest.ResponseRecorder)
-
-	// Execute
-	handler := CreateNewIntervention(deps)
-	err := handler(c)
-
-	// Assert
-	require.NoError(t, err)
-	assert.Equal(t, http.StatusSeeOther, rec.Code)
-
-	// Verify intervention was created without controls
-	var intervention models.Intervention
-	err = db.Preload("Controls").First(&intervention).Error
-	require.NoError(t, err)
-	assert.Empty(t, intervention.Controls)
-}
-
-func TestCreateNewIntervention_MultipleControls(t *testing.T) {
-	// Setup
-	db := tests.SetupTestDB(t)
-	mockStorage := &tests.MockStorageService{}
-	mockEmail := &tests.MockEmailService{}
-
-	deps := &routers.Dependencies{
-		DB:                       db,
-		StorageService:           mockStorage,
-		EmailNotificationService: mockEmail,
-	}
-
-	// Create request with all security controls
-	portal := factories.NewPortal().Create(db)
-	fields := map[string]string{
-		"portal_id":          fmt.Sprintf("%d", portal.ID),
-		"date":               "2024-01-15",
-		"summary":            "Full security check",
-		"signature":          "test-signature",
-		"controls[0].kind":   "warning_lights",
-		"controls[0].result": "true",
-		"controls[1].kind":   "area_lighting",
-		"controls[1].result": "true",
-		"controls[2].kind":   "safety_cells",
-		"controls[2].result": "false",
-		"controls[3].kind":   "pressure_bar",
-		"controls[3].result": "true",
-		"controls[4].kind":   "floor_loop",
-		"controls[4].result": "",
-		"controls[5].kind":   "force_limiter",
-		"controls[5].result": "true",
-		"controls[6].kind":   "safety_springs",
-		"controls[6].result": "false",
-		"controls[7].kind":   "floor_markings",
-		"controls[7].result": "true",
-	}
-
-	user := factories.NewUser().Create(db)
-	c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, nil).Build()
-	rec := c.Response().Writer.(*httptest.ResponseRecorder)
-
-	// Execute
-	handler := CreateNewIntervention(deps)
-	err := handler(c)
-
-	// Assert
-	require.NoError(t, err)
-	assert.Equal(t, http.StatusSeeOther, rec.Code)
-
-	// Verify all controls were created
-	var intervention models.Intervention
-	err = db.Preload("Controls").First(&intervention).Error
-	require.NoError(t, err)
-	assert.Len(t, intervention.Controls, 8)
-}
-
-func TestCreateNewIntervention_InvalidDateFormat(t *testing.T) {
-	// Setup
-	db := tests.SetupTestDB(t)
-	mockStorage := &tests.MockStorageService{}
-	mockEmail := &tests.MockEmailService{}
-
-	deps := &routers.Dependencies{
-		DB:                       db,
-		StorageService:           mockStorage,
-		EmailNotificationService: mockEmail,
-	}
-
-	// Create request with invalid date format
-	portal := factories.NewPortal().Create(db)
-	fields := map[string]string{
-		"portal_id": fmt.Sprintf("%d", portal.ID),
-		"date":      "01/15/2024", // Invalid format, should be YYYY-MM-DD
-		"summary":   "Test invalid date",
-		"signature": "test-signature",
-	}
+	portalIDString := fmt.Sprintf("%d", portal.ID)
+	fields, _ := NewCreateInterventionFormBuilder(portalIDString).WithOutControls().Build()
 
 	user := factories.NewUser().Create(db)
 	c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, nil).Build()
@@ -281,30 +211,45 @@ func TestCreateNewIntervention_InvalidDateFormat(t *testing.T) {
 
 	// Assert
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "invalid date format")
+	httpErr, ok := err.(*echo.HTTPError)
+	require.True(t, ok)
+	assert.Equal(t, http.StatusBadRequest, httpErr.Code)
+
+	// Verify no intervention was created
+	var intervention models.Intervention
+	db.Find(&intervention)
+	require.Equal(t, intervention.ID, uint(0))
+}
+
+func TestCreateNewIntervention_InvalidDateFormat(t *testing.T) {
+	// Setup
+	deps, db, _, _ := setup(t)
+
+	// Create request without controls
+	portal := factories.NewPortal().Create(db)
+	fields, _ := NewCreateInterventionFormBuilder(fmt.Sprintf("%d", portal.ID)).WithDate("invalid").Build()
+	user := factories.NewUser().Create(db)
+	c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, nil).Build()
+
+	// Execute
+	handler := CreateNewIntervention(deps)
+	err := handler(c)
+
+	// Assert
+	require.Error(t, err)
+	httpErr, ok := err.(*echo.HTTPError)
+	require.True(t, ok)
+	assert.Equal(t, http.StatusBadRequest, httpErr.Code)
+	assert.Contains(t, httpErr.Message, "ERROR:parsing time \"invalid\" as \"2006-01-02\"")
 }
 
 func TestCreateNewIntervention_MissingFile(t *testing.T) {
 	// Setup
-	db := tests.SetupTestDB(t)
-	mockStorage := &tests.MockStorageService{}
-	mockEmail := &tests.MockEmailService{}
-
-	deps := &routers.Dependencies{
-		DB:                       db,
-		StorageService:           mockStorage,
-		EmailNotificationService: mockEmail,
-	}
+	deps, db, _, _ := setup(t)
 
 	// Create request with photo name but no file
 	portal := factories.NewPortal().Create(db)
-	fields := map[string]string{
-		"portal_id":      fmt.Sprintf("%d", portal.ID),
-		"date":           "2024-01-15",
-		"summary":        "Test missing file",
-		"signature":      "test-signature",
-		"photos[0].name": "Missing file photo",
-	}
+	fields, _ := NewCreateInterventionFormBuilder(fmt.Sprintf("%d", portal.ID)).WithKeyValue("photos[0].name", "photo 1").Build()
 
 	user := factories.NewUser().Create(db)
 	c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, nil).Build()
@@ -320,109 +265,34 @@ func TestCreateNewIntervention_MissingFile(t *testing.T) {
 }
 
 func TestCreateNewIntervention_ControlResultParsing(t *testing.T) {
-	testCases := []struct {
-		name           string
-		resultValue    string
-		expectedResult *bool
-	}{
-		{
-			name:           "true string",
-			resultValue:    "true",
-			expectedResult: boolPtr(true),
-		},
-		{
-			name:           "false string",
-			resultValue:    "false",
-			expectedResult: boolPtr(false),
-		},
-		{
-			name:           "1 as true",
-			resultValue:    "1",
-			expectedResult: boolPtr(true),
-		},
-		{
-			name:           "0 as false",
-			resultValue:    "0",
-			expectedResult: boolPtr(false),
-		},
-		{
-			name:           "empty string",
-			resultValue:    "",
-			expectedResult: nil,
-		},
-	}
+	// Setup
+	deps, db, _, _ := setup(t)
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			// Setup
-			db := tests.SetupTestDB(t)
-			mockStorage := &tests.MockStorageService{}
-			mockEmail := &tests.MockEmailService{}
+	// Create request with an invalid controls result
+	portal := factories.NewPortal().Create(db)
+	fields, _ := NewCreateInterventionFormBuilder(fmt.Sprintf("%d", portal.ID)).WithControl(16, string(models.ControlKinds[16]), "invalid").Build()
+	user := factories.NewUser().Create(db)
+	c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, nil).Build()
 
-			deps := &routers.Dependencies{
-				DB:                       db,
-				StorageService:           mockStorage,
-				EmailNotificationService: mockEmail,
-			}
+	// Execute
+	handler := CreateNewIntervention(deps)
+	err := handler(c)
 
-			// Create request
-			portal := factories.NewPortal().Create(db)
-			fields := map[string]string{
-				"portal_id":          fmt.Sprintf("%d", portal.ID),
-				"date":               "2024-01-15",
-				"summary":            "Test control parsing",
-				"signature":          "test-signature",
-				"controls[0].kind":   "test_control",
-				"controls[0].result": tc.resultValue,
-			}
-
-			user := factories.NewUser().Create(db)
-			c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, nil).Build()
-
-			// Execute
-			handler := CreateNewIntervention(deps)
-			err := handler(c)
-
-			// Assert
-			require.NoError(t, err)
-
-			// Verify control result was parsed correctly
-			var intervention models.Intervention
-			err = db.Preload("Controls").First(&intervention).Error
-			require.NoError(t, err)
-			require.Len(t, intervention.Controls, 1)
-
-			control := intervention.Controls[0]
-			if tc.expectedResult == nil {
-				assert.Nil(t, control.Result)
-			} else {
-				require.NotNil(t, control.Result)
-				assert.Equal(t, *tc.expectedResult, *control.Result)
-			}
-		})
-	}
+	// Assert
+	require.Error(t, err)
+	httpErr, ok := err.(*echo.HTTPError)
+	require.True(t, ok)
+	assert.Equal(t, http.StatusBadRequest, httpErr.Code)
+	assert.Contains(t, httpErr.Message, "invalid control result: 'invalid'")
 }
 
 func TestCreateNewIntervention_RedirectsToCorrectURL(t *testing.T) {
 	// Setup
-	db := tests.SetupTestDB(t)
-	mockStorage := &tests.MockStorageService{}
-	mockEmail := &tests.MockEmailService{}
+	deps, db, _, _ := setup(t)
 
-	deps := &routers.Dependencies{
-		DB:                       db,
-		StorageService:           mockStorage,
-		EmailNotificationService: mockEmail,
-	}
-
-	// Create request
+	// Create request with an invalid controls result
 	portal := factories.NewPortal().Create(db)
-	fields := map[string]string{
-		"portal_id": fmt.Sprintf("%d", portal.ID),
-		"date":      "2024-01-15",
-		"summary":   "Test redirect",
-		"signature": "test-signature",
-	}
+	fields, _ := NewCreateInterventionFormBuilder(fmt.Sprintf("%d", portal.ID)).Build()
 
 	user := factories.NewUser().Create(db)
 	c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, nil).Build()
@@ -442,61 +312,39 @@ func TestCreateNewIntervention_RedirectsToCorrectURL(t *testing.T) {
 	require.NoError(t, err)
 
 	// Verify redirect URL
-	expectedLocation := fmt.Sprintf("/portals/%d", intervention.ID)
+	expectedLocation := fmt.Sprintf("/admin/portals/%d", intervention.ID)
 	actualLocation := rec.Header().Get("Location")
 	assert.Equal(t, expectedLocation, actualLocation)
 }
 
 func TestCreateNewIntervention_FormParsingError(t *testing.T) {
 	// Setup
-	db := tests.SetupTestDB(t)
-	mockStorage := &tests.MockStorageService{}
-	mockEmail := &tests.MockEmailService{}
+	deps, db, _, _ := setup(t)
 
-	deps := &routers.Dependencies{
-		DB:                       db,
-		StorageService:           mockStorage,
-		EmailNotificationService: mockEmail,
-	}
-
-	// Create malformed request using the corrupted form helper
-	c := tests.CreateEchoContextWithCorruptedForm()
+	user := factories.NewUser().Create(db)
+	c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithInvalidFormData().Build()
 
 	// Execute
 	handler := CreateNewIntervention(deps)
 	err := handler(c)
 
-	// Assert - should return error for malformed requests
+	// Assert
 	require.Error(t, err)
+	httpErr, ok := err.(*echo.HTTPError)
+	require.True(t, ok)
+	assert.Equal(t, http.StatusBadRequest, httpErr.Code)
+	assert.Contains(t, httpErr.Message, "failed to parse form data")
 }
 
 func TestCreateNewIntervention_StorageServiceError(t *testing.T) {
 	// Setup
-	db := tests.SetupTestDB(t)
-	mockStorage := &tests.MockStorageService{
+	deps, db, _, _ := setup(t, SetupArgs{StorageService: &tests.MockStorageService{
 		UploadError: fmt.Errorf("storage service unavailable"),
-	}
-	mockEmail := &tests.MockEmailService{}
+	}})
 
-	deps := &routers.Dependencies{
-		DB:                       db,
-		StorageService:           mockStorage,
-		EmailNotificationService: mockEmail,
-	}
-
-	// Create request with photo
+	// Create request with an invalid controls result
 	portal := factories.NewPortal().Create(db)
-	fields := map[string]string{
-		"portal_id":      fmt.Sprintf("%d", portal.ID),
-		"date":           "2024-01-15",
-		"summary":        "Test storage error",
-		"signature":      "test-signature",
-		"photos[0].name": "Test photo",
-	}
-
-	files := map[string][]byte{
-		"photos[0].file": []byte("fake-image-data"),
-	}
+	fields, files := NewCreateInterventionFormBuilder(fmt.Sprintf("%d", portal.ID)).WithPhotos("photo 1", "photo 2").Build()
 
 	user := factories.NewUser().Create(db)
 	c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, files).Build()
@@ -511,25 +359,11 @@ func TestCreateNewIntervention_StorageServiceError(t *testing.T) {
 }
 
 func TestCreateNewIntervention_EmailServiceCalled(t *testing.T) {
-	// Setup
-	db := tests.SetupTestDB(t)
-	mockStorage := &tests.MockStorageService{}
-	mockEmail := &tests.MockEmailService{}
-
-	deps := &routers.Dependencies{
-		DB:                       db,
-		StorageService:           mockStorage,
-		EmailNotificationService: mockEmail,
-	}
+	deps, db, _, emailService := setup(t)
 
 	// Create request
 	portal := factories.NewPortal().Create(db)
-	fields := map[string]string{
-		"portal_id": fmt.Sprintf("%d", portal.ID),
-		"date":      "2024-01-15",
-		"summary":   "Test email notification",
-		"signature": "test-signature",
-	}
+	fields, _ := NewCreateInterventionFormBuilder(fmt.Sprintf("%d", portal.ID)).Build()
 
 	user := factories.NewUser().Create(db)
 	c := tests.NewContext(http.MethodPost, "/").WithAuthenticatedUser(user).WithMultiPartData(fields, nil).Build()
@@ -542,16 +376,52 @@ func TestCreateNewIntervention_EmailServiceCalled(t *testing.T) {
 	// Assert
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusSeeOther, rec.Code)
-
-	// Verify email service was called (if the service sends emails on intervention creation)
-	// Note: This assertion depends on whether your CreateInterventionService sends emails
-	// Adjust based on actual implementation
-	if mockEmail.SendCalled {
-		assert.Greater(t, len(mockEmail.SentEmails), 0, "Should have sent at least one email")
-	}
+	assert.Equal(t, len(emailService.SentEmails), 1, "Should have sent one email")
 }
 
-// Helper function to create *bool
-func boolPtr(b bool) *bool {
-	return &b
+func TestGetNewInterventionForm(t *testing.T) {
+	// Shared setup
+	db := tests.SetupTestDB(t)
+	mockStorage := &tests.MockStorageService{}
+	mockEmail := &tests.MockEmailService{}
+
+	deps := &routers.Dependencies{
+		DB:                       db,
+		StorageService:           mockStorage,
+		EmailNotificationService: mockEmail,
+	}
+	user := factories.NewUser().Create(db)
+	portal := factories.NewPortal().Create(db)
+
+	t.Run("SuccessWithValidParams", func(t *testing.T) {
+		handler := GetNewInterventionForm(deps)
+		c := tests.NewContext().
+			WithAuthenticatedUser(user).
+			WithQueryParams(map[string]string{
+				"portal_id":         fmt.Sprintf("%d", portal.ID),
+				"intervention_type": "repair",
+			}).
+			Build()
+		err := handler(c)
+		require.NoError(t, err)
+	})
+
+	t.Run("ErrorWhenPortalIdIsNotProvided", func(t *testing.T) {
+		handler := GetNewInterventionForm(deps)
+		c := tests.NewContext().WithAuthenticatedUser(user).Build()
+		err := handler(c)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "query param portal_id is invalid or missing")
+	})
+
+	t.Run("ErrorWhenInterventionTypeIsNotProvided", func(t *testing.T) {
+		handler := GetNewInterventionForm(deps)
+		c := tests.NewContext().
+			WithAuthenticatedUser(user).
+			WithQueryParams(map[string]string{"portal_id": fmt.Sprintf("%d", portal.ID)}).
+			Build()
+		err := handler(c)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "query param intervention_type is invalid or missing")
+	})
 }

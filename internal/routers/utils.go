@@ -3,6 +3,7 @@ package routers
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/go-playground/form"
 	"github.com/labstack/echo/v4"
@@ -12,6 +13,9 @@ import (
 
 func ParseFormData(c echo.Context, target any) error {
 	decoder := form.NewDecoder()
+	decoder.RegisterCustomTypeFunc(func(vals []string) (any, error) {
+		return time.Parse("2006-01-02", vals[0])
+	}, time.Time{})
 
 	contentType := c.Request().Header.Get("Content-Type")
 	if strings.HasPrefix(contentType, "multipart/form-data") {

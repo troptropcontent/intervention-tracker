@@ -7,10 +7,8 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/troptropcontent/qr_code_maintenance/internal/middleware"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
-	"github.com/troptropcontent/qr_code_maintenance/internal/services/interventions"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"github.com/troptropcontent/qr_code_maintenance/internal/templates"
@@ -38,7 +36,7 @@ func (h *Handlers) GetPortal(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
 	}
 
-	return templates.PortalShow(portal, c).Render(c.Request().Context(), c.Response().Writer)
+	return templates.PortalShow(c, h.TranslationService, portal).Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *Handlers) NotFound(c echo.Context) error {
@@ -84,10 +82,11 @@ func (h *Handlers) GetAdminPortal(c echo.Context) error {
 
 	result = h.DB.Preload("Controls").Order("date desc").Find(&interventions, "portal_id = ?", portal.ID)
 	if result.Error != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "Failed to fetch interventions")
+		message := fmt.Errorf("failed to fetch interventions : %v", result.Error.Error())
+		return echo.NewHTTPError(http.StatusNotFound, message)
 	}
 
-	return templates.AdminPortal(portal, qrCodePtr, interventions, c).Render(c.Request().Context(), c.Response().Writer)
+	return templates.AdminPortal(c, h.TranslationService, portal, qrCodePtr, interventions).Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *Handlers) GetAdminPortalEdit(c echo.Context) error {
@@ -313,134 +312,6 @@ func (h *Handlers) QRRedirect(c echo.Context) error {
 	return c.Redirect(http.StatusSeeOther, "/portals/"+strconv.Itoa(int(qrCode.Portal.ID)))
 }
 
-func (h *Handlers) GetNewIntervention(c echo.Context) error {
-	user, err := middleware.GetCurrentUser(c, h.DB)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get user")
-	}
-
-	id := c.Param("id")
-
-	var portal models.Portal
-	result := h.DB.Where("id = ?", id).First(&portal)
-	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
-			return echo.NewHTTPError(http.StatusNotFound, "Portal not found")
-		}
-		return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
-	}
-
-	return templates.AdminInterventionNew(portal, *user, c).Render(c.Request().Context(), c.Response().Writer)
-}
-
-func (h *Handlers) PostIntervention(c echo.Context) error {
-	user, err := middleware.GetCurrentUser(c, h.DB)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get user")
-	}
-
-	id := c.Param("id")
-	portalID, err := strconv.ParseUint(id, 10, 32)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Invalid portal ID")
-	}
-
-	var portal models.Portal
-	result := h.DB.Where("id = ?", id).First(&portal)
-	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
-			return echo.NewHTTPError(http.StatusNotFound, "Portal not found")
-		}
-		return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
-	}
-
-	// Parse form data
-	var formData struct {
-		Date      string `form:"date"`
-		Summary   string `form:"summary"`
-		Signature string `form:"signature"`
-	}
-
-	if err := c.Bind(&formData); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Invalid form data")
-	}
-
-	// Parse intervention date
-	interventionDate, err := time.Parse("2006-01-02", formData.Date)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Invalid date format")
-	}
-
-	// Create intervention
-	intervention := models.Intervention{
-		Date:      interventionDate,
-		UserID:    user.ID,
-		UserName:  user.FullName(),
-		Signature: formData.Signature,
-		PortalID:  uint(portalID),
-	}
-
-	// Set summary if provided
-	if formData.Summary != "" {
-		intervention.Summary = &formData.Summary
-	}
-
-	// Start transaction
-	tx := h.DB.Begin()
-	if tx.Error != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to start transaction")
-	}
-	defer tx.Rollback()
-
-	// Save intervention
-	if result := tx.Create(&intervention); result.Error != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create intervention")
-	}
-
-	// Process control results
-	allControlTypes := append(models.ControlTypesByKind[models.ControlKindSecurity], models.ControlTypesByKind[models.ControlKindOther]...)
-
-	for _, controlType := range allControlTypes {
-		controlValue := c.FormValue("control_" + controlType)
-
-		// Only create control records for non-empty values (user made a selection)
-		if controlValue != "" {
-			var result models.ControlResult
-			switch controlValue {
-			case "true":
-				trueVal := true
-				result = &trueVal
-			case "false":
-				falseVal := false
-				result = &falseVal
-			}
-			// If controlValue is empty string, result stays nil (not controlled)
-
-			control := models.Control{
-				Kind:           controlType,
-				Result:         result,
-				InterventionID: intervention.ID,
-			}
-
-			if res := tx.Create(&control); res.Error != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create control")
-			}
-		}
-	}
-
-	// Commit transaction
-	if err := tx.Commit().Error; err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to save intervention")
-	}
-
-	// Attach PDF report to S3 and send notification email asynchronously
-	// This doesn't block the HTTP response - errors are logged
-	go interventions.AttachReportPdf(h.DB, h.StorageService, h.EmailNotificationService, intervention.ID)
-
-	// Redirect to portal admin page
-	return c.Redirect(http.StatusSeeOther, "/admin/portals/"+id)
-}
-
 func (h *Handlers) GetInterventionReport(c echo.Context) error {
 	id := c.Param("id")
 
@@ -454,21 +325,4 @@ func (h *Handlers) GetInterventionReport(c echo.Context) error {
 	}
 
 	return templates.InterventionReport(templates.InterventionReportConfig{Intervention: &intervention, Translator: h.TranslationService}).Render(c.Request().Context(), c.Response().Writer)
-}
-
-// sendInterventionNotification sends an email notification with PDF report
-func (h *Handlers) sendInterventionNotification(intervention *models.Intervention, portal *models.Portal, user *models.User) error {
-	// Initialize PDF service
-	gotenbergURL := "http://gotemberg:3000" // From docker-compose.yml
-	pdfService := interventions.NewPDFService(gotenbergURL)
-
-	// Initialize notification service
-	notificationService := interventions.NewNotificationService(pdfService, h.EmailNotificationService)
-
-	// Set the related entities on the intervention for the notification
-	intervention.Portal = *portal
-	intervention.User = *user
-
-	// Send notification
-	return notificationService.SendInterventionReport(intervention)
 }

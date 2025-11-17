@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"strconv"
+	"time"
 )
 
 type InterventionInputGroupConfig struct {
@@ -43,38 +45,45 @@ templ addNewPhotoInputGroupButton() {
 	</button>
 }
 
-templ controlTable(controls []string, baseInputIndex int) {
+templ controlTable(translator translation.TranslatorService, controls []models.ControlKind, baseInputIndex int) {
 	<div class="print:break-inside-avoid">
 		<table class="table w-full border-separate border-spacing-0 border-gray-300 text-sm">
 			<thead>
 				<tr class="bg-gray-100">
 					<th class="rounded-tl-md border border-gray-300 border-b-0 border-r-0 px-3 py-2 text-left font-medium w-1/2">Contrôle</th>
 					<th class="border border-gray-300 border-b-0  border-r-0 px-2 py-1 text-center font-medium w-2/12">
-						<span class="hidden sm:inline">Conforme</span>
-						<span class="sm:hidden text-green-500">C</span>
+						<span class="hidden sm:inline">{ translator.MustTranslate("models.control.results.compliant.label") }</span>
+						<span class="sm:hidden text-success">{ translator.MustTranslate("models.control.results.compliant.icon") }</span>
 					</th>
 					<th class="border border-gray-300 border-b-0  border-r-0 px-2 py-1 text-center font-medium w-2/12">
-						<span class="hidden sm:inline">Non conforme</span>
-						<span class="sm:hidden text-red-500">NC</span>
+						<span class="hidden sm:inline">{ translator.MustTranslate("models.control.results.needs_attention.label") }</span>
+						<span class="sm:hidden text-warning">{ translator.MustTranslate("models.control.results.needs_attention.icon") }</span>
+					</th>
+					<th class="border border-gray-300 border-b-0  border-r-0 px-2 py-1 text-center font-medium w-2/12">
+						<span class="hidden sm:inline">{ translator.MustTranslate("models.control.results.non_compliant.label") }</span>
+						<span class="sm:hidden text-error">{ translator.MustTranslate("models.control.results.non_compliant.icon") }</span>
 					</th>
 					<th class="rounded-tr-md border border-gray-300 border-b-0  px-2 py-1 text-center font-medium w-2/12">
-						<span class="hidden sm:inline">Non contrôlé</span>
-						<span class="sm:hidden">NA</span>
+						<span class="hidden sm:inline">{ translator.MustTranslate("models.control.results.skipped.label") }</span>
+						<span class="sm:hidden">{ translator.MustTranslate("models.control.results.skipped.icon") }</span>
 					</th>
 				</tr>
 			</thead>
 			<tbody>
 				for i, control := range controls {
 					<tr class={ templ.KV("bg-gray-50", i%2 == 0), "group" }>
-						<td class="group-last:rounded-bl-md border border-gray-300 border-b-0 group-last:border-b border-r-0 px-3 py-2 font-medium" data-label="Contrôle">{ GetControlTypeLabel(control) }</td>
+						<td class="group-last:rounded-bl-md border border-gray-300 border-b-0 group-last:border-b border-r-0 px-3 py-2 font-medium" data-label="Contrôle">{ translator.MustTranslate(fmt.Sprintf("models.control.kinds.%v", control)) }</td>
 						<td class="border border-gray-300 border-b-0 group-last:border-b border-r-0 px-2 py-1 text-center" data-label="Conforme">
-							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value="true" class="h-4 w-4 text-green-600"/>
+							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value={ models.ControlResultCompliant } class="radio radio-xs radio-success"/>
 						</td>
 						<td class="border border-gray-300 border-b-0 group-last:border-b border-r-0 px-2 py-1 text-center" data-label="Non conforme">
-							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value="false" class="h-4 w-4 text-red-600"/>
+							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value={ models.ControlResultNeedsAttention } class="radio radio-xs radio-warning"/>
+						</td>
+						<td class="border border-gray-300 border-b-0 group-last:border-b border-r-0 px-2 py-1 text-center" data-label="Non conforme">
+							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value={ models.ControlResultNonCompliant } class="radio radio-xs radio-error"/>
 						</td>
 						<td class="group-last:rounded-br-md border border-gray-300 border-b-0 group-last:border-b px-2 py-1 text-center" data-label="Non contrôlé">
-							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value="" checked class="h-4 w-4 text-gray-400"/>
+							<input type="radio" name={ fmt.Sprintf("controls[%v].result", baseInputIndex+i) } value={ models.ControlResultSkipped } checked class="radio radio-xs radio-primary"/>
 						</td>
 						<input type="hidden" name={ fmt.Sprintf("controls[%v].kind", baseInputIndex+i) } value={ control } checked class="h-4 w-4 text-gray-400"/>
 					</tr>
@@ -92,7 +101,36 @@ templ controlTable(controls []string, baseInputIndex int) {
 	</div>
 }
 
-templ AdminInterventionNew(portal models.Portal, user models.User, context echo.Context) {
+templ MaintenanceSpecificSections(translator translation.TranslatorService) {
+	@InterventionInputGroup(InterventionInputGroupConfig{Label: "Contrôles d'intervention"}) {
+		{{ firstHalf, secondHalf := SplitControlKindsForDisplay() }}
+		<div class="mb-8">
+			@controlTable(translator, firstHalf, 0)
+		</div>
+		<div class="mb-8">
+			@controlTable(translator, secondHalf, len(firstHalf))
+		</div>
+	}
+	<input type="hidden" name="type" value={ models.InterventionTypeMaintenance }/>
+}
+
+templ RepairSpecificSections(translator translation.TranslatorService) {
+	@InterventionInputGroup(InterventionInputGroupConfig{Label: "Temps passé sur l'intervention (en heures)"}) {
+		@InputNumber(&InputNumberArgs{
+			Title:         "Doit etre compris entre 1 et 10",
+			Placeholder:   "Indiquer le nombre d'heures passées",
+			Name:          "time_spent_hours",
+			Min:           0.5,
+			Max:           10,
+			Step:          0.5,
+			ValidatorHint: "La valeur doit etre comprise entre 0.5 et 10 et arrondie à la demie heure.",
+			Required:      true,
+		})
+	}
+	<input type="hidden" name="type" value={ models.InterventionTypeRepair }/>
+}
+
+templ AdminInterventionNew(context echo.Context, translator translation.TranslatorService, portal *models.Portal, user *models.User, interventionType models.InterventionType) {
 	@MainLayout(MainLayoutConfig{Title: "Nouvelle intervention - " + portal.Name}, context) {
 		<div class="max-w-4xl mx-auto">
 			<div class="mb-6">
@@ -110,22 +148,28 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 					<!-- Intervention Details -->
 					@InterventionInputGroup(InterventionInputGroupConfig{Label: "Détails de l'intervention"}) {
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-							@InputCalendar("Date d'intervention", "date", "", true)
+							@InputDate(&InputDateArgs{
+								Title:         "Date de l'intervention",
+								Label:         "Date de l'intervention",
+								Name:          "date",
+								Required:      true,
+								Max:           time.Now(),
+								ValidatorHint: "La date ne peux pas etre dans le future",
+							})
 						</div>
 					}
-					@InterventionInputGroup(InterventionInputGroupConfig{Label: "Contrôles d'intervention"}) {
-						<div class="mb-8">
-							<h4 class="text-md font-medium text-gray-800 mb-3">Sécurité</h4>
-							@controlTable(models.ControlTypesByKind[models.ControlKindSecurity], 0)
-						</div>
-						<!-- Other Controls Table -->
-						<div class="mb-8">
-							<h4 class="text-md font-medium text-gray-800 mb-3">Autres</h4>
-							@controlTable(models.ControlTypesByKind[models.ControlKindOther], len(models.ControlTypesByKind[models.ControlKindSecurity]))
-						</div>
+					switch interventionType {
+						case models.InterventionTypeMaintenance:
+							@MaintenanceSpecificSections(translator)
+						case models.InterventionTypeRepair:
+							@RepairSpecificSections(translator)
 					}
 					@InterventionInputGroup(InterventionInputGroupConfig{Label: "Résumé de l'intervention"}) {
-						@InputTextarea(&InputTextareaConfig{Placeholder: "Description générale de l'intervention...", Name: "summary", Required: true, WraperClass: "mt-4"})
+						@TextAreaInput(&TextAreaInputArgs{
+							Placeholder: "Description générale de l'intervention...",
+							Name:        "summary",
+							Required:    true,
+						})
 					}
 					@InterventionInputGroup(InterventionInputGroupConfig{
 						Label:      "Photos",
@@ -171,31 +215,4 @@ templ AdminInterventionNew(portal models.Portal, user models.User, context echo.
 			</div>
 		</div>
 	}
-}
-
-func GetControlTypeLabel(controlType string) string {
-	labels := map[string]string{
-		"warning_lights":   "Feux d'avertissement",
-		"area_lighting":    "Éclairage de zone",
-		"safety_cells":     "Cellules de sécurité",
-		"pressure_bar":     "Barre de pression",
-		"floor_loop":       "Boucle de sol",
-		"force_limiter":    "Limiteur d'effort",
-		"safety_springs":   "Ressorts de sécurité",
-		"floor_markings":   "Marquage au sol",
-		"apron_condition":  "État du tablier",
-		"horizontal_rails": "Rails horizontaux",
-		"vertical_rails":   "Rails verticaux",
-		"roller_condition": "État des galets",
-		"drive_system":     "Système d'entraînement",
-		"limit_switches":   "Interrupteurs de fin de course",
-		"control_devices":  "Organes de commande",
-		"control_panel":    "Coffret de commande",
-		"manual_override":  "Manœuvre de secours",
-	}
-
-	if label, exists := labels[controlType]; exists {
-		return label
-	}
-	return controlType
 }

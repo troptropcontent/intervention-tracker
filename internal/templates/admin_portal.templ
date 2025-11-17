@@ -1,12 +1,13 @@
 package templates
 
 import (
-	"strconv"
-	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"fmt"
 	"github.com/labstack/echo/v4"
+	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 )
 
-templ AdminPortal(portal models.Portal, qrCode *models.QRCode, interventions []models.Intervention, context echo.Context) {
+templ AdminPortal(context echo.Context, translator translation.TranslatorService, portal models.Portal, qrCode *models.QRCode, interventions []models.Intervention) {
 	@MainLayout(MainLayoutConfig{Title: "Admin - " + portal.Name, Controller: "qr-code-scanner", Attributes: templ.Attributes{"data-qr-code-scanner-portal-id-value": portal.ID}}, context) {
 		<div class="max-w-4xl mx-auto">
 			<div class="flex justify-between items-center mb-6">
@@ -17,15 +18,15 @@ templ AdminPortal(portal models.Portal, qrCode *models.QRCode, interventions []m
 					<h1 class="text-3xl font-bold text-gray-900">{ portal.Name }</h1>
 				</div>
 				<div class="space-x-2">
-					<a href={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID)) + "/edit") } class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg inline-block">
-						Modifier
-					</a>
-					<a href={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID)) + "/interventions/new") } class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
-						Nouvelle intervention
-					</a>
+					<details class="dropdown dropdown-end">
+						<summary class="btn m-1">Nouvelle intervention</summary>
+						<ul class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+							<li><a href={ templ.URL(fmt.Sprintf("/admin/interventions/new?intervention_type=maintenance&portal_id=%d", portal.ID)) }>Maintenance</a></li>
+							<li><a href={ templ.URL(fmt.Sprintf("/admin/interventions/new?intervention_type=repair&portal_id=%d", portal.ID)) }>Dépannage</a></li>
+						</ul>
+					</details>
 				</div>
 			</div>
-
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 				<div class="bg-white shadow-sm rounded-lg p-6">
 					<h2 class="text-xl font-semibold text-gray-900 mb-4">Informations générales</h2>
@@ -44,7 +45,6 @@ templ AdminPortal(portal models.Portal, qrCode *models.QRCode, interventions []m
 						</div>
 					</div>
 				</div>
-
 				<div class="bg-white shadow-sm rounded-lg p-6">
 					<h2 class="text-xl font-semibold text-gray-900 mb-4">Adresse</h2>
 					<div class="space-y-3">
@@ -64,7 +64,6 @@ templ AdminPortal(portal models.Portal, qrCode *models.QRCode, interventions []m
 						</div>
 					</div>
 				</div>
-
 				<div class="bg-white shadow-sm rounded-lg p-6">
 					<h2 class="text-xl font-semibold text-gray-900 mb-4">Syndic</h2>
 					<div class="space-y-3">
@@ -96,7 +95,6 @@ templ AdminPortal(portal models.Portal, qrCode *models.QRCode, interventions []m
 						</div>
 					</div>
 				</div>
-
 				<div class="bg-white shadow-sm rounded-lg p-6">
 					<h2 class="text-xl font-semibold text-gray-900 mb-4">QR Code</h2>
 					<div class="space-y-4" id="qr_code_association_section">
@@ -105,16 +103,15 @@ templ AdminPortal(portal models.Portal, qrCode *models.QRCode, interventions []m
 						} else {
 							@AdminQrCodeUnassociated(&portal)
 						}
-    				</div>
+					</div>
 				</div>
 			</div>
-
 			<div class="bg-white shadow-sm rounded-lg p-6">
 				<h2 class="text-xl font-semibold text-gray-900 mb-4">Historique des interventions</h2>
 				if len(interventions) > 0 {
 					<div class="space-y-4">
 						for _, intervention := range interventions {
-							@Intervention(&intervention)
+							@Intervention(translator, &intervention)
 						}
 					</div>
 				} else {
@@ -125,7 +122,6 @@ templ AdminPortal(portal models.Portal, qrCode *models.QRCode, interventions []m
 				}
 			</div>
 		</div>
-
 		<!-- QR Scanner Modal -->
 		<div id="qr-scanner-modal" data-qr-code-scanner-target="modal" style="display: none;" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
 			<div class="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -137,16 +133,12 @@ templ AdminPortal(portal models.Portal, qrCode *models.QRCode, interventions []m
 						</svg>
 					</button>
 				</div>
-				
 				<div id="scanner-loading" data-qr-code-scanner-target="loading" class="text-center py-4">
 					<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
 					<p class="text-gray-600 mt-2">Démarrage de la caméra...</p>
 				</div>
-				
 				<div id="admin-qr-reader" data-qr-code-scanner-target="reader" class="w-full"></div>
-				
 				<div id="scanner-status" data-qr-code-scanner-target="status" class="mt-4 text-center" style="display: none;"></div>
-				
 				<div id="scanner-error" data-qr-code-scanner-target="error" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-md" style="display: none;">
 					<div class="flex">
 						<svg class="w-5 h-5 text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,7 +149,6 @@ templ AdminPortal(portal models.Portal, qrCode *models.QRCode, interventions []m
 						</div>
 					</div>
 				</div>
-				
 				<div class="mt-4 text-center">
 					<button type="button" data-action="qr-code-scanner#closeQRScanner" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md text-sm font-medium">
 						Fermer
