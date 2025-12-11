@@ -14,16 +14,24 @@ templ AuthedNav(userEmail string) {
 			<h1 class="text-xl font-bold">
 				<a href="/" class="hover:text-blue-200">Maintenance Automatisme</a>
 			</h1>
-			<div class="space-x-4">
-				<a href="/admin/portals" class="hover:text-blue-200">Admin</a>
-				<span class="text-blue-200">{ userEmail }</span>
-				<button
-					data-controller="logout"
-					data-action="click->logout#logout"
-					class="hover:text-blue-200 cursor-pointer"
+			<div class="dropdown dropdown-end">
+				<div tabindex="0" role="button">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu-icon lucide-menu"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg>
+				</div>
+				<ul
+					tabindex="-1"
+					class="menu dropdown-content bg-base-200 rounded-box z-1 w-36 mt-5 p-2 shadow-sm"
 				>
-					Déconnexion
-				</button>
+					<li><a href="/admin/portals" class="text-base-content">Espace admin</a></li>
+					<li>
+						<a
+							class="text-base-content"
+							data-controller="logout"
+							data-action="click->logout#logout"
+							class="hover:text-blue-200 cursor-pointer"
+						>Déconnexion</a>
+					</li>
+				</ul>
 			</div>
 		</div>
 	</nav>
@@ -37,7 +45,6 @@ templ PublicNav() {
 			</h1>
 			<div class="space-x-4">
 				<a href="/login" class="hover:text-blue-200">Connexion</a>
-				<a href="/register" class="hover:text-blue-200">Inscription</a>
 			</div>
 		</div>
 	</nav>
