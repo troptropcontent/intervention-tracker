@@ -6,6 +6,7 @@
 "views.admin.intervention_report.controls.result.na" = "Non controllé"
 "views.admin.intervention_report.controls.result.passed" = "Conforme"
 "views.admin.intervention_report.controls.result.fail" = "Non conforme"
+"views.admin.portal.title" = "Contrat N° {{.InternalId}}"
 "models.control.kinds.warning_lights" = "Feux d'avertissement"
 "models.control.kinds.area_lighting" = "Éclairage de zone"
 "models.control.kinds.safety_cells" = "Cellules de sécurité"
