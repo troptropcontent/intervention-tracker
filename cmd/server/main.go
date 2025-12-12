@@ -14,6 +14,7 @@ import (
 	authmiddleware "github.com/troptropcontent/qr_code_maintenance/internal/middleware"
 	"github.com/troptropcontent/qr_code_maintenance/internal/routers"
 	"github.com/troptropcontent/qr_code_maintenance/internal/routers/interventions"
+	"github.com/troptropcontent/qr_code_maintenance/internal/routers/portals"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
@@ -87,13 +88,13 @@ func main() {
 
 	// Admin routes (require authentication)
 	admin_routes := e.Group("/admin", authmiddleware.RequireAuth())
-	admin_routes.GET("/portals", h.GetAdminPortals)
 	admin_routes.GET("/portals/:id", h.GetAdminPortal)
 	admin_routes.GET("/portals/:id/edit", h.GetAdminPortalEdit)
 	admin_routes.POST("/portals/:id", h.UpdatePortal).Name = "admin-get-portal"
 	admin_routes.POST("/portals/:id/qr-code/associate", h.AssociateQRCode)
 	admin_routes.POST("/portals/:id/qr-code/remove", h.RemoveQRCode)
 	interventions.NewRouter(*admin_routes, dependencies)
+	portals.NewRouter(*admin_routes, dependencies)
 	admin_routes.GET("/portals/scan", h.GetAdminPortalsScan)
 
 	// 404 handler

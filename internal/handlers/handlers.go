@@ -47,16 +47,6 @@ func (h *Handlers) GetAdminPortalsScan(c echo.Context) error {
 	return templates.AdminPortalsScan(c).Render(c.Request().Context(), c.Response().Writer)
 }
 
-func (h *Handlers) GetAdminPortals(c echo.Context) error {
-	var portals []models.Portal
-	result := h.DB.Order("name").Find(&portals)
-	if result.Error != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to fetch portals")
-	}
-
-	return templates.AdminPortals(portals, c).Render(c.Request().Context(), c.Response().Writer)
-}
-
 func (h *Handlers) GetAdminPortal(c echo.Context) error {
 	id := c.Param("id")
 

@@ -4,9 +4,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"strconv"
+	"fmt"
 )
 
-templ AdminPortals(portals []models.Portal, context echo.Context) {
+templ AdminPortals(portals []models.Portal, pagination PaginationData, context echo.Context) {
 	@MainLayout(MainLayoutConfig{Title: "Admin - Portails"}, context) {
 		<div class="max-w-7xl mx-auto">
 			<div class="flex justify-between items-center mb-6">
@@ -15,10 +16,40 @@ templ AdminPortals(portals []models.Portal, context echo.Context) {
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-qr-code-icon lucide-qr-code"><rect width="5" height="5" x="3" y="3" rx="1"></rect><rect width="5" height="5" x="16" y="3" rx="1"></rect><rect width="5" height="5" x="3" y="16" rx="1"></rect><path d="M21 16h-3a2 2 0 0 0-2 2v3"></path><path d="M21 21v.01"></path><path d="M12 7v3a2 2 0 0 1-2 2H7"></path><path d="M3 12h.01"></path><path d="M12 3h.01"></path><path d="M12 16v.01"></path><path d="M16 12h1"></path><path d="M21 12v.01"></path><path d="M12 21v-1"></path></svg>
 				</a>
 			</div>
+			<!-- Search Bar -->
+			<div class="mb-6">
+				<form method="GET" action="/admin/portals" class="flex gap-4">
+					<div class="flex-1">
+						<input
+							type="text"
+							name="search"
+							value={ pagination.Search }
+							placeholder="Rechercher par numéro de contrat, adresse, client, téléphone ou email..."
+							class="input input-bordered w-full"
+						/>
+					</div>
+					<button type="submit" class="btn btn-primary">
+						Rechercher
+					</button>
+					if pagination.Search != "" {
+						<a href="/admin/portals" class="btn btn-ghost">
+							Réinitialiser
+						</a>
+					}
+				</form>
+			</div>
+			<!-- Results count -->
+			<div class="mb-4 text-sm text-gray-600">
+				{ fmt.Sprintf("Affichage de %d résultat(s)", pagination.TotalCount) }
+			</div>
 			if len(portals) == 0 {
 				<div class="text-center py-12">
 					<div class="text-gray-500 text-lg">Aucun portail trouvé</div>
-					<p class="text-gray-400 mt-2">Commencez par ajouter des portails au système</p>
+					if pagination.Search != "" {
+						<p class="text-gray-400 mt-2">Aucun résultat pour votre recherche. Essayez avec d'autres mots-clés.</p>
+					} else {
+						<p class="text-gray-400 mt-2">Commencez par ajouter des portails au système</p>
+					}
 				</div>
 			} else {
 				<div class="bg-white shadow-sm rounded-lg overflow-hidden">
@@ -59,6 +90,50 @@ templ AdminPortals(portals []models.Portal, context echo.Context) {
 						</tbody>
 					</table>
 				</div>
+				<!-- Pagination -->
+				if pagination.TotalPages > 1 {
+					<div class="mt-6 flex justify-center">
+						<div class="join">
+							<!-- Previous button -->
+							if pagination.HasPrev {
+								<a
+									href={ templ.URL(fmt.Sprintf("/admin/portals?page=%d&limit=%d&search=%s", pagination.CurrentPage-1, pagination.Limit, pagination.Search)) }
+									class="join-item btn"
+								>
+									«
+								</a>
+							} else {
+								<button class="join-item btn btn-disabled">«</button>
+							}
+							<!-- Page numbers -->
+							for i := 1; i <= pagination.TotalPages; i++ {
+								if i == pagination.CurrentPage {
+									<button class="join-item btn btn-active">{ strconv.Itoa(i) }</button>
+								} else if i == 1 || i == pagination.TotalPages || (i >= pagination.CurrentPage-2 && i <= pagination.CurrentPage+2) {
+									<a
+										href={ templ.URL(fmt.Sprintf("/admin/portals?page=%d&limit=%d&search=%s", i, pagination.Limit, pagination.Search)) }
+										class="join-item btn"
+									>
+										{ strconv.Itoa(i) }
+									</a>
+								} else if i == pagination.CurrentPage-3 || i == pagination.CurrentPage+3 {
+									<button class="join-item btn btn-disabled">...</button>
+								}
+							}
+							<!-- Next button -->
+							if pagination.HasNext {
+								<a
+									href={ templ.URL(fmt.Sprintf("/admin/portals?page=%d&limit=%d&search=%s", pagination.CurrentPage+1, pagination.Limit, pagination.Search)) }
+									class="join-item btn"
+								>
+									»
+								</a>
+							} else {
+								<button class="join-item btn btn-disabled">»</button>
+							}
+						</div>
+					</div>
+				}
 			}
 		</div>
 	}

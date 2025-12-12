@@ -5,6 +5,17 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 )
 
+// PaginationData holds pagination information
+type PaginationData struct {
+	CurrentPage int
+	TotalPages  int
+	TotalCount  int
+	Limit       int
+	HasPrev     bool
+	HasNext     bool
+	Search      string
+}
+
 func SplitControlKindsForDisplay() ([]models.ControlKind, []models.ControlKind) {
 	mid := (len(models.ControlKinds) + 1) / 2 // Rounds up for odd numbers
 	return models.ControlKinds[:mid], models.ControlKinds[mid:]
