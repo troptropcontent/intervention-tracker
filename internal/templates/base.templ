@@ -82,7 +82,7 @@ templ MainLayout(config MainLayoutConfig, context echo.Context) {
 				@PublicNav()
 			}
 			<main
-				class="container mx-auto px-4 py-8"
+				class="container mx-auto p-4"
 				if config.Controller != "" {
 					data-controller={ config.Controller }
 				}
