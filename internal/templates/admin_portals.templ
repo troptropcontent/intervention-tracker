@@ -1,13 +1,14 @@
 package templates
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"strconv"
-	"fmt"
 )
 
-templ AdminPortals(portals []models.Portal, pagination PaginationData, context echo.Context) {
+templ AdminPortals(context echo.Context, translator translation.TranslatorService, pagination PaginationData, portals []models.Portal) {
 	@MainLayout(MainLayoutConfig{Title: "Admin - Portails"}, context) {
 		<div class="max-w-7xl mx-auto">
 			<div class="flex justify-between items-center mb-6">
@@ -26,22 +27,15 @@ templ AdminPortals(portals []models.Portal, pagination PaginationData, context e
 							value={ pagination.Search }
 							placeholder="Rechercher par numéro de contrat, adresse, client, téléphone ou email..."
 							class="input input-bordered w-full"
+							hx-get="/admin/portals"
+							hx-trigger="input changed delay:500ms, keyup[key=='Enter']"
+							hx-select="#portals"
+							hx-target="#portals"
 						/>
 					</div>
-					<button type="submit" class="btn btn-primary">
-						Rechercher
-					</button>
-					if pagination.Search != "" {
-						<a href="/admin/portals" class="btn btn-ghost">
-							Réinitialiser
-						</a>
-					}
 				</form>
 			</div>
 			<!-- Results count -->
-			<div class="mb-4 text-sm text-gray-600">
-				{ fmt.Sprintf("Affichage de %d résultat(s)", pagination.TotalCount) }
-			</div>
 			if len(portals) == 0 {
 				<div class="text-center py-12">
 					<div class="text-gray-500 text-lg">Aucun portail trouvé</div>
@@ -52,88 +46,90 @@ templ AdminPortals(portals []models.Portal, pagination PaginationData, context e
 					}
 				</div>
 			} else {
-				<div class="bg-white shadow-sm rounded-lg overflow-hidden">
-					<table class="min-w-full divide-y divide-gray-200">
-						<thead class="bg-gray-50">
-							<tr>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contrat #</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Adresse</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Contact</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-							</tr>
-						</thead>
-						<tbody class="bg-white divide-y divide-gray-200">
-							for _, portal := range portals {
-								<tr class="hover:bg-gray-50">
-									<td class="px-6 py-4 whitespace-nowrap">
-										<div class="text-sm font-medium text-gray-900">{ portal.InternalId }</div>
-									</td>
-									<td class="px-6 py-4 hidden md:table-cell">
-										<div class="text-sm text-gray-900">{ portal.AddressStreet }</div>
-										<div class="text-sm text-gray-500">{ portal.AddressZipcode } { portal.AddressCity }</div>
-									</td>
-									<td class="px-6 py-4 whitespace-nowrap">
-										<div class="text-sm text-gray-900">{ portal.ContractorCompany }</div>
-									</td>
-									<td class="px-6 py-4 hidden md:table-cell">
-										<div class="text-sm text-gray-900">{ portal.ContactPhone }</div>
-										<div class="text-sm text-gray-500">{ portal.ContactEmail }</div>
-									</td>
-									<td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-										<a href={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID))) } class="link link-primary text-right">
-											Voir
-										</a>
-									</td>
+				<div id="portals">
+					<div class="bg-white shadow-sm rounded-lg overflow-hidden">
+						<table class="min-w-full divide-y divide-gray-200">
+							<thead class="bg-gray-50">
+								<tr>
+									<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contrat #</th>
+									<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Adresse</th>
+									<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+									<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Contact</th>
+									<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
 								</tr>
-							}
-						</tbody>
-					</table>
-				</div>
-				<!-- Pagination -->
-				if pagination.TotalPages > 1 {
-					<div class="mt-6 flex justify-center">
-						<div class="join">
-							<!-- Previous button -->
-							if pagination.HasPrev {
-								<a
-									href={ templ.URL(fmt.Sprintf("/admin/portals?page=%d&limit=%d&search=%s", pagination.CurrentPage-1, pagination.Limit, pagination.Search)) }
-									class="join-item btn"
-								>
-									«
-								</a>
-							} else {
-								<button class="join-item btn btn-disabled">«</button>
-							}
-							<!-- Page numbers -->
-							for i := 1; i <= pagination.TotalPages; i++ {
-								if i == pagination.CurrentPage {
-									<button class="join-item btn btn-active">{ strconv.Itoa(i) }</button>
-								} else if i == 1 || i == pagination.TotalPages || (i >= pagination.CurrentPage-2 && i <= pagination.CurrentPage+2) {
+							</thead>
+							<tbody class="bg-white divide-y divide-gray-200">
+								for _, portal := range portals {
+									<tr class="hover:bg-gray-50">
+										<td class="px-6 py-4 whitespace-nowrap">
+											<div class="text-sm font-medium text-gray-900">{ portal.InternalId }</div>
+										</td>
+										<td class="px-6 py-4 hidden md:table-cell">
+											<div class="text-sm text-gray-900">{ portal.AddressStreet }</div>
+											<div class="text-sm text-gray-500">{ portal.AddressZipcode } { portal.AddressCity }</div>
+										</td>
+										<td class="px-6 py-4 whitespace-nowrap">
+											<div class="text-sm text-gray-900">{ portal.ContractorCompany }</div>
+										</td>
+										<td class="px-6 py-4 hidden md:table-cell">
+											<div class="text-sm text-gray-900">{ portal.ContactPhone }</div>
+											<div class="text-sm text-gray-500">{ portal.ContactEmail }</div>
+										</td>
+										<td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+											<a href={ templ.URL("/admin/portals/" + strconv.Itoa(int(portal.ID))) } class="link link-primary text-right">
+												Voir
+											</a>
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+					<!-- Pagination -->
+					if pagination.TotalPages > 1 {
+						<div class="mt-6 flex justify-center">
+							<div class="join">
+								<!-- Previous button -->
+								if pagination.HasPrev {
 									<a
-										href={ templ.URL(fmt.Sprintf("/admin/portals?page=%d&limit=%d&search=%s", i, pagination.Limit, pagination.Search)) }
+										href={ templ.URL(fmt.Sprintf("/admin/portals?page=%d&limit=%d&search=%s", pagination.CurrentPage-1, pagination.Limit, pagination.Search)) }
 										class="join-item btn"
 									>
-										{ strconv.Itoa(i) }
+										«
 									</a>
-								} else if i == pagination.CurrentPage-3 || i == pagination.CurrentPage+3 {
-									<button class="join-item btn btn-disabled">...</button>
+								} else {
+									<button class="join-item btn btn-disabled">«</button>
 								}
-							}
-							<!-- Next button -->
-							if pagination.HasNext {
-								<a
-									href={ templ.URL(fmt.Sprintf("/admin/portals?page=%d&limit=%d&search=%s", pagination.CurrentPage+1, pagination.Limit, pagination.Search)) }
-									class="join-item btn"
-								>
-									»
-								</a>
-							} else {
-								<button class="join-item btn btn-disabled">»</button>
-							}
+								<!-- Page numbers -->
+								for i := 1; i <= pagination.TotalPages; i++ {
+									if i == pagination.CurrentPage {
+										<button class="join-item btn btn-active">{ strconv.Itoa(i) }</button>
+									} else if i == 1 || i == pagination.TotalPages || (i >= pagination.CurrentPage-2 && i <= pagination.CurrentPage+2) {
+										<a
+											href={ templ.URL(fmt.Sprintf("/admin/portals?page=%d&limit=%d&search=%s", i, pagination.Limit, pagination.Search)) }
+											class="join-item btn"
+										>
+											{ strconv.Itoa(i) }
+										</a>
+									} else if i == pagination.CurrentPage-3 || i == pagination.CurrentPage+3 {
+										<button class="join-item btn btn-disabled">...</button>
+									}
+								}
+								<!-- Next button -->
+								if pagination.HasNext {
+									<a
+										href={ templ.URL(fmt.Sprintf("/admin/portals?page=%d&limit=%d&search=%s", pagination.CurrentPage+1, pagination.Limit, pagination.Search)) }
+										class="join-item btn"
+									>
+										»
+									</a>
+								} else {
+									<button class="join-item btn btn-disabled">»</button>
+								}
+							</div>
 						</div>
-					</div>
-				}
+					}
+				</div>
 			}
 		</div>
 	}

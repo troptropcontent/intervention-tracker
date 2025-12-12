@@ -12,6 +12,7 @@ import (
 
 func GetPortals(dependencies *routers.Dependencies) echo.HandlerFunc {
 	return func(c echo.Context) error {
+
 		// Get query parameters
 		page, _ := strconv.Atoi(c.QueryParam("page"))
 		if page < 1 {
@@ -65,6 +66,8 @@ func GetPortals(dependencies *routers.Dependencies) echo.HandlerFunc {
 			Search:      search,
 		}
 
-		return templates.AdminPortals(portals, paginationData, c).Render(c.Request().Context(), c.Response().Writer)
+		c.Response().Header().Set("HX-Replace-Url", "/admin/portals?search="+search)
+
+		return templates.AdminPortals(c, dependencies.TranslationService, paginationData, portals).Render(c.Request().Context(), c.Response().Writer)
 	}
 }
