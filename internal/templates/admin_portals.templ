@@ -1,14 +1,16 @@
 package templates
 
 import (
-	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"strconv"
 )
 
-templ AdminPortals(context echo.Context, translator translation.TranslatorService, pagination PaginationData, portals []models.Portal) {
+type AdminPortalsData struct {
+}
+
+templ AdminPortals(context echo.Context, translator translation.TranslatorService, pagination PaginationData, search string, portals []models.Portal) {
 	@MainLayout(MainLayoutConfig{Title: "Admin - Portails"}, context) {
 		<div class="max-w-7xl mx-auto">
 			<div class="flex justify-between items-center mb-6">
@@ -24,7 +26,7 @@ templ AdminPortals(context echo.Context, translator translation.TranslatorServic
 						<input
 							type="text"
 							name="search"
-							value={ pagination.Search }
+							value={ search }
 							placeholder="Rechercher par numéro de contrat, adresse, client, téléphone ou email..."
 							class="input input-bordered w-full"
 							hx-get="/admin/portals"
@@ -39,7 +41,7 @@ templ AdminPortals(context echo.Context, translator translation.TranslatorServic
 			if len(portals) == 0 {
 				<div class="text-center py-12">
 					<div class="text-gray-500 text-lg">Aucun portail trouvé</div>
-					if pagination.Search != "" {
+					if search != "" {
 						<p class="text-gray-400 mt-2">Aucun résultat pour votre recherche. Essayez avec d'autres mots-clés.</p>
 					} else {
 						<p class="text-gray-400 mt-2">Commencez par ajouter des portails au système</p>
@@ -87,47 +89,7 @@ templ AdminPortals(context echo.Context, translator translation.TranslatorServic
 					</div>
 					<!-- Pagination -->
 					if pagination.TotalPages > 1 {
-						<div class="mt-6 flex justify-center">
-							<div class="join">
-								<!-- Previous button -->
-								if pagination.HasPrev {
-									<a
-										href={ templ.URL(fmt.Sprintf("/admin/portals?page=%d&limit=%d&search=%s", pagination.CurrentPage-1, pagination.Limit, pagination.Search)) }
-										class="join-item btn"
-									>
-										«
-									</a>
-								} else {
-									<button class="join-item btn btn-disabled">«</button>
-								}
-								<!-- Page numbers -->
-								for i := 1; i <= pagination.TotalPages; i++ {
-									if i == pagination.CurrentPage {
-										<button class="join-item btn btn-active">{ strconv.Itoa(i) }</button>
-									} else if i == 1 || i == pagination.TotalPages || (i >= pagination.CurrentPage-2 && i <= pagination.CurrentPage+2) {
-										<a
-											href={ templ.URL(fmt.Sprintf("/admin/portals?page=%d&limit=%d&search=%s", i, pagination.Limit, pagination.Search)) }
-											class="join-item btn"
-										>
-											{ strconv.Itoa(i) }
-										</a>
-									} else if i == pagination.CurrentPage-3 || i == pagination.CurrentPage+3 {
-										<button class="join-item btn btn-disabled">...</button>
-									}
-								}
-								<!-- Next button -->
-								if pagination.HasNext {
-									<a
-										href={ templ.URL(fmt.Sprintf("/admin/portals?page=%d&limit=%d&search=%s", pagination.CurrentPage+1, pagination.Limit, pagination.Search)) }
-										class="join-item btn"
-									>
-										»
-									</a>
-								} else {
-									<button class="join-item btn btn-disabled">»</button>
-								}
-							</div>
-						</div>
+						@Pagination(&pagination)
 					}
 				</div>
 			}

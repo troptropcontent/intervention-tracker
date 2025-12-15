@@ -1,0 +1,61 @@
+package templates
+
+import "strconv"
+
+// PaginationData holds pagination information
+type PaginationData struct {
+	BaseUrl     string
+	CurrentPage int
+	TotalPages  int
+	TotalCount  int
+	HasPrev     bool
+	HasNext     bool
+}
+
+templ Pagination(args *PaginationData) {
+	<div class="mt-6 flex justify-center">
+		<div class="join">
+			<!-- Previous button -->
+			if args.HasPrev {
+				<a
+					hx-get={ templ.URL(MustAddQueryParamsToURL(args.BaseUrl, map[string]string{"page": strconv.Itoa(args.CurrentPage - 1)})) }
+					class="join-item btn"
+					hx-select="#portals"
+					hx-target="#portals"
+				>
+					«
+				</a>
+			} else {
+				<button class="join-item btn btn-disabled">«</button>
+			}
+			<!-- Page numbers -->
+			for i := 1; i <= args.TotalPages; i++ {
+				if i == args.CurrentPage {
+					<button class="join-item btn btn-active">{ strconv.Itoa(i) }</button>
+				} else if i == 1 || i == args.TotalPages || (i >= args.CurrentPage-2 && i <= args.CurrentPage+2) {
+					<a
+						href={ templ.URL(MustAddQueryParamsToURL(args.BaseUrl, map[string]string{"page": strconv.Itoa(i)})) }
+						class="join-item btn"
+					>
+						{ strconv.Itoa(i) }
+					</a>
+				} else if i == args.CurrentPage-3 || i == args.CurrentPage+3 {
+					<button class="join-item btn btn-disabled">...</button>
+				}
+			}
+			<!-- Next button -->
+			if args.HasNext {
+				<a
+					hx-get={ templ.URL(MustAddQueryParamsToURL(args.BaseUrl, map[string]string{"page": strconv.Itoa(args.CurrentPage + 1)})) }
+					class="join-item btn"
+					hx-select="#portals"
+					hx-target="#portals"
+				>
+					»
+				</a>
+			} else {
+				<button class="join-item btn btn-disabled">»</button>
+			}
+		</div>
+	</div>
+}

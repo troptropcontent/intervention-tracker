@@ -2,18 +2,31 @@ package templates
 
 import (
 	"fmt"
+	"net/url"
+
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 )
 
-// PaginationData holds pagination information
-type PaginationData struct {
-	CurrentPage int
-	TotalPages  int
-	TotalCount  int
-	Limit       int
-	HasPrev     bool
-	HasNext     bool
-	Search      string
+func AddQueryParamsToURL(baseURL string, queryParams map[string]string) (string, error) {
+	u, err := url.Parse(baseURL)
+	if err != nil {
+		return "", err
+	}
+
+	values := u.Query()
+	for key, value := range queryParams {
+		values.Set(key, value)
+	}
+
+	u.RawQuery = values.Encode()
+	return u.String(), nil
+}
+func MustAddQueryParamsToURL(baseURL string, queryParams map[string]string) string {
+	u, err := AddQueryParamsToURL(baseURL, queryParams)
+	if err != nil {
+		return baseURL
+	}
+	return u
 }
 
 func SplitControlKindsForDisplay() ([]models.ControlKind, []models.ControlKind) {
