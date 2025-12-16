@@ -2,13 +2,14 @@ package templates
 
 import (
 	"fmt"
+	"strconv"
 	"github.com/labstack/echo/v4"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 )
 
 templ AdminPortal(context echo.Context, translator translation.TranslatorService, portal models.Portal, qrCode *models.QRCode, interventions []models.Intervention) {
-	@MainLayout(MainLayoutConfig{Title: "Admin - " + portal.Name, Controller: "qr-code-scanner", Attributes: templ.Attributes{"data-qr-code-scanner-portal-id-value": portal.ID}}, context) {
+	@MainLayout(MainLayoutConfig{Title: "Admin - " + portal.Name, Controller: "qr-code-scanner", Attributes: templ.Attributes{"data-qr-code-scanner-portal-id-value": strconv.Itoa(int(portal.ID))}}, context) {
 		<div class="max-w-4xl mx-auto">
 			<div class="flex flex-col mb-4">
 				<a href="/admin/portals" class="text-blue-600 hover:text-blue-800 text-sm mb-2 inline-block">
