@@ -19,7 +19,7 @@ templ Intervention(translator translation.TranslatorService, intervention *model
 					</span>
 				</div>
 				if intervention.Summary != nil && *intervention.Summary != "" {
-					<p class="text-gray-600 text-sm mb-3">{ *intervention.Summary }</p>
+					<p class="text-gray-600 text-sm mb-3 whitespace-pre-wrap">{ *intervention.Summary }</p>
 				}
 			</div>
 			<div class="text-xs text-gray-400">
