@@ -10,16 +10,16 @@ import (
 templ AdminPortal(context echo.Context, translator translation.TranslatorService, portal models.Portal, qrCode *models.QRCode, interventions []models.Intervention) {
 	@MainLayout(MainLayoutConfig{Title: "Admin - " + portal.Name, Controller: "qr-code-scanner", Attributes: templ.Attributes{"data-qr-code-scanner-portal-id-value": portal.ID}}, context) {
 		<div class="max-w-4xl mx-auto">
-			<div class="flex justify-between items-center mb-6">
-				<div>
-					<a href="/admin/portals" class="text-blue-600 hover:text-blue-800 text-sm mb-2 inline-block">
-						← Retour à la liste
-					</a>
+			<div class="flex flex-col mb-4">
+				<a href="/admin/portals" class="text-blue-600 hover:text-blue-800 text-sm mb-2 inline-block">
+					← Retour à la liste
+				</a>
+				<div class="flex justify-between items-center">
 					<h1 class="text-3xl font-bold text-gray-900">{ translator.MustTranslate("views.admin.portal.title", map[string]interface{}{"InternalId": portal.InternalId}) }</h1>
-				</div>
-				<div class="space-x-2">
 					<details class="dropdown dropdown-end">
-						<summary class="btn m-1">Nouvelle intervention</summary>
+						<summary class="btn btn-square">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+						</summary>
 						<ul class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
 							<li><a href={ templ.URL(fmt.Sprintf("/admin/interventions/new?intervention_type=maintenance&portal_id=%d", portal.ID)) }>Maintenance</a></li>
 							<li><a href={ templ.URL(fmt.Sprintf("/admin/interventions/new?intervention_type=repair&portal_id=%d", portal.ID)) }>Dépannage</a></li>
