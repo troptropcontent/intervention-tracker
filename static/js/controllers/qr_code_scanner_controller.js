@@ -5,6 +5,7 @@ export default class extends Controller {
     static values = { portalId: String }
 
     connect() {
+        console.log("QrCodeScannerController connected")
         this.scanner = null
         this.isScanning = false
         this.qrUuidRegex = /\/qr_codes\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/i
@@ -14,8 +15,39 @@ export default class extends Controller {
         this.cleanup()
     }
 
-    openQRScanner() {
+    async openQRScanner() {
         if (!this.modalTarget) return
+
+        // Check if mediaDevices is available
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert("Votre navigateur ne supporte pas l'accès à la caméra")
+            return
+        }
+
+        // Request permissions IMMEDIATELY on user click (before any async operations)
+        // This ensures the browser considers it a direct user gesture
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true })
+            stream.getTracks().forEach(track => track.stop())
+        } catch (error) {
+            console.error("Camera permission denied:", error)
+
+            let errorMessage = "🔒 Accès caméra refusé.\n\n"
+
+            if (error.name === 'NotAllowedError') {
+                errorMessage += "Pour débloquer :\n" +
+                    "1. Cliquez sur l'icône 🔒 dans la barre d'adresse\n" +
+                    "2. Changez 'Caméra' de 'Bloquer' à 'Autoriser'\n" +
+                    "3. Rechargez la page et réessayez"
+            } else if (error.name === 'NotFoundError') {
+                errorMessage += "Aucune caméra détectée sur cet appareil"
+            } else {
+                errorMessage += "Erreur: " + error.message
+            }
+
+            alert(errorMessage)
+            return
+        }
 
         this.showModal()
         this.initializeScanner()
@@ -58,23 +90,26 @@ export default class extends Controller {
 
     async setupCamera() {
         try {
+            // Get the list of cameras (permissions already granted in openQRScanner)
             const devices = await Html5Qrcode.getCameras()
-            
+
             if (!devices || devices.length === 0) {
                 throw new Error("Aucune caméra détectée sur cet appareil")
             }
 
+            // Prefer back camera (usually last in the list)
             const cameraId = devices[devices.length - 1].id
             await this.startScanning(cameraId)
-            
+
         } catch (error) {
-            throw new Error(`Erreur lors de l'accès aux caméras: ${error}`)
+            console.error("Camera setup error:", error)
+            throw new Error(`Erreur lors de l'accès aux caméras: ${error.message || error}`)
         }
     }
 
     async startScanning(cameraId) {
         this.scanner = new Html5Qrcode(this.readerTarget.id)
-        
+
         const config = {
             fps: 10,
             qrbox: { width: 250, height: 250 },
@@ -89,7 +124,7 @@ export default class extends Controller {
             this.isScanning = true
             this.hideLoading()
             this.showStatus("Pointez la caméra vers le QR code")
-            
+
         } catch (error) {
             throw new Error(`Erreur lors du démarrage de la caméra: ${error}`)
         }
@@ -97,14 +132,14 @@ export default class extends Controller {
 
     async handleQRCodeDetected(decodedText) {
         const match = decodedText.match(this.qrUuidRegex)
-        
+
         if (!match) return
 
         const qrCodeId = match[1]
-        
+
         this.hideReader()
         this.showStatus("QR code détecté, association en cours...", "text-green-600")
-        
+
         await this.stopScanning()
         await this.processQRCode(qrCodeId)
     }
@@ -124,7 +159,7 @@ export default class extends Controller {
                     qr_code_uuid: qrCodeId
                 })
             })
-            
+
             if (response.ok) {
                 const htmlContent = await response.text()
                 const targetElement = document.getElementById('qr_code_association_section')
@@ -139,7 +174,7 @@ export default class extends Controller {
                 const errorData = await response.text()
                 throw new Error(errorData || "Erreur lors de l'association du QR code")
             }
-            
+
         } catch (error) {
             this.showError(`Erreur API: ${error.message}`)
             this.showReader()
@@ -202,7 +237,7 @@ export default class extends Controller {
 
     showError(message) {
         this.hideStatus()
-        
+
         if (this.hasErrorMessageTarget) {
             this.errorMessageTarget.textContent = message
         }

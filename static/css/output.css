@@ -319,54 +319,6 @@
       }
     }
   }
-  .drawer-side {
-    :where(&) {
-      @layer daisyui.component {
-        overflow-x: hidden;
-        overflow-y: hidden;
-      }
-    }
-    @layer daisyui.component {
-      pointer-events: none;
-      visibility: hidden;
-      position: fixed;
-      inset-inline-start: calc(0.25rem * 0);
-      top: calc(0.25rem * 0);
-      z-index: 10;
-      grid-column-start: 1;
-      grid-row-start: 1;
-      display: grid;
-      width: 100%;
-      grid-template-columns: repeat(1, minmax(0, 1fr));
-      grid-template-rows: repeat(1, minmax(0, 1fr));
-      align-items: flex-start;
-      justify-items: start;
-      overscroll-behavior: contain;
-      opacity: 0%;
-      transition: opacity 0.2s ease-out 0.1s allow-discrete, visibility 0.3s ease-out 0.1s allow-discrete;
-      height: 100vh;
-      height: 100dvh;
-      > .drawer-overlay {
-        position: sticky;
-        top: calc(0.25rem * 0);
-        cursor: pointer;
-        place-self: stretch;
-        background-color: oklch(0% 0 0 / 40%);
-      }
-      > * {
-        grid-column-start: 1;
-        grid-row-start: 1;
-      }
-      > *:not(.drawer-overlay) {
-        will-change: transform;
-        transition: translate 0.3s ease-out, width 0.2s ease-out;
-        translate: -100%;
-        [dir="rtl"] & {
-          translate: 100%;
-        }
-      }
-    }
-  }
   .fab {
     @layer daisyui.component {
       pointer-events: none;
@@ -456,63 +408,6 @@
       }
       > :nth-child(6) {
         transition-delay: 120ms;
-      }
-    }
-  }
-  .drawer-open {
-    @layer daisyui.modifier {
-      :where(& > .drawer-side) {
-        overflow-y: auto;
-      }
-      > .drawer-toggle {
-        display: none;
-        & ~ .drawer-side {
-          pointer-events: auto;
-          visibility: visible;
-          position: sticky;
-          display: block;
-          width: auto;
-          overscroll-behavior: auto;
-          opacity: 100%;
-          & > .drawer-overlay {
-            cursor: default;
-            background-color: transparent;
-          }
-          & > *:not(.drawer-overlay) {
-            translate: 0%;
-            [dir="rtl"] & {
-              translate: 0%;
-            }
-          }
-        }
-        &:checked ~ .drawer-side {
-          pointer-events: auto;
-          visibility: visible;
-        }
-      }
-    }
-  }
-  .drawer-toggle {
-    @layer daisyui.component {
-      position: fixed;
-      height: calc(0.25rem * 0);
-      width: calc(0.25rem * 0);
-      appearance: none;
-      opacity: 0%;
-      &:checked {
-        & ~ .drawer-side {
-          pointer-events: auto;
-          visibility: visible;
-          overflow-y: auto;
-          opacity: 100%;
-          & > *:not(.drawer-overlay) {
-            translate: 0%;
-          }
-        }
-      }
-      &:focus-visible ~ .drawer-content label.drawer-button {
-        outline: 2px solid;
-        outline-offset: 2px;
       }
     }
   }
@@ -756,47 +651,6 @@
         &:before {
           display: none;
         }
-      }
-    }
-  }
-  .collapse-arrow {
-    @layer daisyui.modifier {
-      > .collapse-title:after {
-        position: absolute;
-        display: block;
-        height: 0.5rem;
-        width: 0.5rem;
-        transform: translateY(-100%) rotate(45deg);
-        @media (prefers-reduced-motion: no-preference) {
-          transition-property: all;
-          transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-          transition-duration: 0.2s;
-        }
-        top: 50%;
-        inset-inline-end: 1.4rem;
-        content: "";
-        transform-origin: 75% 75%;
-        box-shadow: 2px 2px;
-        pointer-events: none;
-      }
-    }
-  }
-  .collapse-plus {
-    @layer daisyui.modifier {
-      > .collapse-title:after {
-        position: absolute;
-        display: block;
-        height: 0.5rem;
-        width: 0.5rem;
-        @media (prefers-reduced-motion: no-preference) {
-          transition-property: all;
-          transition-duration: 300ms;
-          transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        top: 0.9rem;
-        inset-inline-end: 1.4rem;
-        content: "+";
-        pointer-events: none;
       }
     }
   }
@@ -1067,6 +921,38 @@
       mask-image: url("data:image/svg+xml,%3Csvg width='24' height='24' stroke='black' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cg transform-origin='center'%3E%3Ccircle cx='12' cy='12' r='9.5' fill='none' stroke-width='3' stroke-linecap='round'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 12 12' to='360 12 12' dur='2s' repeatCount='indefinite'/%3E%3Canimate attributeName='stroke-dasharray' values='0,150;42,150;42,150' keyTimes='0;0.475;1' dur='1.5s' repeatCount='indefinite'/%3E%3Canimate attributeName='stroke-dashoffset' values='0;-16;-59' keyTimes='0;0.475;1' dur='1.5s' repeatCount='indefinite'/%3E%3C/circle%3E%3C/g%3E%3C/svg%3E");
     }
   }
+  .btn-disabled {
+    @layer daisyui.modifier {
+      &:not(.btn-link, .btn-ghost) {
+        background-color: var(--color-base-content);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--color-base-content) 10%, transparent);
+        }
+        box-shadow: none;
+      }
+      pointer-events: none;
+      --btn-border: #0000;
+      --btn-noise: none;
+      --btn-fg: var(--color-base-content);
+      @supports (color: color-mix(in lab, red, red)) {
+        --btn-fg: color-mix(in oklch, var(--color-base-content) 20%, #0000);
+      }
+      @media (hover: hover) {
+        &:hover {
+          pointer-events: none;
+          background-color: var(--color-neutral);
+          @supports (color: color-mix(in lab, red, red)) {
+            background-color: color-mix(in oklab, var(--color-neutral) 20%, transparent);
+          }
+          --btn-border: #0000;
+          --btn-fg: var(--color-base-content);
+          @supports (color: color-mix(in lab, red, red)) {
+            --btn-fg: color-mix(in oklch, var(--color-base-content) 20%, #0000);
+          }
+        }
+      }
+    }
+  }
   .collapse {
     &:not(td, tr, colgroup) {
       visibility: revert-layer;
@@ -1207,24 +1093,6 @@
       }
     }
   }
-  .collapse-content {
-    @layer daisyui.component {
-      grid-column-start: 1;
-      grid-row-start: 1;
-    }
-    @layer daisyui.component {
-      visibility: hidden;
-      grid-column-start: 1;
-      grid-row-start: 2;
-      min-height: 0;
-      padding-left: 1rem;
-      padding-right: 1rem;
-      cursor: unset;
-      @media (prefers-reduced-motion: no-preference) {
-        transition: visibility 0.2s, padding 0.2s ease-out, background-color 0.2s ease-out;
-      }
-    }
-  }
   .validator-hint {
     @layer daisyui.component {
       visibility: hidden;
@@ -1247,19 +1115,6 @@
           visibility: visible;
           display: block;
           color: var(--color-error);
-        }
-      }
-    }
-  }
-  .collapse-open {
-    @layer daisyui.modifier {
-      grid-template-rows: max-content 1fr;
-      > .collapse-content {
-        visibility: visible;
-        min-height: fit-content;
-        padding-bottom: 1rem;
-        @media (prefers-reduced-motion: no-preference) {
-          transition: padding 0.2s ease-out, background-color 0.2s ease-out;
         }
       }
     }
@@ -1322,27 +1177,6 @@
         }
         :not(.list-col-wrap) {
           grid-row-start: 1;
-        }
-      }
-    }
-  }
-  .toast {
-    @layer daisyui.component {
-      position: fixed;
-      inset-inline-start: auto;
-      inset-inline-end: calc(0.25rem * 4);
-      top: auto;
-      bottom: calc(0.25rem * 4);
-      display: flex;
-      flex-direction: column;
-      gap: calc(0.25rem * 2);
-      background-color: transparent;
-      translate: var(--toast-x, 0) var(--toast-y, 0);
-      width: max-content;
-      max-width: calc(100vw - 2rem);
-      & > * {
-        @media (prefers-reduced-motion: no-preference) {
-          animation: toast 0.25s ease-out;
         }
       }
     }
@@ -2060,26 +1894,6 @@
       }
     }
   }
-  .diff-resizer {
-    @layer daisyui.component {
-      position: relative;
-      z-index: 1;
-      grid-column-start: 1;
-      grid-row-start: 2;
-      height: calc(0.25rem * 4);
-      width: 50cqi;
-      max-width: calc(100cqi - 1rem);
-      min-width: 1rem;
-      resize: horizontal;
-      overflow: hidden;
-      opacity: 0%;
-      transform: scaleY(3) translate(0.35rem, 0.35rem);
-      cursor: ew-resize;
-      transform-origin: 100% 100%;
-      clip-path: inset(calc(100% - 0.75rem) 0 0 calc(100% - 0.75rem));
-      transition: min-width 0.3s ease-out, max-width 0.3s ease-out;
-    }
-  }
   .swap {
     @layer daisyui.component {
       position: relative;
@@ -2114,20 +1928,6 @@
         opacity: 100%;
         backface-visibility: visible;
       }
-    }
-  }
-  .collapse-title {
-    @layer daisyui.component {
-      grid-column-start: 1;
-      grid-row-start: 1;
-    }
-    @layer daisyui.component {
-      position: relative;
-      width: 100%;
-      padding: 1rem;
-      padding-inline-end: 3rem;
-      min-height: 1lh;
-      transition: background-color 0.2s ease-out;
     }
   }
   .checkbox {
@@ -2280,74 +2080,6 @@
       }
     }
   }
-  .rating {
-    @layer daisyui.component {
-      position: relative;
-      display: inline-flex;
-      vertical-align: middle;
-      & input {
-        border: none;
-        appearance: none;
-      }
-      :where(*) {
-        height: calc(0.25rem * 6);
-        width: calc(0.25rem * 6);
-        border-radius: 0;
-        background-color: var(--color-base-content);
-        opacity: 20%;
-        @media (prefers-reduced-motion: no-preference) {
-          animation: rating 0.25s ease-out;
-        }
-        &:is(input) {
-          cursor: pointer;
-        }
-      }
-      & .rating-hidden {
-        width: calc(0.25rem * 2);
-        background-color: transparent;
-      }
-      input[type="radio"]:checked {
-        background-image: none;
-      }
-      * {
-        &:checked, &[aria-checked="true"], &[aria-current="true"], &:has(~ *:checked, ~ *[aria-checked="true"], ~ *[aria-current="true"]) {
-          opacity: 100%;
-        }
-        &:focus-visible {
-          scale: 1.1;
-          @media (prefers-reduced-motion: no-preference) {
-            transition: scale 0.2s ease-out;
-          }
-        }
-      }
-      & *:active:focus {
-        animation: none;
-        scale: 1.1;
-      }
-    }
-    @layer daisyui.modifier {
-      &.rating-xs :where(*:not(.rating-hidden)) {
-        width: calc(0.25rem * 4);
-        height: calc(0.25rem * 4);
-      }
-      &.rating-sm :where(*:not(.rating-hidden)) {
-        width: calc(0.25rem * 5);
-        height: calc(0.25rem * 5);
-      }
-      &.rating-md :where(*:not(.rating-hidden)) {
-        width: calc(0.25rem * 6);
-        height: calc(0.25rem * 6);
-      }
-      &.rating-lg :where(*:not(.rating-hidden)) {
-        width: calc(0.25rem * 7);
-        height: calc(0.25rem * 7);
-      }
-      &.rating-xl :where(*:not(.rating-hidden)) {
-        width: calc(0.25rem * 8);
-        height: calc(0.25rem * 8);
-      }
-    }
-  }
   .card {
     @layer daisyui.component {
       position: relative;
@@ -2461,30 +2193,6 @@
   }
   .inset-0 {
     inset: calc(var(--spacing) * 0);
-  }
-  .dropdown-right {
-    @layer daisyui.modifier {
-      --anchor-h: right;
-      --anchor-v: span-bottom;
-      .dropdown-content {
-        inset-inline-start: 100%;
-        top: calc(0.25rem * 0);
-        bottom: auto;
-        transform-origin: 0;
-      }
-    }
-  }
-  .dropdown-left {
-    @layer daisyui.modifier {
-      --anchor-h: left;
-      --anchor-v: span-bottom;
-      .dropdown-content {
-        inset-inline-end: 100%;
-        top: calc(0.25rem * 0);
-        bottom: auto;
-        transform-origin: 100%;
-      }
-    }
   }
   .dropdown-end {
     @layer daisyui.modifier {
@@ -2699,6 +2407,16 @@
       }
     }
   }
+  .btn-active {
+    @layer daisyui.modifier {
+      --btn-bg: var(--btn-color, var(--color-base-200));
+      @supports (color: color-mix(in lab, red, red)) {
+        --btn-bg: color-mix(in oklab, var(--btn-color, var(--color-base-200)), #000 7%);
+      }
+      --btn-shadow: 0 0 0 0 oklch(0% 0 0/0), 0 0 0 0 oklch(0% 0 0/0);
+      isolation: isolate;
+    }
+  }
   .stack {
     @layer daisyui.component {
       display: inline-grid;
@@ -2785,53 +2503,6 @@
   }
   .z-50 {
     z-index: 50;
-  }
-  .tab-content {
-    @layer daisyui.component {
-      order: var(--tabcontent-order);
-      display: none;
-      border-color: transparent;
-      --tabcontent-radius-ss: var(--radius-box);
-      --tabcontent-radius-se: var(--radius-box);
-      --tabcontent-radius-es: var(--radius-box);
-      --tabcontent-radius-ee: var(--radius-box);
-      --tabcontent-order: 1;
-      width: 100%;
-      margin: var(--tabcontent-margin);
-      border-width: var(--border);
-      border-start-start-radius: var(--tabcontent-radius-ss);
-      border-start-end-radius: var(--tabcontent-radius-se);
-      border-end-start-radius: var(--tabcontent-radius-es);
-      border-end-end-radius: var(--tabcontent-radius-ee);
-    }
-  }
-  .modal-box {
-    @layer daisyui.component {
-      grid-column-start: 1;
-      grid-row-start: 1;
-      max-height: 100vh;
-      width: calc(11/12 * 100%);
-      max-width: 32rem;
-      background-color: var(--color-base-100);
-      padding: calc(0.25rem * 6);
-      transition: translate 0.3s ease-out, scale 0.3s ease-out, opacity 0.2s ease-out 0.05s, box-shadow 0.3s ease-out;
-      border-top-left-radius: var(--modal-tl, var(--radius-box));
-      border-top-right-radius: var(--modal-tr, var(--radius-box));
-      border-bottom-left-radius: var(--modal-bl, var(--radius-box));
-      border-bottom-right-radius: var(--modal-br, var(--radius-box));
-      scale: 95%;
-      opacity: 0;
-      box-shadow: oklch(0% 0 0/ 0.25) 0px 25px 50px -12px;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-    }
-  }
-  .drawer-content {
-    @layer daisyui.component {
-      grid-column-start: 2;
-      grid-row-start: 1;
-      min-width: calc(0.25rem * 0);
-    }
   }
   .container {
     width: 100%;
@@ -2940,8 +2611,14 @@
       }
     }
   }
-  .mt-0 {
-    margin-top: calc(var(--spacing) * 0);
+  .join-item {
+    &:where(*:not(:first-child, :disabled, [disabled], .btn-disabled)) {
+      margin-inline-start: calc(var(--border, 1px) * -1);
+      margin-block-start: 0;
+    }
+    &:where(*:is(:disabled, [disabled], .btn-disabled)) {
+      border-width: var(--border, 1px) 0 var(--border, 1px) var(--border, 1px);
+    }
   }
   .mt-0\.5 {
     margin-top: calc(var(--spacing) * 0.5);
@@ -2957,6 +2634,9 @@
   }
   .mt-4 {
     margin-top: calc(var(--spacing) * 4);
+  }
+  .mt-5 {
+    margin-top: calc(var(--spacing) * 5);
   }
   .mt-6 {
     margin-top: calc(var(--spacing) * 6);
@@ -3169,15 +2849,6 @@
       grid-auto-rows: max-content;
     }
   }
-  .card-title {
-    @layer daisyui.component {
-      display: flex;
-      align-items: center;
-      gap: calc(0.25rem * 2);
-      font-size: var(--cardtitle-fs, 1.125rem);
-      font-weight: 600;
-    }
-  }
   .join {
     display: inline-flex;
     align-items: stretch;
@@ -3240,61 +2911,6 @@
       }
     }
   }
-  .prose {
-    :root & {
-      --tw-prose-body: var(--color-base-content);
-      @supports (color: color-mix(in lab, red, red)) {
-        --tw-prose-body: color-mix(in oklab, var(--color-base-content) 80%, #0000);
-      }
-      --tw-prose-headings: var(--color-base-content);
-      --tw-prose-lead: var(--color-base-content);
-      --tw-prose-links: var(--color-base-content);
-      --tw-prose-bold: var(--color-base-content);
-      --tw-prose-counters: var(--color-base-content);
-      --tw-prose-bullets: var(--color-base-content);
-      @supports (color: color-mix(in lab, red, red)) {
-        --tw-prose-bullets: color-mix(in oklab, var(--color-base-content) 50%, #0000);
-      }
-      --tw-prose-hr: var(--color-base-content);
-      @supports (color: color-mix(in lab, red, red)) {
-        --tw-prose-hr: color-mix(in oklab, var(--color-base-content) 20%, #0000);
-      }
-      --tw-prose-quotes: var(--color-base-content);
-      --tw-prose-quote-borders: var(--color-base-content);
-      @supports (color: color-mix(in lab, red, red)) {
-        --tw-prose-quote-borders: color-mix(in oklab, var(--color-base-content) 20%, #0000);
-      }
-      --tw-prose-captions: var(--color-base-content);
-      @supports (color: color-mix(in lab, red, red)) {
-        --tw-prose-captions: color-mix(in oklab, var(--color-base-content) 50%, #0000);
-      }
-      --tw-prose-code: var(--color-base-content);
-      --tw-prose-pre-code: var(--color-neutral-content);
-      --tw-prose-pre-bg: var(--color-neutral);
-      --tw-prose-th-borders: var(--color-base-content);
-      @supports (color: color-mix(in lab, red, red)) {
-        --tw-prose-th-borders: color-mix(in oklab, var(--color-base-content) 50%, #0000);
-      }
-      --tw-prose-td-borders: var(--color-base-content);
-      @supports (color: color-mix(in lab, red, red)) {
-        --tw-prose-td-borders: color-mix(in oklab, var(--color-base-content) 20%, #0000);
-      }
-      --tw-prose-kbd: var(--color-base-content);
-      @supports (color: color-mix(in lab, red, red)) {
-        --tw-prose-kbd: color-mix(in oklab, var(--color-base-content) 80%, #0000);
-      }
-      :where(code):not(pre > code) {
-        background-color: var(--color-base-200);
-        border-radius: var(--radius-selector);
-        border: var(--border) solid var(--color-base-300);
-        padding-inline: 0.5em;
-        font-weight: inherit;
-        &:before, &:after {
-          display: none;
-        }
-      }
-    }
-  }
   .mask {
     @layer daisyui.component {
       display: inline-block;
@@ -3327,6 +2943,13 @@
   }
   .table {
     display: table;
+  }
+  .btn-square {
+    @layer daisyui.modifier {
+      padding-inline: calc(0.25rem * 0);
+      width: var(--size);
+      height: var(--size);
+    }
   }
   .h-4 {
     height: calc(var(--spacing) * 4);
@@ -3361,14 +2984,8 @@
   .min-h-screen {
     min-height: 100vh;
   }
-  .w-1 {
-    width: calc(var(--spacing) * 1);
-  }
   .w-1\/2 {
     width: calc(1/2 * 100%);
-  }
-  .w-2 {
-    width: calc(var(--spacing) * 2);
   }
   .w-2\/12 {
     width: calc(2/12 * 100%);
@@ -3387,6 +3004,9 @@
   }
   .w-12 {
     width: calc(var(--spacing) * 12);
+  }
+  .w-36 {
+    width: calc(var(--spacing) * 36);
   }
   .w-52 {
     width: calc(var(--spacing) * 52);
@@ -3415,9 +3035,6 @@
   .flex-1 {
     flex: 1;
   }
-  .flex-shrink {
-    flex-shrink: 1;
-  }
   .flex-grow {
     flex-grow: 1;
   }
@@ -3437,23 +3054,6 @@
   }
   .transform {
     transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
-  }
-  .skeleton {
-    @layer daisyui.component {
-      border-radius: var(--radius-box);
-      background-color: var(--color-base-300);
-      @media (prefers-reduced-motion: reduce) {
-        transition-duration: 15s;
-      }
-      will-change: background-position;
-      background-image: linear-gradient( 105deg, #0000 0% 40%, var(--color-base-100) 50%, #0000 60% 100% );
-      background-size: 200% auto;
-      background-repeat: no-repeat;
-      background-position-x: -50%;
-      @media (prefers-reduced-motion: no-preference) {
-        animation: skeleton 1.8s ease-in-out infinite;
-      }
-    }
   }
   .animate-spin {
     animation: var(--animate-spin);
@@ -3766,9 +3366,6 @@
   .bg-white {
     background-color: var(--color-white);
   }
-  .mask-repeat {
-    mask-repeat: repeat;
-  }
   .object-contain {
     object-fit: contain;
   }
@@ -3816,9 +3413,6 @@
   }
   .px-6 {
     padding-inline: calc(var(--spacing) * 6);
-  }
-  .py-0 {
-    padding-block: calc(var(--spacing) * 0);
   }
   .py-0\.5 {
     padding-block: calc(var(--spacing) * 0.5);
@@ -3902,14 +3496,24 @@
     --tw-tracking: var(--tracking-wider);
     letter-spacing: var(--tracking-wider);
   }
-  .text-wrap {
-    text-wrap: wrap;
-  }
   .whitespace-nowrap {
     white-space: nowrap;
   }
   .whitespace-pre-wrap {
     white-space: pre-wrap;
+  }
+  .link-primary {
+    @layer daisyui.modifier {
+      color: var(--color-primary);
+      @media (hover: hover) {
+        &:hover {
+          color: var(--color-primary);
+          @supports (color: color-mix(in lab, red, red)) {
+            color: color-mix(in oklab, var(--color-primary) 80%, #000);
+          }
+        }
+      }
+    }
   }
   .text-base-content {
     color: var(--color-base-content);
@@ -4046,14 +3650,6 @@
     transition-property: box-shadow;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
     transition-duration: var(--tw-duration, var(--default-transition-duration));
-  }
-  .ease-in-out {
-    --tw-ease: var(--ease-in-out);
-    transition-timing-function: var(--ease-in-out);
-  }
-  .ease-out {
-    --tw-ease: var(--ease-out);
-    transition-timing-function: var(--ease-out);
   }
   .btn-sm {
     @layer daisyui.modifier {
@@ -4282,6 +3878,16 @@
   .sm\:grid-cols-2 {
     @media (width >= 40rem) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .md\:col-span-2 {
+    @media (width >= 48rem) {
+      grid-column: span 2 / span 2;
+    }
+  }
+  .md\:table-cell {
+    @media (width >= 48rem) {
+      display: table-cell;
     }
   }
   .md\:grid-cols-2 {
@@ -4552,7 +4158,7 @@
     --color-base-300: oklch(95% 0 0);
     --color-base-content: oklch(21% 0.006 285.885);
     --color-primary: var(--color-brand);
-    --color-primary-content: oklch(93% 0.034 272.788);
+    --color-primary-content: white;
     --color-secondary: teal;
     --color-secondary-content: oklch(94% 0.028 342.258);
     --color-accent: oklch(77% 0.152 181.912);
@@ -4761,10 +4367,6 @@
   syntax: "*";
   inherits: false;
 }
-@property --tw-ease {
-  syntax: "*";
-  inherits: false;
-}
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -4814,7 +4416,6 @@
       --tw-drop-shadow-color: initial;
       --tw-drop-shadow-alpha: 100%;
       --tw-drop-shadow-size: initial;
-      --tw-ease: initial;
     }
   }
 }

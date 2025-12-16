@@ -8,5 +8,6 @@
   --color-brand: #3481b8;
   --color-brand-dark: #346589;
   --color-primary: var(--color-brand);
+  --color-primary-content: white;
   --color-secondary: teal;
 }

@@ -94,6 +94,8 @@ templ InputDate(args *InputDateArgs) {
 			<label for={ args.Name } class="block text-sm font-medium text-gray-700 mb-1">{ args.Label }</label>
 		}
 		<input
+			id={ args.Name }
+			name={ args.Name }
 			type="date"
 			class={ "input input-primary", templ.KV("validator", args.ValidatorHint != "") }
 			required={ args.Required }
