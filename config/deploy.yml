@@ -11,6 +11,7 @@ servers:
     cmd: ./background_jobs start
 
 proxy:
+  app_port: 8080
   ssl: true
   host: antivol.maintenanceautomatisme.fr
 
