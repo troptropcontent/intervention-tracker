@@ -32,8 +32,6 @@ env:
 ssh:
   user: ubuntu
 
-asset_path: /static
-
 accessories:
   database:
     image: postgres:17.5
