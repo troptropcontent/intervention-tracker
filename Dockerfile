@@ -6,7 +6,6 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y curl && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
-
 # Set working directory
 WORKDIR /app
 
@@ -18,6 +17,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
 
 # Copy Go module files
 COPY go.mod go.sum ./
+
+# Install templ
+RUN go install github.com/a-h/templ/cmd/templ@latest
 
 # Download Go dependencies
 RUN go mod download
