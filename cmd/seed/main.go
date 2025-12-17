@@ -47,10 +47,9 @@ func main() {
 
 	// Create a user
 	user := models.User{
-		Email:     "admin@example.com",
-		FirstName: "Admin",
-		LastName:  "User",
-		IsActive:  true,
+		Email:     "admin@antivol.com",
+		FirstName: "John",
+		LastName:  "Does",
 	}
 
 	if err := user.SetPassword("password123"); err != nil {
@@ -68,7 +67,7 @@ func main() {
 	log.Println("Creating 900 portals...")
 
 	portals := make([]models.Portal, 900)
-	for i := 0; i < 900; i++ {
+	for i := range 900 {
 		streetNum := (i % 200) + 1
 		city := cities[i%len(cities)]
 		street := streets[i%len(streets)]
@@ -79,6 +78,7 @@ func main() {
 
 		portals[i] = models.Portal{
 			UUID:              uuid.New().String(),
+			InternalId:        fmt.Sprintf("PRT-%05d", i+1),
 			Name:              fmt.Sprintf("Portal %s - %d", city, i+1),
 			AddressStreet:     fmt.Sprintf("%d %s", streetNum, street),
 			AddressZipcode:    fmt.Sprintf("%05d", 75000+(i%25000)),
