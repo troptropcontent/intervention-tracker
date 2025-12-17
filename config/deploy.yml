@@ -6,6 +6,7 @@ servers:
   web:
     - 51.254.129.231
   jobs:
+    proxy: false
     hosts:
       - 51.254.129.231
     cmd: ./background_jobs start
