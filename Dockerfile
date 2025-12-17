@@ -10,10 +10,6 @@ RUN apt-get update -qq && \
 # Set working directory
 WORKDIR /app
 
-# Install tailwind
-RUN curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64 && \
-    chmod +x tailwindcss-linux-x64 && \
-    mv tailwindcss-linux-x64 ./bin/tailwindcss
 
 # Copy Go module files
 COPY go.mod go.sum ./
@@ -24,6 +20,10 @@ RUN go mod download
 # Copy the entire source code
 COPY . .
 
+# Install tailwind
+RUN curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64 && \
+    chmod +x tailwindcss-linux-x64 && \
+    mv tailwindcss-linux-x64 ./bin/tailwindcss
 # Build CSS with Tailwind
 RUN ./bin/tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify
 
