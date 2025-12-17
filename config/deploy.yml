@@ -25,9 +25,17 @@ builder:
 
 env:
   clear:
-    DB_HOST: 192.168.0.2
+    GO_ENV: production
   secret:
-    - RAILS_MASTER_KEY
+    - SMTP_USERNAME
+    - SMTP_PASSWORD
+    - SMTP_HOST
+    - SMTP_PORT
+    - DB_PASSWORD
+    - S3_ENDPOINT
+    - S3_ACCESS_KEY
+    - S3_SECRET_KEY
+    - S3_REGION
 
 ssh:
   user: ubuntu

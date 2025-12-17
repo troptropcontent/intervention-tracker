@@ -49,7 +49,7 @@ func NewAttachmentService(db *gorm.DB, storageService storage.StorageService, jo
 // Returns the created attachment ID and an error if the operation fails.
 func (a *AttachmentService) Attach(ctx context.Context, file io.ReadSeeker, filename string, holder_id uint, holder_type string, kind string) (uint, error) {
 	// Get temporary directory path from environment or use default
-	tempDir := utils.GetEnv("UPLOAD_TEMP_DIR", "/tmp/qr_code_uploads")
+	tempDir := utils.GetEnv("UPLOAD_TEMP_DIR", "/tmp/attachments")
 
 	// Create temporary file using utility function
 	tempFilePath, fileSize, err := utils.CreateTempFile(tempDir, filename, file)
