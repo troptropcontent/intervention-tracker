@@ -11,10 +11,9 @@ servers:
       ssl: true
       host: antivol.maintenanceautomatisme.fr
   jobs:
-    proxy: false
     hosts:
       - 51.254.129.231
-    cmd: ./background_jobs start
+    cmd: /app/background_jobs start
 
 registry:
   username:

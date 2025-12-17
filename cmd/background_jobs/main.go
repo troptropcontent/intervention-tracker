@@ -57,6 +57,7 @@ func main() {
 		}
 
 	case "start":
+		log.Fatalf("Failed to initialize configuration: %v", "CHECK IF WE WOULD SEE ANYTHING")
 		// Create shared configuration
 		cfg, err := jobs.NewConfig(ctx)
 		if err != nil {
