@@ -2,6 +2,12 @@ service: intervention-tracker
 
 image: troptropcontent/intervention-tracker
 
+healthcheck:
+  path: /up
+  port: 8080
+  interval: 10s
+  timeout: 5s
+
 servers:
   web:
     - 51.254.129.231
@@ -37,6 +43,7 @@ env:
     - S3_REGION
     - GOTENBERG_URL
     - DB_HOST
+    - GO_COOKIE_SECRET
 
 ssh:
   user: ubuntu
