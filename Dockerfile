@@ -28,7 +28,7 @@ COPY . .
 # Install tailwind
 RUN 
 # Build CSS with Tailwind
-RUN pnpm exec @tailwindcss/cli -i ./static/css/input.css -o ./static/css/output.css --minify
+RUN pnpm exec tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify
 
 # Generate templ files
 RUN templ generate
