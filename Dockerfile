@@ -10,6 +10,11 @@ RUN apt-get update -qq && \
 # Set working directory
 WORKDIR /app
 
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g corepack && \
+    corepack enable pnpm && \
+    pnpm i tailwindcss@latest @tailwindcss/cli@latest daisyui@latest
 
 # Copy Go module files
 COPY go.mod go.sum ./
@@ -21,11 +26,9 @@ RUN go mod download
 COPY . .
 
 # Install tailwind
-RUN curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64 && \
-    chmod +x tailwindcss-linux-x64 && \
-    mv tailwindcss-linux-x64 ./bin/tailwindcss
+RUN 
 # Build CSS with Tailwind
-RUN ./bin/tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify
+RUN pnpm exec @tailwindcss/cli -i ./static/css/input.css -o ./static/css/output.css --minify
 
 # Generate templ files
 RUN templ generate
