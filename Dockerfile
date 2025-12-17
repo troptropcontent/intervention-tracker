@@ -38,6 +38,12 @@ RUN templ generate
 # Build the Go application
 RUN go build -o /app/server ./cmd/server/main.go
 
+# Build the Database command
+RUN go build -o /app/database ./cmd/database/main.go
+
+# Build the River command
+RUN go build -o /app/background_jobs ./cmd/background_jobs/main.go
+
 # Expose port
 EXPOSE 8080
 
