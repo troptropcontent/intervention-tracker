@@ -22,7 +22,7 @@ type GotenbergService struct {
 
 // NewGotenbergService creates a new Gotenberg service instance
 func NewGotenbergService(gotenbergUrl ...string) *GotenbergService {
-	baseUrl := utils.GetEnv("GOTEMBERG_URL", "")
+	baseUrl := utils.GetEnv("GOTENBERG_URL", "")
 	if baseUrl == "" {
 		if len(gotenbergUrl) > 0 {
 			baseUrl = gotenbergUrl[0]
