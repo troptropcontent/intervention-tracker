@@ -15,6 +15,9 @@ servers:
       - 51.254.129.231
     cmd: /app/background_jobs start
 
+volumes:
+  - /var/lib/intervention-tracker/attachments:/tmp/attachments
+
 registry:
   username:
     - KAMAL_REGISTRY_USERNAME
