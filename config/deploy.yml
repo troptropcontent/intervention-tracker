@@ -1,0 +1,59 @@
+service: intervention-tracker
+
+image: troptropcontent/intervention-tracker
+
+servers:
+  web:
+    hosts:
+      - 51.254.129.231
+    proxy:
+      app_port: 8080
+      ssl: true
+      host: antivol.maintenanceautomatisme.fr
+  jobs:
+    hosts:
+      - 51.254.129.231
+    cmd: /app/background_jobs start
+
+volumes:
+  - /var/lib/intervention-tracker/attachments:/tmp/attachments
+
+registry:
+  username:
+    - KAMAL_REGISTRY_USERNAME
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  arch: amd64
+
+env:
+  clear:
+    GO_ENV: production
+  secret:
+    - SMTP_USERNAME
+    - SMTP_PASSWORD
+    - SMTP_HOST
+    - SMTP_PORT
+    - S3_ENDPOINT
+    - S3_ACCESS_KEY
+    - S3_SECRET_KEY
+    - S3_REGION
+    - GOTENBERG_URL
+    - DB_HOST
+    - GO_COOKIE_SECRET
+
+ssh:
+  user: ubuntu
+
+accessories:
+  database:
+    image: postgres:17.5
+    roles:
+      - web
+    directories:
+      - data:/var/lib/postgresql/data
+  gotemberg:
+    image: gotenberg/gotenberg:8
+    roles:
+      - web
