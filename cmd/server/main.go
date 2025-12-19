@@ -75,6 +75,11 @@ func main() {
 	// Static files
 	e.Static("/static", "static")
 
+	// Health check endpoint
+	e.GET("/up", func(c echo.Context) error {
+		return c.String(200, "ok")
+	})
+
 	// Public routes
 	e.GET("/login", h.GetLogin)
 	e.POST("/login", h.PostLogin)

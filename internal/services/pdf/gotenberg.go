@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 )
 
 const DefaultGotenbergURL = "http://gotemberg:3000"
@@ -20,11 +22,13 @@ type GotenbergService struct {
 
 // NewGotenbergService creates a new Gotenberg service instance
 func NewGotenbergService(gotenbergUrl ...string) *GotenbergService {
-	var baseUrl string
-	if len(gotenbergUrl) > 0 {
-		baseUrl = gotenbergUrl[0]
-	} else {
-		baseUrl = DefaultGotenbergURL
+	baseUrl := utils.GetEnv("GOTENBERG_URL", "")
+	if baseUrl == "" {
+		if len(gotenbergUrl) > 0 {
+			baseUrl = gotenbergUrl[0]
+		} else {
+			baseUrl = DefaultGotenbergURL
+		}
 	}
 	return &GotenbergService{
 		BaseURL: baseUrl,
