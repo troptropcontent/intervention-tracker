@@ -49,7 +49,7 @@ fi
 
 # Install Claude Code globally
 print_step "Installing Claude Code CLI globally..."
-pnpm install -g @anthropic-ai/claude-code
+curl -fsSL https://claude.ai/install.sh | bash
 print_success "Claude Code CLI installed successfully"
 
 # Setup git configuration from environment variables
