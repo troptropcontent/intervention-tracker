@@ -1,0 +1,39 @@
+package templates
+
+const SignaturePadController = "signature-pad"
+
+templ SignaturePadCanvas() {
+	<canvas
+		data-signature-pad-target="canvas"
+		class="touch-none cursor-crosshair border border-primary rounded-lg mx-auto"
+	></canvas>
+}
+
+templ SignaturePadClearButton() {
+	<button
+		type="button"
+		data-signature-pad-target="clearButton"
+		data-action="click->signature-pad#clear"
+		class="btn"
+	>
+		Effacer la signature
+	</button>
+}
+
+templ SignaturePadHiddenInput(inputName string) {
+	<input
+		type="hidden"
+		name={ inputName }
+		data-signature-pad-target="dataInput"
+	/>
+}
+
+templ SignaturePad(inputName string) {
+	<div data-controller={ SignaturePadController } class="space-y-4">
+		<div class="flex justify-end">
+			@SignaturePadCanvas()
+			@SignaturePadClearButton()
+		</div>
+		@SignaturePadHiddenInput(inputName)
+	</div>
+}

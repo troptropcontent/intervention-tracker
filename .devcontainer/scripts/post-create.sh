@@ -49,7 +49,7 @@ fi
 
 # Install Claude Code globally
 print_step "Installing Claude Code CLI globally..."
-pnpm install -g @anthropic-ai/claude-code
+curl -fsSL https://claude.ai/install.sh | bash
 print_success "Claude Code CLI installed successfully"
 
 # Setup git configuration from environment variables
@@ -60,6 +60,15 @@ if [ -n "$GIT_EMAIL" ] && [ -n "$GIT_NAME" ]; then
     print_success "Git configured with email: $GIT_EMAIL and name: $GIT_NAME"
 else
     print_warning "GIT_EMAIL and/or GIT_NAME environment variables not set - skipping git configuration"
+fi
+
+# Install Air for Go live reload
+print_step "Installing Air live reload tool for Go..."
+go install github.com/air-verse/air@latest
+if command -v air &> /dev/null; then
+    print_success "Air installed successfully at $(which air)"
+else
+    print_warning "Air installation could not be verified - check GOPATH/bin is in PATH"
 fi
 
 sudo chown -R $(whoami):$(whoami) /go/pkg

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 
 	"github.com/gorilla/sessions"
@@ -9,12 +10,20 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/troptropcontent/qr_code_maintenance/internal/database"
 	"github.com/troptropcontent/qr_code_maintenance/internal/handlers"
+	"github.com/troptropcontent/qr_code_maintenance/internal/jobs"
 	authmiddleware "github.com/troptropcontent/qr_code_maintenance/internal/middleware"
+	"github.com/troptropcontent/qr_code_maintenance/internal/routers"
+	"github.com/troptropcontent/qr_code_maintenance/internal/routers/interventions"
+	"github.com/troptropcontent/qr_code_maintenance/internal/routers/portals"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"github.com/troptropcontent/qr_code_maintenance/internal/utils"
 )
 
 func main() {
+	ctx := context.Background()
+
 	// Connect to database with GORM
 	db, err := database.InitializeDatabase()
 	if err != nil {
@@ -23,10 +32,35 @@ func main() {
 
 	emailService, err := email.NewSMTPServiceFromEnv(&email.NewSMTPServiceFromEnvOptions{})
 	if err != nil {
-		log.Fatalf("failed to instanciate email service: %v", err)
+		log.Fatalf("failed to instantiate email service: %v", err)
 	}
+
+	// Initialize S3 storage service (reads config from environment variables)
+	storageService, err := storage.NewS3StorageService(nil)
+	if err != nil {
+		log.Fatalf("failed to initialize storage service: %v", err)
+	}
+
+	translator := translation.NewTranslator()
+
+	// Create job enqueuer for the web application (only creates the pgx pool, not duplicating services)
+	backgroundJobRunner, err := jobs.NewEnqueuer(ctx)
+	if err != nil {
+		log.Fatalf("Failed to create job enqueuer: %v", err)
+	}
+	defer backgroundJobRunner.Close()
+
 	// Initialize handlers
-	h := &handlers.Handlers{DB: db, EmailNotificationService: emailService}
+	h := &handlers.Handlers{
+		DB:                       db,
+		EmailNotificationService: emailService,
+		StorageService:           storageService,
+		TranslationService:       translator}
+
+	dependencies, err := routers.NewRouterDependencies(db, emailService, storageService, translator, backgroundJobRunner)
+	if err != nil {
+		log.Fatalf("failed to initialize router dependencies: %v", err)
+	}
 
 	e := echo.New()
 
@@ -41,6 +75,11 @@ func main() {
 	// Static files
 	e.Static("/static", "static")
 
+	// Health check endpoint
+	e.GET("/up", func(c echo.Context) error {
+		return c.String(200, "ok")
+	})
+
 	// Public routes
 	e.GET("/login", h.GetLogin)
 	e.POST("/login", h.PostLogin)
@@ -54,15 +93,13 @@ func main() {
 
 	// Admin routes (require authentication)
 	admin_routes := e.Group("/admin", authmiddleware.RequireAuth())
-	admin_routes.GET("/portals", h.GetAdminPortals)
 	admin_routes.GET("/portals/:id", h.GetAdminPortal)
 	admin_routes.GET("/portals/:id/edit", h.GetAdminPortalEdit)
-	admin_routes.POST("/portals/:id", h.UpdatePortal)
+	admin_routes.POST("/portals/:id", h.UpdatePortal).Name = "admin-get-portal"
 	admin_routes.POST("/portals/:id/qr-code/associate", h.AssociateQRCode)
 	admin_routes.POST("/portals/:id/qr-code/remove", h.RemoveQRCode)
-	admin_routes.GET("/portals/:id/interventions/new", h.GetNewIntervention)
-	admin_routes.POST("/portals/:id/interventions", h.PostIntervention)
-	admin_routes.GET("/interventions/:id/report", h.GetInterventionReport)
+	interventions.NewRouter(*admin_routes, dependencies)
+	portals.NewRouter(*admin_routes, dependencies)
 	admin_routes.GET("/portals/scan", h.GetAdminPortalsScan)
 
 	// 404 handler
