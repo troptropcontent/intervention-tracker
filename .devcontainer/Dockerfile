@@ -1,8 +1,8 @@
 FROM mcr.microsoft.com/devcontainers/go:1.25-bookworm
 
 # [Optional] Uncomment this section to install additional OS packages.
-# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
+RUN rm -f /etc/apt/sources.list.d/yarn.list && apt-get update
+    # && apt-get -y install --no-install-recommends <your-package-list-here>
 
 # [Optional] Uncomment the next lines to use go get to install anything else you need
 # USER vscode
