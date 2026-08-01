@@ -1,9 +1,9 @@
 module github.com/troptropcontent/qr_code_maintenance
 
-go 1.24.5
+go 1.25.0
 
 require (
-	github.com/a-h/templ v0.3.943
+	github.com/a-h/templ v0.3.1020
 	github.com/aws/aws-sdk-go-v2 v1.39.3
 	github.com/aws/aws-sdk-go-v2/credentials v1.18.18
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.88.6
@@ -22,8 +22,8 @@ require (
 	github.com/riverqueue/river/riverdriver/riverpgxv5 v0.26.0
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/crypto v0.41.0
-	golang.org/x/text v0.29.0
+	golang.org/x/crypto v0.48.0
+	golang.org/x/text v0.34.0
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gorm v1.30.1
@@ -64,9 +64,9 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	go.uber.org/goleak v1.3.0 // indirect
-	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/sync v0.17.0 // indirect
-	golang.org/x/sys v0.35.0 // indirect
+	golang.org/x/net v0.51.0 // indirect
+	golang.org/x/sync v0.19.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
 	golang.org/x/time v0.12.0 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
