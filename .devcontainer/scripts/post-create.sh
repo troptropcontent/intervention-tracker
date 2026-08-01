@@ -47,11 +47,6 @@ else
     print_warning "pnpm home directory not found - this might be normal on first setup"
 fi
 
-# Install Claude Code globally
-print_step "Installing Claude Code CLI globally..."
-curl -fsSL https://claude.ai/install.sh | bash
-print_success "Claude Code CLI installed successfully"
-
 # Setup git configuration from environment variables
 print_step "Setting up git configuration..."
 if [ -n "$GIT_EMAIL" ] && [ -n "$GIT_NAME" ]; then

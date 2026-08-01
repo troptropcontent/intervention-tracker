@@ -48,10 +48,13 @@ db:
 	PGPASSWORD=postgres psql -h db -p 5432 -U postgres -d qr_maintenance
 
 sandbox:
-	go run cmd/sandbox/main.go
+	op run --env-file='./.env' --go run cmd/sandbox/main.go
 
 river:
 	op run --env-file='./.env' -- go run cmd/background_jobs/main.go start
 
 migrate:
-	go run cmd/database/main.go migrate
+	op run --env-file='./.env' -- go run cmd/database/main.go migrate
+
+seed:
+	op run --env-file='./.env' -- go run cmd/seed/main.go
