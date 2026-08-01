@@ -16,7 +16,7 @@ tailwind-build:
 
 # Start the server
 server:
-	templ generate && go run cmd/server/main.go
+	templ generate && op run --env-file='./.env' -- go run cmd/server/main.go
 
 # Run tests (clean output)
 test:
@@ -34,7 +34,7 @@ live/templ:
 
 # run air to detect any go file changes to re-build and re-run the server.
 live/server:
-	air
+	op run --env-file='./.env' -- air
 
 # run tailwindcss to generate the styles.css bundle in watch mode.
 live/tailwind:
@@ -51,7 +51,7 @@ sandbox:
 	go run cmd/sandbox/main.go
 
 river:
-	go run cmd/background_jobs/main.go start
+	op run --env-file='./.env' -- go run cmd/background_jobs/main.go start
 
 migrate:
 	go run cmd/database/main.go migrate

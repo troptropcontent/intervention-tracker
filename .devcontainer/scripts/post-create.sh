@@ -73,23 +73,6 @@ fi
 
 sudo chown -R $(whoami):$(whoami) /go/pkg
 
-# Auto-source resolved 1Password secrets (~/.env.local.sh) in every new shell,
-# so commands never need to be prefixed with `op run --env-file=./.env --`.
-# The file itself is (re)generated on every container start by
-# .devcontainer/scripts/resolve-env.sh (postStartCommand).
-print_step "Wiring up auto-loading of resolved secrets..."
-SOURCE_SNIPPET='[ -f "$HOME/.env.local.sh" ] && source "$HOME/.env.local.sh"'
-for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
-    if [ -f "$rc" ] && ! grep -qF ".env.local.sh" "$rc"; then
-        {
-            echo ""
-            echo "# Load 1Password-resolved secrets (see .devcontainer/scripts/resolve-env.sh)"
-            echo "$SOURCE_SNIPPET"
-        } >> "$rc"
-        print_success "Added secret auto-load to $rc"
-    fi
-done
-
 echo
 echo -e "${GREEN}╔════════════════════════════════════════╗${NC}"
 echo -e "${GREEN}║        Setup Complete! 🎉              ║${NC}"
