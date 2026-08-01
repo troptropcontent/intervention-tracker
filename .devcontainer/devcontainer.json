@@ -30,15 +30,15 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
 		8080
-	],
-	"postCreateCommand": "op run --env-file='./.env' -- bash .devcontainer/scripts/post-create.sh",
+	]
+	// "postCreateCommand": "op run --env-file='./.env' -- bash .devcontainer/scripts/post-create.sh",
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "go version",
 	// Re-resolves .env secrets into ~/.env.local.sh on every container start
 	// (including simple restarts, not just rebuilds), so every new shell
 	// already has real secret values exported - no need to prefix commands
 	// with `op run --env-file=./.env --`.
-	"postStartCommand": "bash .devcontainer/scripts/resolve-env.sh"
+	// "postStartCommand": "bash .devcontainer/scripts/resolve-env.sh"
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 }
