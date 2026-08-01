@@ -15,7 +15,7 @@ import (
 func main() {
 	var (
 		count   = flag.Int("count", 50, "Number of QR codes to generate")
-		baseURL = flag.String("url", "http://localhost:8080", "Base URL for QR codes")
+		baseURL = flag.String("url", "http://localhost:3000", "Base URL for QR codes")
 		output  = flag.String("output", "qr_codes", "Output directory for QR code images")
 		size    = flag.Int("size", 256, "QR code image size in pixels")
 		help    = flag.Bool("help", false, "Show help message")
