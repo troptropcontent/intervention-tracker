@@ -106,8 +106,8 @@ func main() {
 	e.RouteNotFound("/*", h.NotFound)
 
 	// Start server
-	log.Println("Server starting on :3000")
-	if err := e.Start(":3000"); err != nil {
+	log.Println("Server starting on :8080")
+	if err := e.Start(":8080"); err != nil {
 		log.Fatal(err)
 	}
 }

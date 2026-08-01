@@ -7,7 +7,7 @@ servers:
     hosts:
       - 51.254.129.231
     proxy:
-      app_port: 3000
+      app_port: 8080
       ssl: true
       host: antivol.maintenanceautomatisme.fr
   jobs:
