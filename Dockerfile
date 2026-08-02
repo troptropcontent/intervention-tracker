@@ -9,7 +9,7 @@ RUN apt-get update -qq && \
 # Set working directory
 WORKDIR /app
 
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y nodejs && \
     npm install -g corepack && \
     corepack enable pnpm && \
@@ -27,8 +27,6 @@ RUN go mod download
 # Copy the entire source code
 COPY . .
 
-# Install tailwind
-RUN 
 # Build CSS with Tailwind
 RUN pnpm exec tailwindcss -i ./static/css/input.css -o ./static/css/output.css --minify
 
