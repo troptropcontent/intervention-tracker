@@ -15,6 +15,11 @@ import (
 )
 
 func GetDatabaseDSN() string {
+	// If DATABASE_URL is set, use it directly (pgx accepts URL-form DSNs)
+	if databaseURL := utils.GetEnv("DATABASE_URL", ""); databaseURL != "" {
+		return databaseURL
+	}
+
 	// Database configuration from environment variables
 	host := utils.GetEnv("DB_HOST", "db")
 	port := utils.GetEnv("DB_PORT", "5432")

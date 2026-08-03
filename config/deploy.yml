@@ -40,19 +40,13 @@ env:
     - S3_SECRET_KEY
     - S3_REGION
     - GOTENBERG_URL
-    - DB_HOST
+    - DATABASE_URL
     - GO_COOKIE_SECRET
 
 ssh:
   user: ubuntu
 
 accessories:
-  database:
-    image: postgres:17.5
-    roles:
-      - web
-    directories:
-      - data:/var/lib/postgresql/data
   gotemberg:
     image: gotenberg/gotenberg:8
     roles:
