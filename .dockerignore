@@ -1,0 +1,9 @@
+node_modules
+qr_codes
+credentials.json
+token.json
+.devcontainer
+gmail_smtp_credentials.json
+tmp
+*_templ.go
+.git

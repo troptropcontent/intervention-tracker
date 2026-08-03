@@ -7,7 +7,7 @@ RUN rm -f /etc/apt/sources.list.d/yarn.list && apt-get update \
 
 # [Optional] Uncomment the next lines to use go get to install anything else you need
 # USER vscode
-RUN go install github.com/a-h/templ/cmd/templ@latest
+RUN go install github.com/a-h/templ/cmd/templ@v0.3.1020
 
 COPY --from=1password/op:2 /usr/local/bin/op /usr/local/bin/op
 

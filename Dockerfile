@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.24
+FROM golang:1.25
 
 # Install base packages
 RUN apt-get update -qq && \
@@ -11,15 +11,19 @@ WORKDIR /app
 
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y nodejs && \
-    npm install -g corepack && \
-    corepack enable pnpm && \
-    pnpm i tailwindcss@latest @tailwindcss/cli@latest daisyui@latest
+    npm install -g corepack
+
+# Copy package files first so pnpm uses the pinned versions/lockfile and reads pnpm-workspace.yaml
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+RUN corepack enable pnpm && \
+    pnpm install --frozen-lockfile
 
 # Copy Go module files
 COPY go.mod go.sum ./
 
 # Install templ
-RUN go install github.com/a-h/templ/cmd/templ@latest
+RUN go install github.com/a-h/templ/cmd/templ@v0.3.1020
 
 # Download Go dependencies
 RUN go mod download

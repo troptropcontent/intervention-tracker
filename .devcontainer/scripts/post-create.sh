@@ -59,7 +59,7 @@ fi
 
 # Install Air for Go live reload
 print_step "Installing Air live reload tool for Go..."
-go install github.com/air-verse/air@latest
+go install github.com/air-verse/air@v1.67.4
 if command -v air &> /dev/null; then
     print_success "Air installed successfully at $(which air)"
 else

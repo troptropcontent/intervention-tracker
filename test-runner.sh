@@ -40,7 +40,7 @@ if command -v templ &> /dev/null; then
     echo "✅ templ command available"
     templ generate --help > /dev/null && echo "✅ templ generate works"
 else
-    echo "❌ templ command not found - install with: go install github.com/a-h/templ/cmd/templ@latest"
+    echo "❌ templ command not found - install with: go install github.com/a-h/templ/cmd/templ@v0.3.1020"
 fi
 
 # Check static files exist
