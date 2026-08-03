@@ -5,14 +5,14 @@ image: troptropcontent/intervention-tracker
 servers:
   web:
     hosts:
-      - 51.254.129.231
+      - 51.178.142.109
     proxy:
       app_port: 8080
       ssl: true
       host: antivol.maintenanceautomatisme.fr
   jobs:
     hosts:
-      - 51.254.129.231
+      - 51.178.142.109
     cmd: /app/background_jobs start
 
 volumes:
