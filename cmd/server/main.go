@@ -30,6 +30,10 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
+	if err := database.AutoMigrate(db); err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
+
 	emailService, err := email.NewSMTPServiceFromEnv(&email.NewSMTPServiceFromEnvOptions{})
 	if err != nil {
 		log.Fatalf("failed to instantiate email service: %v", err)
