@@ -64,6 +64,15 @@ func main() {
 		}
 		defer cfg.Close()
 
+		// Ensure River's schema is up to date before starting the runner
+		migrator, err := rivermigrate.New(riverpgxv5.New(cfg.DBPool), nil)
+		if err != nil {
+			log.Fatalf("Failed to create migrator: %v", err)
+		}
+		if _, err := migrator.Migrate(ctx, rivermigrate.DirectionUp, &rivermigrate.MigrateOpts{}); err != nil {
+			log.Fatalf("Failed to run migrations: %v", err)
+		}
+
 		// Create the job runner
 		runner, err := jobs.NewRunner(ctx, cfg)
 		if err != nil {
