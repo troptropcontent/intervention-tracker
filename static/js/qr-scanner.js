@@ -102,12 +102,12 @@ function processScannedURL(scannedText) {
     const uuid = extractUUIDFromURL(scannedText);
     
     if (uuid) {
-        // Redirection vers la page du portail
-        const portalURL = `/portals/${uuid}`;
-        console.log("Redirection vers:", portalURL);
-        
+        // Redirection vers le QR code, qui résout le portail associé côté serveur
+        const qrCodeURL = `/qr_codes/${uuid}`;
+        console.log("Redirection vers:", qrCodeURL);
+
         setTimeout(() => {
-            window.location.href = portalURL;
+            window.location.href = qrCodeURL;
         }, 1500); // Délai pour voir le message de succès
     } else {
         showError("QR code invalide - l'URL ne correspond pas à un portail");
@@ -119,8 +119,8 @@ function processScannedURL(scannedText) {
 }
 
 function extractUUIDFromURL(url) {
-    // Regex pour extraire un UUID d'une URL
-    const uuidRegex = /\/portals\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/i;
+    // Regex pour extraire l'UUID du QR code d'une URL /qr_codes/:uuid
+    const uuidRegex = /\/qr_codes\/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/i;
     const match = url.match(uuidRegex);
     return match ? match[1] : null;
 }
