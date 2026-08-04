@@ -15,6 +15,7 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/routers"
 	"github.com/troptropcontent/qr_code_maintenance/internal/routers/interventions"
 	"github.com/troptropcontent/qr_code_maintenance/internal/routers/portals"
+	"github.com/troptropcontent/qr_code_maintenance/internal/routers/qrcodes"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
@@ -104,6 +105,7 @@ func main() {
 	admin_routes.POST("/portals/:id/qr-code/remove", h.RemoveQRCode)
 	interventions.NewRouter(*admin_routes, dependencies)
 	portals.NewRouter(*admin_routes, dependencies)
+	qrcodes.NewRouter(*admin_routes, dependencies)
 	admin_routes.GET("/portals/scan", h.GetAdminPortalsScan)
 
 	// 404 handler

@@ -1,0 +1,74 @@
+package templates
+
+// QRCodeSheetItem is the view-model for a single printable QR code cell.
+type QRCodeSheetItem struct {
+	UUID         string
+	ImageDataURI string
+}
+
+const qrCodeSheetPageSize = 24 // 4 columns x 6 rows per A4 page
+
+func chunkQRCodeSheetItems(items []QRCodeSheetItem, size int) [][]QRCodeSheetItem {
+	var chunks [][]QRCodeSheetItem
+	for i := 0; i < len(items); i += size {
+		end := i + size
+		if end > len(items) {
+			end = len(items)
+		}
+		chunks = append(chunks, items[i:end])
+	}
+	return chunks
+}
+
+templ QRCodeSheet(items []QRCodeSheetItem, stylesheetPath string) {
+	<!DOCTYPE html>
+	<html lang="fr">
+		<head>
+			<meta charset="UTF-8"/>
+			<link rel="stylesheet" href={ stylesheetPath }/>
+			<style>
+				.sheet-page {
+					display: grid;
+					grid-template-columns: repeat(4, 1fr);
+					grid-template-rows: repeat(6, 1fr);
+					break-after: page;
+				}
+				.sheet-page:last-child {
+					break-after: auto;
+				}
+				.sheet-cell {
+					break-inside: avoid;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					justify-content: center;
+					border: 1px dashed #ccc;
+					padding: 8px;
+				}
+				.sheet-cell img {
+					width: 1.3in;
+					height: 1.3in;
+				}
+				.sheet-cell span {
+					font-family: monospace;
+					font-size: 8px;
+					margin-top: 4px;
+					word-break: break-all;
+					text-align: center;
+				}
+			</style>
+		</head>
+		<body>
+			for _, page := range chunkQRCodeSheetItems(items, qrCodeSheetPageSize) {
+				<div class="sheet-page">
+					for _, item := range page {
+						<div class="sheet-cell">
+							<img src={ item.ImageDataURI }/>
+							<span>{ item.UUID }</span>
+						</div>
+					}
+				</div>
+			}
+		</body>
+	</html>
+}
