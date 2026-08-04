@@ -92,8 +92,8 @@ func main() {
 	e.POST("/register", h.PostRegister)
 	e.POST("/logout", h.PostLogout)
 
-	// Protected routes
-	e.GET("/portals/:id", h.GetPortal, authmiddleware.RequireAuth())
+	// Public portal view (reached by scanning an associated QR code while logged out)
+	e.GET("/portals/:id", h.GetPortal)
 	e.GET("/qr_codes/:uuid", h.QRRedirect)
 
 	// Admin routes (require authentication)

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	authmiddleware "github.com/troptropcontent/qr_code_maintenance/internal/middleware"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/email"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/storage"
@@ -298,8 +299,15 @@ func (h *Handlers) QRRedirect(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, "Associated portal not found")
 	}
 
-	// Redirect to the portal page using its UUID
-	return c.Redirect(http.StatusSeeOther, "/portals/"+strconv.Itoa(int(qrCode.Portal.ID)))
+	portalID := strconv.Itoa(int(qrCode.Portal.ID))
+
+	// Logged-in users go straight to the admin view to record interventions;
+	// anonymous scanners see the public read-only portal page.
+	if authmiddleware.IsLoggedIn(c) {
+		return c.Redirect(http.StatusSeeOther, "/admin/portals/"+portalID)
+	}
+
+	return c.Redirect(http.StatusSeeOther, "/portals/"+portalID)
 }
 
 func (h *Handlers) GetInterventionReport(c echo.Context) error {
