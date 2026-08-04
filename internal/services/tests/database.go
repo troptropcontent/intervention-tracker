@@ -24,6 +24,7 @@ func SetupTestDB(t *testing.T) *gorm.DB {
 		&models.Control{},
 		&models.Attachment{},
 		&models.Portal{},
+		&models.QRCodeBatch{},
 		&models.QRCode{},
 	)
 	require.NoError(t, err, "Failed to run migrations")

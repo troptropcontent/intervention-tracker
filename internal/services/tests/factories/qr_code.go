@@ -40,6 +40,11 @@ func (b *QRCodeBuilder) WithPortal(portalID uint) *QRCodeBuilder {
 	return b
 }
 
+func (b *QRCodeBuilder) WithBatch(batchID uint) *QRCodeBuilder {
+	b.qrCode.BatchID = &batchID
+	return b
+}
+
 func (b *QRCodeBuilder) WithPortalModel(portal *models.Portal) *QRCodeBuilder {
 	b.qrCode.PortalID = &portal.ID
 	b.qrCode.Portal = portal

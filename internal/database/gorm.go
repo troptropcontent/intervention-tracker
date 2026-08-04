@@ -80,6 +80,7 @@ func AutoMigrate(db *gorm.DB) error {
 
 	err := db.AutoMigrate(
 		&models.Portal{},
+		&models.QRCodeBatch{},
 		&models.QRCode{},
 		&models.User{},
 		&models.Intervention{},
