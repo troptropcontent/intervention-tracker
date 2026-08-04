@@ -30,6 +30,7 @@ builder:
 env:
   clear:
     GO_ENV: production
+    APP_BASE_URL: https://antivol.maintenanceautomatisme.fr
   secret:
     - SMTP_USERNAME
     - SMTP_PASSWORD
