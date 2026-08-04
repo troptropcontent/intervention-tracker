@@ -10,6 +10,19 @@ import (
 	"gorm.io/gorm"
 )
 
+// IsLoggedIn reports whether the request carries a valid session, without
+// requiring RequireAuth to have run first. Useful for handlers on routes
+// that must stay reachable by anonymous users but still branch on auth state.
+func IsLoggedIn(c echo.Context) bool {
+	sess, err := session.Get("session", c)
+	if err != nil {
+		return false
+	}
+
+	userID, ok := sess.Values["user_id"]
+	return ok && userID != nil
+}
+
 func RequireAuth() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
