@@ -9,9 +9,16 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/gorilla/sessions"
+	echosession "github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 )
+
+// sessionStoreContextKey mirrors the unexported key echo-contrib/session.Middleware
+// stores its session.Store under, so tests can seed a session without wiring up
+// the real middleware chain.
+const sessionStoreContextKey = "_session_store"
 
 type EchoContextBuilder struct {
 	Context echo.Context
@@ -97,6 +104,40 @@ func (b *EchoContextBuilder) WithAuthenticatedUser(user *models.User) *EchoConte
 	b.Context.Set("user_email", user.Email)
 
 	return b
+}
+
+// WithLoggedInSession simulates a real, cookie-backed logged-in session, for
+// handlers (like QRRedirect) that read the session directly instead of
+// relying on RequireAuth middleware to have populated the echo context.
+func (b *EchoContextBuilder) WithLoggedInSession(userID uint, userEmail string) *EchoContextBuilder {
+	b.withSessionStore()
+
+	sess, _ := echosession.Get("session", b.Context)
+	sess.Values["user_id"] = userID
+	sess.Values["user_email"] = userEmail
+	_ = sess.Save(b.Context.Request(), b.Context.Response())
+
+	// Round-trip the Set-Cookie header back onto the request, the way a
+	// browser would on the next request, so a fresh session.Get() call
+	// inside the handler decodes the same session.
+	resp := &http.Response{Header: b.Context.Response().Header()}
+	for _, cookie := range resp.Cookies() {
+		b.Context.Request().AddCookie(cookie)
+	}
+
+	return b
+}
+
+// WithLoggedOutSession simulates an anonymous request under the real session
+// middleware: a store is present but no session cookie was sent.
+func (b *EchoContextBuilder) WithLoggedOutSession() *EchoContextBuilder {
+	b.withSessionStore()
+	return b
+}
+
+func (b *EchoContextBuilder) withSessionStore() {
+	store := sessions.NewCookieStore([]byte("test-session-secret"))
+	b.Context.Set(sessionStoreContextKey, store)
 }
 
 func (b *EchoContextBuilder) Build() echo.Context {
