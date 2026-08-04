@@ -86,6 +86,12 @@ func (s *PDFService) renderSheetHTML(codes []models.QRCode, baseURL string) (str
 }
 
 func (s *PDFService) qrCodeDataURI(codeUUID string, baseURL string) (string, error) {
+	return QRCodeDataURI(codeUUID, baseURL)
+}
+
+// QRCodeDataURI encodes the URL pointing at baseURL + "/qr_codes/:uuid" as a
+// base64 PNG data URI, suitable for embedding directly in HTML.
+func QRCodeDataURI(codeUUID string, baseURL string) (string, error) {
 	url := fmt.Sprintf("%s/qr_codes/%s", baseURL, codeUUID)
 
 	png, err := qrcode.Encode(url, qrcode.Medium, qrImagePixelSize)

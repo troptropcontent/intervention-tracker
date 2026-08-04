@@ -20,5 +20,7 @@ func NewRouter(parentGroup echo.Group, dependencies *routers.Dependencies, pdfCo
 	qr_code_routes.POST("/batches", CreateBatch(dependencies))
 	qr_code_routes.GET("/batches/:batch_id", GetBatch(dependencies))
 	qr_code_routes.GET("/batches/:batch_id/pdf", DownloadBatchPDF(dependencies, converter))
+	qr_code_routes.GET("/:uuid", ShowQRCode(dependencies))
+	qr_code_routes.GET("/:uuid/pdf", DownloadQRCodePDF(dependencies, converter))
 	qr_code_routes.POST("/:uuid/status", UpdateStatus(dependencies))
 }

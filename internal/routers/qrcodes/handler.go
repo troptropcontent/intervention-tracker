@@ -171,6 +171,58 @@ func GetBatch(dependencies *routers.Dependencies) echo.HandlerFunc {
 	}
 }
 
+func ShowQRCode(dependencies *routers.Dependencies) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		uuid := c.Param("uuid")
+
+		var qrCode models.QRCode
+		result := dependencies.DB.Preload("Portal").Preload("Batch").Where("uuid = ?", uuid).First(&qrCode)
+		if result.Error != nil {
+			if result.Error == gorm.ErrRecordNotFound {
+				return echo.NewHTTPError(http.StatusNotFound, "QR code not found")
+			}
+			return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
+		}
+
+		baseURL := utils.GetEnv("APP_BASE_URL", "http://localhost:8080")
+		imageDataURI, err := qrcodes.QRCodeDataURI(qrCode.UUID, baseURL)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to generate QR code image")
+		}
+
+		return templates.AdminQRCodeShow(c, qrCode, imageDataURI).Render(c.Request().Context(), c.Response().Writer)
+	}
+}
+
+func DownloadQRCodePDF(dependencies *routers.Dependencies, pdfConverter pdf.HtmlToPdfConverter) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		uuid := c.Param("uuid")
+
+		var qrCode models.QRCode
+		result := dependencies.DB.Where("uuid = ?", uuid).First(&qrCode)
+		if result.Error != nil {
+			if result.Error == gorm.ErrRecordNotFound {
+				return echo.NewHTTPError(http.StatusNotFound, "QR code not found")
+			}
+			return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
+		}
+
+		baseURL := utils.GetEnv("APP_BASE_URL", "http://localhost:8080")
+		pdfService := qrcodes.NewPDFService(pdfConverter)
+
+		pdfFile, err := pdfService.GenerateSheetPDF([]models.QRCode{qrCode}, baseURL)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to generate PDF")
+		}
+		defer func() {
+			pdfFile.Close()
+			os.Remove(pdfFile.Name())
+		}()
+
+		return c.Attachment(pdfFile.Name(), fmt.Sprintf("qr-code-%s.pdf", qrCode.UUID))
+	}
+}
+
 func DownloadBatchPDF(dependencies *routers.Dependencies, pdfConverter pdf.HtmlToPdfConverter) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		batchID := c.Param("batch_id")

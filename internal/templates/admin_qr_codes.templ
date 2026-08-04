@@ -97,7 +97,9 @@ templ AdminQRCodes(context echo.Context, pagination PaginationData, status strin
 								for _, qrCode := range qrCodes {
 									<tr class="hover:bg-gray-50">
 										<td class="px-6 py-4 whitespace-nowrap">
-											<div class="text-sm font-mono text-gray-900">{ qrCode.UUID }</div>
+											<a href={ templ.URL("/admin/qr-codes/" + qrCode.UUID) } class="text-sm font-mono link link-primary">
+												{ qrCode.UUID }
+											</a>
 										</td>
 										<td class="px-6 py-4 whitespace-nowrap">
 											<span class={ qrCodeStatusBadgeClass(qrCode.Status) }>{ qrCodeStatusLabel(qrCode.Status) }</span>

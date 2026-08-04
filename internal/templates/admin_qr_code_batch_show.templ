@@ -43,7 +43,11 @@ templ AdminQRCodeBatchShow(context echo.Context, batch models.QRCodeBatch) {
 					<tbody class="bg-white divide-y divide-gray-200">
 						for _, qrCode := range batch.QRCodes {
 							<tr>
-								<td class="px-6 py-3 text-sm font-mono text-gray-900">{ qrCode.UUID }</td>
+								<td class="px-6 py-3 text-sm font-mono text-gray-900">
+									<a href={ templ.URL("/admin/qr-codes/" + qrCode.UUID) } class="link link-primary">
+										{ qrCode.UUID }
+									</a>
+								</td>
 							</tr>
 						}
 					</tbody>

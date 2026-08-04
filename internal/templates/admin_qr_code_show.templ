@@ -1,0 +1,76 @@
+package templates
+
+import (
+	"strconv"
+
+	"github.com/labstack/echo/v4"
+	"github.com/troptropcontent/qr_code_maintenance/internal/models"
+)
+
+templ AdminQRCodeShow(context echo.Context, qrCode models.QRCode, imageDataURI string) {
+	@MainLayout(MainLayoutConfig{Title: "QR Code"}, context) {
+		<div class="max-w-md mx-auto">
+			<div class="mb-6">
+				<a href="/admin/qr-codes" class="text-blue-600 hover:text-blue-800 text-sm mb-2 inline-block">
+					← Retour aux QR codes
+				</a>
+				<h1 class="text-3xl font-bold text-gray-900 font-mono break-all">{ qrCode.UUID }</h1>
+			</div>
+			<div class="bg-white shadow-sm rounded-lg p-6 mb-6 flex flex-col items-center">
+				<img src={ imageDataURI } alt={ "QR code " + qrCode.UUID } class="w-64 h-64"/>
+				<a
+					href={ templ.URL("/admin/qr-codes/" + qrCode.UUID + "/pdf") }
+					class="btn btn-primary mt-6"
+				>
+					Télécharger le PDF à imprimer
+				</a>
+			</div>
+			<div class="bg-white shadow-sm rounded-lg p-6">
+				<dl class="divide-y divide-gray-200">
+					<div class="py-3 flex justify-between">
+						<dt class="text-sm text-gray-500">Statut</dt>
+						<dd><span class={ qrCodeStatusBadgeClass(qrCode.Status) }>{ qrCodeStatusLabel(qrCode.Status) }</span></dd>
+					</div>
+					<div class="py-3 flex justify-between">
+						<dt class="text-sm text-gray-500">Portail</dt>
+						<dd class="text-sm text-gray-900">
+							if qrCode.Portal != nil {
+								<a href={ templ.URL("/admin/portals/" + strconv.Itoa(int(qrCode.Portal.ID))) } class="link link-primary">
+									{ qrCode.Portal.Name }
+								</a>
+							} else {
+								<span class="text-gray-400">-</span>
+							}
+						</dd>
+					</div>
+					<div class="py-3 flex justify-between">
+						<dt class="text-sm text-gray-500">Lot</dt>
+						<dd class="text-sm text-gray-900">
+							if qrCode.Batch != nil {
+								<a href={ templ.URL("/admin/qr-codes/batches/" + strconv.Itoa(int(qrCode.Batch.ID))) } class="link link-primary">
+									if qrCode.Batch.Label != nil && *qrCode.Batch.Label != "" {
+										{ *qrCode.Batch.Label }
+									} else {
+										Lot #{ strconv.Itoa(int(qrCode.Batch.ID)) }
+									}
+								</a>
+							} else {
+								<span class="text-gray-400">-</span>
+							}
+						</dd>
+					</div>
+					<div class="py-3 flex justify-between">
+						<dt class="text-sm text-gray-500">Généré le</dt>
+						<dd class="text-sm text-gray-900">{ qrCode.GeneratedAt.Format("02/01/2006 à 15:04") }</dd>
+					</div>
+					if qrCode.AssociatedAt != nil {
+						<div class="py-3 flex justify-between">
+							<dt class="text-sm text-gray-500">Associé le</dt>
+							<dd class="text-sm text-gray-900">{ qrCode.AssociatedAt.Format("02/01/2006 à 15:04") }</dd>
+						</div>
+					}
+				</dl>
+			</div>
+		</div>
+	}
+}
