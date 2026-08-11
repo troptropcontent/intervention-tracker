@@ -22,7 +22,7 @@ templ Register(errorMessage string, context echo.Context) {
 							id="first_name" 
 							name="first_name" 
 							required
-							class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+							class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
 							placeholder="Jean"
 						/>
 					</div>
@@ -34,7 +34,7 @@ templ Register(errorMessage string, context echo.Context) {
 							id="last_name" 
 							name="last_name" 
 							required
-							class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+							class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
 							placeholder="Dupont"
 						/>
 					</div>
@@ -47,7 +47,7 @@ templ Register(errorMessage string, context echo.Context) {
 						id="email" 
 						name="email" 
 						required
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
 						placeholder="votre.email@exemple.com"
 					/>
 				</div>
@@ -60,24 +60,24 @@ templ Register(errorMessage string, context echo.Context) {
 						name="password" 
 						required
 						minlength="8"
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
 						placeholder="Minimum 8 caractères"
 					/>
 					<p class="text-xs text-gray-500 mt-1">Le mot de passe doit contenir au moins 8 caractères</p>
 				</div>
 				
-				<button 
-					type="submit" 
-					class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+				<button
+					type="submit"
+					class="btn btn-primary w-full"
 				>
 					Créer le compte
 				</button>
 			</form>
-			
+
 			<div class="mt-6 text-center">
 				<p class="text-gray-600">
-					Déjà un compte ? 
-					<a href="/login" class="text-blue-600 hover:text-blue-800">Se connecter</a>
+					Déjà un compte ?
+					<a href="/login" class="text-primary hover:text-primary-dark">Se connecter</a>
 				</p>
 			</div>
 		</div>

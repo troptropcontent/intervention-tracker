@@ -12,6 +12,7 @@
   --color-brand: #3481b8;
   --color-brand-dark: #346589;
   --color-primary: var(--color-brand);
+  --color-primary-dark: var(--color-brand-dark);
   --color-primary-content: white;
   --color-secondary: teal;
 }
