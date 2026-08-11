@@ -13,7 +13,7 @@ import (
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/tests/factories"
 )
 
-func TestGetSettings_RendersCurrentNotificationEmail(t *testing.T) {
+func TestGetSettings_RendersCurrentEmails(t *testing.T) {
 	deps, db := setup(t)
 
 	user := factories.NewUser().WithEmail("login@example.com").WithNotificationEmail("reports@example.com").Create(db)
@@ -26,7 +26,9 @@ func TestGetSettings_RendersCurrentNotificationEmail(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
-	assert.Contains(t, rec.Body.String(), "reports@example.com")
+	body := rec.Body.String()
+	assert.Contains(t, body, "login@example.com")
+	assert.Contains(t, body, "reports@example.com")
 }
 
 func TestGetSettings_Unauthenticated_ReturnsUnauthorized(t *testing.T) {
@@ -43,14 +45,17 @@ func TestGetSettings_Unauthenticated_ReturnsUnauthorized(t *testing.T) {
 	assert.Equal(t, http.StatusUnauthorized, httpErr.Code)
 }
 
-func TestUpdateSettings_ValidEmail_UpdatesAndRedirects(t *testing.T) {
+func TestUpdateSettings_ValidNotificationEmail_UpdatesAndRedirects(t *testing.T) {
 	deps, db := setup(t)
 
 	user := factories.NewUser().WithEmail("login@example.com").Create(db)
 
 	c := tests.NewContext(http.MethodPost, "/").
 		WithAuthenticatedUser(user).
-		WithFormData(map[string]string{"notification_email": "new-notifications@example.com"}).
+		WithFormData(map[string]string{
+			"email":              user.Email,
+			"notification_email": "new-notifications@example.com",
+		}).
 		Build()
 	rec := c.Response().Writer.(*httptest.ResponseRecorder)
 
@@ -67,14 +72,72 @@ func TestUpdateSettings_ValidEmail_UpdatesAndRedirects(t *testing.T) {
 	assert.Equal(t, "login@example.com", updated.Email, "login email must stay untouched")
 }
 
-func TestUpdateSettings_InvalidEmail_ReRendersWithError(t *testing.T) {
+func TestUpdateSettings_InvalidNotificationEmail_ReRendersWithError(t *testing.T) {
 	deps, db := setup(t)
 
 	user := factories.NewUser().WithNotificationEmail("original@example.com").Create(db)
 
 	c := tests.NewContext(http.MethodPost, "/").
 		WithAuthenticatedUser(user).
-		WithFormData(map[string]string{"notification_email": "not-an-email"}).
+		WithFormData(map[string]string{
+			"email":              user.Email,
+			"notification_email": "not-an-email",
+		}).
+		Build()
+	rec := c.Response().Writer.(*httptest.ResponseRecorder)
+
+	handler := UpdateSettings(deps)
+	err := handler(c)
+
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Contains(t, rec.Body.String(), "Adresse email de notification invalide")
+
+	var unchanged models.User
+	require.NoError(t, db.First(&unchanged, user.ID).Error)
+	assert.Equal(t, "original@example.com", unchanged.NotificationEmail)
+}
+
+func TestUpdateSettings_ChangeLoginEmail_UpdatesWithoutTouchingNotificationEmail(t *testing.T) {
+	deps, db := setup(t)
+
+	user := factories.NewUser().
+		WithEmail("old-login@example.com").
+		WithNotificationEmail("reports@example.com").
+		Create(db)
+
+	c := tests.NewContext(http.MethodPost, "/").
+		WithAuthenticatedUser(user).
+		WithFormData(map[string]string{
+			"email":              "new-login@example.com",
+			"notification_email": user.NotificationEmail,
+		}).
+		Build()
+	rec := c.Response().Writer.(*httptest.ResponseRecorder)
+
+	handler := UpdateSettings(deps)
+	err := handler(c)
+
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusSeeOther, rec.Code)
+
+	var updated models.User
+	require.NoError(t, db.First(&updated, user.ID).Error)
+	assert.Equal(t, "new-login@example.com", updated.Email)
+	assert.Equal(t, "reports@example.com", updated.NotificationEmail, "notification email must stay untouched")
+}
+
+func TestUpdateSettings_InvalidLoginEmail_ReRendersWithError(t *testing.T) {
+	deps, db := setup(t)
+
+	user := factories.NewUser().WithEmail("original@example.com").Create(db)
+
+	c := tests.NewContext(http.MethodPost, "/").
+		WithAuthenticatedUser(user).
+		WithFormData(map[string]string{
+			"email":              "not-an-email",
+			"notification_email": user.NotificationEmail,
+		}).
 		Build()
 	rec := c.Response().Writer.(*httptest.ResponseRecorder)
 
@@ -87,5 +150,53 @@ func TestUpdateSettings_InvalidEmail_ReRendersWithError(t *testing.T) {
 
 	var unchanged models.User
 	require.NoError(t, db.First(&unchanged, user.ID).Error)
-	assert.Equal(t, "original@example.com", unchanged.NotificationEmail)
+	assert.Equal(t, "original@example.com", unchanged.Email)
+}
+
+func TestUpdateSettings_DuplicateLoginEmail_ReRendersWithError(t *testing.T) {
+	deps, db := setup(t)
+
+	factories.NewUser().WithEmail("taken@example.com").Create(db)
+	user := factories.NewUser().WithEmail("mine@example.com").Create(db)
+
+	c := tests.NewContext(http.MethodPost, "/").
+		WithAuthenticatedUser(user).
+		WithFormData(map[string]string{
+			"email":              "taken@example.com",
+			"notification_email": user.NotificationEmail,
+		}).
+		Build()
+	rec := c.Response().Writer.(*httptest.ResponseRecorder)
+
+	handler := UpdateSettings(deps)
+	err := handler(c)
+
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Contains(t, rec.Body.String(), "déjà utilisée")
+
+	var unchanged models.User
+	require.NoError(t, db.First(&unchanged, user.ID).Error)
+	assert.Equal(t, "mine@example.com", unchanged.Email)
+}
+
+func TestUpdateSettings_SameEmailResubmitted_DoesNotTriggerDuplicateError(t *testing.T) {
+	deps, db := setup(t)
+
+	user := factories.NewUser().WithEmail("mine@example.com").Create(db)
+
+	c := tests.NewContext(http.MethodPost, "/").
+		WithAuthenticatedUser(user).
+		WithFormData(map[string]string{
+			"email":              "mine@example.com",
+			"notification_email": user.NotificationEmail,
+		}).
+		Build()
+	rec := c.Response().Writer.(*httptest.ResponseRecorder)
+
+	handler := UpdateSettings(deps)
+	err := handler(c)
+
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusSeeOther, rec.Code)
 }

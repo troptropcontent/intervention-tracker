@@ -46,6 +46,17 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
+// SetEmail validates and sets the user's login email address. It is
+// independent from NotificationEmail: changing it does not change where
+// intervention reports are sent, and vice versa.
+func (u *User) SetEmail(email string) error {
+	if _, err := mail.ParseAddress(email); err != nil {
+		return fmt.Errorf("invalid email address: %w", err)
+	}
+	u.Email = email
+	return nil
+}
+
 // SetNotificationEmail validates and sets the address intervention report
 // emails are sent to. It is independent from Email: changing the login
 // email does not change this, and vice versa.
