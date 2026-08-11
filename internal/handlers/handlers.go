@@ -40,6 +40,13 @@ func (h *Handlers) GetPortal(c echo.Context) error {
 	return templates.PortalShow(c, h.TranslationService, portal).Render(c.Request().Context(), c.Response().Writer)
 }
 
+func (h *Handlers) GetHome(c echo.Context) error {
+	if authmiddleware.IsLoggedIn(c) {
+		return c.Redirect(http.StatusSeeOther, "/admin/portals")
+	}
+	return c.Redirect(http.StatusSeeOther, "/login")
+}
+
 func (h *Handlers) NotFound(c echo.Context) error {
 	return templates.NotFound(c, h.TranslationService).Render(c.Request().Context(), c.Response().Writer)
 }
