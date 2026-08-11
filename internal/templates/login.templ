@@ -21,7 +21,7 @@ templ Login(email, password, errorMessage string, context echo.Context) {
 						id="email" 
 						name="email" 
 						required
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
 						placeholder="votre.email@exemple.com"
 						if email != "" {
 							value={email}
@@ -36,7 +36,7 @@ templ Login(email, password, errorMessage string, context echo.Context) {
 						id="password" 
 						name="password" 
 						required
-						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
 						placeholder="Votre mot de passe"
 						if password != "" {
 							value={password}
@@ -44,18 +44,18 @@ templ Login(email, password, errorMessage string, context echo.Context) {
 					/>
 				</div>
 				
-				<button 
-					type="submit" 
-					class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+				<button
+					type="submit"
+					class="btn btn-primary w-full"
 				>
 					Se connecter
 				</button>
 			</form>
-			
+
 			<div class="mt-6 text-center">
 				<p class="text-gray-600">
-					Pas encore de compte ? 
-					<a href="/register" class="text-blue-600 hover:text-blue-800">Créer un compte</a>
+					Pas encore de compte ?
+					<a href="/register" class="text-primary hover:text-primary-dark">Créer un compte</a>
 				</p>
 			</div>
 		</div>

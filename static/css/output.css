@@ -7157,6 +7157,7 @@
     --color-brand-light: #639cc4;
     --color-brand: #3481b8;
     --color-brand-dark: #346589;
+    --color-primary-dark: var(--color-brand-dark);
   }
 }
 @property --tw-border-spacing-x {
