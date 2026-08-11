@@ -5,7 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-templ AdminSettings(user models.User, saved bool, errorMessage string, context echo.Context) {
+templ AdminSettings(user models.User, saved bool, errorMessage string, passwordError string, context echo.Context) {
 	@MainLayout(MainLayoutConfig{Title: "Paramètres"}, context) {
 		<div class="max-w-2xl mx-auto">
 			<div class="mb-6">
@@ -28,14 +28,38 @@ templ AdminSettings(user models.User, saved bool, errorMessage string, context e
 				<form method="POST" action="/admin/settings" class="space-y-6">
 					<div>
 						<h3 class="text-lg font-medium text-gray-900 mb-4">Compte</h3>
-						<div>
+						<div class="grid grid-cols-2 gap-4">
+							<div>
+								<label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
+								<input
+									type="text"
+									id="first_name"
+									name="first_name"
+									value={ user.FirstName }
+									class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+									required
+								/>
+							</div>
+							<div>
+								<label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+								<input
+									type="text"
+									id="last_name"
+									name="last_name"
+									value={ user.LastName }
+									class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+									required
+								/>
+							</div>
+						</div>
+						<div class="mt-4">
 							<label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email de connexion</label>
 							<input
 								type="email"
 								id="email"
 								name="email"
 								value={ user.Email }
-								class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+								class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
 								required
 							/>
 							<p class="text-xs text-gray-500 mt-1">Utilisé pour vous connecter. Ne change pas automatiquement l'email de notification.</p>
@@ -51,7 +75,7 @@ templ AdminSettings(user models.User, saved bool, errorMessage string, context e
 								id="notification_email"
 								name="notification_email"
 								value={ user.NotificationEmail }
-								class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+								class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
 								required
 							/>
 							<p class="text-xs text-gray-500 mt-1">Les rapports d'intervention seront envoyés à cette adresse.</p>
@@ -59,8 +83,67 @@ templ AdminSettings(user models.User, saved bool, errorMessage string, context e
 					</div>
 
 					<div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-						<button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium">
+						<button type="submit" class="btn btn-primary">
 							Enregistrer
+						</button>
+					</div>
+				</form>
+			</div>
+
+			<div class="bg-white shadow-sm rounded-lg p-6 mt-6">
+				<form method="POST" action="/admin/settings/password" class="space-y-6">
+					<div>
+						<h3 class="text-lg font-medium text-gray-900 mb-4">Mot de passe</h3>
+
+						if passwordError != "" {
+							<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+								{ passwordError }
+							</div>
+						}
+
+						<div>
+							<label for="current_password" class="block text-sm font-medium text-gray-700 mb-1">Mot de passe actuel</label>
+							<input
+								type="password"
+								id="current_password"
+								name="current_password"
+								autocomplete="current-password"
+								class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+								required
+							/>
+						</div>
+						<div class="grid grid-cols-2 gap-4 mt-4">
+							<div>
+								<label for="new_password" class="block text-sm font-medium text-gray-700 mb-1">Nouveau mot de passe</label>
+								<input
+									type="password"
+									id="new_password"
+									name="new_password"
+									autocomplete="new-password"
+									minlength="8"
+									class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+									required
+								/>
+							</div>
+							<div>
+								<label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-1">Confirmer le mot de passe</label>
+								<input
+									type="password"
+									id="confirm_password"
+									name="confirm_password"
+									autocomplete="new-password"
+									minlength="8"
+									class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+									required
+								/>
+							</div>
+						</div>
+						<p class="text-xs text-gray-500 mt-1">Au moins 8 caractères.</p>
+					</div>
+
+					<div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+						<button type="submit" class="btn btn-primary">
+							Changer le mot de passe
 						</button>
 					</div>
 				</form>
