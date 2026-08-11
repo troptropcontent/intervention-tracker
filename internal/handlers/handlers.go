@@ -78,7 +78,7 @@ func (h *Handlers) GetAdminPortal(c echo.Context) error {
 	// Fetch associated QR code if exists
 	var interventions []models.Intervention
 
-	result = h.DB.Preload("Controls").Order("date desc").Find(&interventions, "portal_id = ?", portal.ID)
+	result = h.DB.Preload("Controls").Preload("Attachments", "kind = ?", "report").Order("date desc").Find(&interventions, "portal_id = ?", portal.ID)
 	if result.Error != nil {
 		message := fmt.Errorf("failed to fetch interventions : %v", result.Error.Error())
 		return echo.NewHTTPError(http.StatusNotFound, message)

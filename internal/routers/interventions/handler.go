@@ -199,6 +199,42 @@ func GetInterventionReport(dependencies *routers.Dependencies) echo.HandlerFunc 
 	}
 }
 
+// GetInterventionReportPDF resolves the PDF report that was actually generated and
+// emailed for this intervention (stored in S3 as an Attachment of kind "report") and
+// redirects to a short-lived signed URL for it.
+func GetInterventionReportPDF(dependencies *routers.Dependencies) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		interventionIdString := c.Param("intervention_id")
+		interventionId, err := strconv.Atoi(interventionIdString)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, "could not extract interventionId from request path")
+		}
+
+		var attachment models.Attachment
+		result := dependencies.DB.
+			Where("holder_type = ? AND holder_id = ? AND kind = ? AND upload_status = ?", "interventions", interventionId, "report", models.AttachmentUploadStatusCompleted).
+			Order("created_at desc").
+			First(&attachment)
+		if result.Error != nil {
+			if result.Error == gorm.ErrRecordNotFound {
+				return echo.NewHTTPError(http.StatusNotFound, "Report not generated yet for this intervention")
+			}
+			return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
+		}
+
+		url, err := dependencies.StorageService.GetFileURL(
+			c.Request().Context(),
+			attachment.StorageKey,
+			15*time.Minute, // URL valid for 15 minutes
+		)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Could not retrieve signed url for %v", attachment.FileName)
+		}
+
+		return c.Redirect(http.StatusFound, url)
+	}
+}
+
 func GetNewInterventionForm(dependencies *routers.Dependencies) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user, err := routers.FindAuthenticatedUser(c, dependencies.DB)

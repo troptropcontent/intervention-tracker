@@ -379,6 +379,79 @@ func TestCreateNewIntervention_EmailServiceCalled(t *testing.T) {
 	assert.Equal(t, len(emailService.SentEmails), 1, "Should have sent one email")
 }
 
+func TestGetInterventionReportPDF_Success(t *testing.T) {
+	deps, db, _, _ := setup(t)
+
+	user := factories.NewUser().Create(db)
+	portal := factories.NewPortal().Create(db)
+	intervention := factories.NewIntervention().WithUserModel(user).WithPortalModel(portal).Create(db)
+	attachment := factories.NewAttachment().
+		WithHolderType("interventions").
+		WithHolderID(intervention.ID).
+		WithKind("report").
+		WithStorageKey("interventions/1/report/report.pdf").
+		WithUploadStatus(models.AttachmentUploadStatusCompleted).
+		Create(db)
+
+	c := tests.NewContext().Build()
+	c.SetParamNames("intervention_id")
+	c.SetParamValues(fmt.Sprintf("%d", intervention.ID))
+	rec := c.Response().Writer.(*httptest.ResponseRecorder)
+
+	handler := GetInterventionReportPDF(deps)
+	err := handler(c)
+
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusFound, rec.Code)
+	assert.Contains(t, rec.Header().Get("Location"), attachment.StorageKey)
+}
+
+func TestGetInterventionReportPDF_NotGeneratedYet(t *testing.T) {
+	deps, db, _, _ := setup(t)
+
+	user := factories.NewUser().Create(db)
+	portal := factories.NewPortal().Create(db)
+	intervention := factories.NewIntervention().WithUserModel(user).WithPortalModel(portal).Create(db)
+
+	c := tests.NewContext().Build()
+	c.SetParamNames("intervention_id")
+	c.SetParamValues(fmt.Sprintf("%d", intervention.ID))
+
+	handler := GetInterventionReportPDF(deps)
+	err := handler(c)
+
+	require.Error(t, err)
+	httpErr, ok := err.(*echo.HTTPError)
+	require.True(t, ok)
+	assert.Equal(t, http.StatusNotFound, httpErr.Code)
+}
+
+func TestGetInterventionReportPDF_IgnoresPendingUpload(t *testing.T) {
+	deps, db, _, _ := setup(t)
+
+	user := factories.NewUser().Create(db)
+	portal := factories.NewPortal().Create(db)
+	intervention := factories.NewIntervention().WithUserModel(user).WithPortalModel(portal).Create(db)
+	factories.NewAttachment().
+		WithHolderType("interventions").
+		WithHolderID(intervention.ID).
+		WithKind("report").
+		WithUploadStatus(models.AttachmentUploadStatusPending).
+		Create(db)
+
+	c := tests.NewContext().Build()
+	c.SetParamNames("intervention_id")
+	c.SetParamValues(fmt.Sprintf("%d", intervention.ID))
+
+	handler := GetInterventionReportPDF(deps)
+	err := handler(c)
+
+	require.Error(t, err)
+	httpErr, ok := err.(*echo.HTTPError)
+	require.True(t, ok)
+	assert.Equal(t, http.StatusNotFound, httpErr.Code)
+}
+
 func TestGetNewInterventionForm(t *testing.T) {
 	// Shared setup
 	db := tests.SetupTestDB(t)

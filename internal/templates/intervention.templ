@@ -1,6 +1,7 @@
 package templates
 
 import (
+	"fmt"
 	"github.com/troptropcontent/qr_code_maintenance/internal/models"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 	"strconv"
@@ -30,6 +31,13 @@ templ Intervention(translator translation.TranslatorService, intervention *model
 			<div class="text-xs text-gray-500">
 				Créée le { intervention.CreatedAt.Format("02/01/2006 à 15:04") }
 			</div>
+			if len(intervention.Attachments) > 0 {
+				<a href={ templ.URL(fmt.Sprintf("/admin/interventions/%d/report.pdf", intervention.ID)) } target="_blank" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+					Voir le rapport PDF
+				</a>
+			} else {
+				<span class="text-gray-400 text-sm">Rapport en cours de génération…</span>
+			}
 		</div>
 	</div>
 }
