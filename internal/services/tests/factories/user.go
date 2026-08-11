@@ -27,6 +27,14 @@ func (b *UserBuilder) WithEmail(email string) *UserBuilder {
 	return b
 }
 
+// WithNotificationEmail sets a notification email that diverges from the
+// login Email. If not called, Build/Create leave NotificationEmail empty so
+// User.BeforeCreate can default it to Email, mirroring real registration.
+func (b *UserBuilder) WithNotificationEmail(email string) *UserBuilder {
+	b.user.NotificationEmail = email
+	return b
+}
+
 func (b *UserBuilder) WithName(firstName, lastName string) *UserBuilder {
 	b.user.FirstName = firstName
 	b.user.LastName = lastName
