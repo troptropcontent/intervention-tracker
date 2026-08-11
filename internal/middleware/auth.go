@@ -23,21 +23,36 @@ func IsLoggedIn(c echo.Context) bool {
 	return ok && userID != nil
 }
 
-func RequireAuth() echo.MiddlewareFunc {
+// LoadSessionUser populates user_id/user_email in the request context when a
+// valid session exists, without requiring one. Unlike RequireAuth, it never
+// redirects, so it's safe to run on every route (including public ones) and
+// lets the shared layout render the authenticated nav for logged-in users
+// even on pages anonymous visitors can also reach.
+func LoadSessionUser() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			sess, err := session.Get("session", c)
-			if err != nil {
-				return c.Redirect(http.StatusSeeOther, "/login")
+			if err == nil {
+				if userID, ok := sess.Values["user_id"]; ok && userID != nil {
+					c.Set("user_id", userID)
+					c.Set("user_email", sess.Values["user_email"])
+				}
 			}
 
-			userID, ok := sess.Values["user_id"]
-			if !ok || userID == nil {
+			return next(c)
+		}
+	}
+}
+
+// RequireAuth rejects the request unless LoadSessionUser (registered globally
+// in main.go, ahead of route matching) already found a valid session and
+// populated user_id in the context.
+func RequireAuth() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if c.Get("user_id") == nil {
 				return c.Redirect(http.StatusSeeOther, "/login")
 			}
-
-			c.Set("user_id", userID)
-			c.Set("user_email", sess.Values["user_email"])
 
 			return next(c)
 		}

@@ -71,6 +71,7 @@ func main() {
 
 	// Session middleware
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte(utils.MustGetEnv("GO_COOKIE_SECRET")))))
+	e.Use(authmiddleware.LoadSessionUser())
 
 	// Middleware
 	e.Use(middleware.Logger())
@@ -86,6 +87,7 @@ func main() {
 	})
 
 	// Public routes
+	e.GET("/", h.GetHome)
 	e.GET("/login", h.GetLogin)
 	e.POST("/login", h.PostLogin)
 	e.GET("/register", h.GetRegister)

@@ -284,30 +284,32 @@ func (h *Handlers) UpdatePortal(c echo.Context) error {
 func (h *Handlers) QRRedirect(c echo.Context) error {
 	qrUUID := c.Param("uuid")
 
-	// Find the associated portal using GORM joins
 	var qrCode models.QRCode
-	result := h.DB.Preload("Portal").Where("uuid = ? AND status = ?", qrUUID, models.QRCodeStatusAssociated).First(&qrCode)
+	result := h.DB.Preload("Portal").Where("uuid = ?", qrUUID).First(&qrCode)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
-			return echo.NewHTTPError(http.StatusNotFound, "QR Code not found or not associated")
+			return templates.QRCodeScanUnassociated(c, h.TranslationService, nil).Render(c.Request().Context(), c.Response().Writer)
 		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "Database error")
 	}
 
-	// Check if portal is loaded
-	if qrCode.Portal == nil {
-		return echo.NewHTTPError(http.StatusNotFound, "Associated portal not found")
+	if qrCode.Status == models.QRCodeStatusAssociated && qrCode.Portal != nil {
+		portalID := strconv.Itoa(int(qrCode.Portal.ID))
+
+		// Logged-in users go straight to the admin view to record interventions;
+		// anonymous scanners see the public read-only portal page.
+		if authmiddleware.IsLoggedIn(c) {
+			return c.Redirect(http.StatusSeeOther, "/admin/portals/"+portalID)
+		}
+
+		return c.Redirect(http.StatusSeeOther, "/portals/"+portalID)
 	}
 
-	portalID := strconv.Itoa(int(qrCode.Portal.ID))
-
-	// Logged-in users go straight to the admin view to record interventions;
-	// anonymous scanners see the public read-only portal page.
-	if authmiddleware.IsLoggedIn(c) {
-		return c.Redirect(http.StatusSeeOther, "/admin/portals/"+portalID)
-	}
-
-	return c.Redirect(http.StatusSeeOther, "/portals/"+portalID)
+	// QR code exists but isn't linked to a portal yet (available/damaged/lost),
+	// or data is inconsistent (associated with no portal loaded): show a status-aware
+	// explanation instead of a generic 404.
+	status := qrCode.Status
+	return templates.QRCodeScanUnassociated(c, h.TranslationService, &status).Render(c.Request().Context(), c.Response().Writer)
 }
 
 func (h *Handlers) GetInterventionReport(c echo.Context) error {

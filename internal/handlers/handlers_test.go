@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/tests"
 	"github.com/troptropcontent/qr_code_maintenance/internal/services/tests/factories"
+	"github.com/troptropcontent/qr_code_maintenance/internal/services/translation"
 )
 
 func TestHandlers_NotFound(t *testing.T) {
@@ -72,34 +73,82 @@ func TestHandlers_GetPortal_InvalidUUID(t *testing.T) {
 
 func TestHandlers_QRRedirect_NotFound(t *testing.T) {
 	db := tests.SetupTestDB(t)
-	h := &Handlers{DB: db}
+	h := &Handlers{DB: db, TranslationService: translation.NewTranslator()}
 
 	c := tests.NewContext(http.MethodGet, "/qr_codes/unknown-uuid").WithLoggedOutSession().Build()
+	rec := c.Response().Writer.(*httptest.ResponseRecorder)
 	c.SetParamNames("uuid")
 	c.SetParamValues("unknown-uuid")
 
 	err := h.QRRedirect(c)
 
-	httpErr, ok := err.(*echo.HTTPError)
-	require.True(t, ok)
-	assert.Equal(t, http.StatusNotFound, httpErr.Code)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Contains(t, rec.Body.String(), "n&#39;est pas reconnu")
 }
 
 func TestHandlers_QRRedirect_NotAssociated(t *testing.T) {
 	db := tests.SetupTestDB(t)
-	h := &Handlers{DB: db}
+	h := &Handlers{DB: db, TranslationService: translation.NewTranslator()}
 
 	qrCode := factories.NewQRCode().AsAvailable().Create(db)
 
 	c := tests.NewContext(http.MethodGet, "/qr_codes/"+qrCode.UUID).WithLoggedOutSession().Build()
+	rec := c.Response().Writer.(*httptest.ResponseRecorder)
 	c.SetParamNames("uuid")
 	c.SetParamValues(qrCode.UUID)
 
 	err := h.QRRedirect(c)
 
-	httpErr, ok := err.(*echo.HTTPError)
-	require.True(t, ok)
-	assert.Equal(t, http.StatusNotFound, httpErr.Code)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Contains(t, rec.Body.String(), "n&#39;est pas encore associé")
+}
+
+func TestHandlers_QRRedirect_Damaged_ShowsDamagedMessage(t *testing.T) {
+	db := tests.SetupTestDB(t)
+	h := &Handlers{DB: db, TranslationService: translation.NewTranslator()}
+
+	qrCode := factories.NewQRCode().AsDamaged().Create(db)
+
+	c := tests.NewContext(http.MethodGet, "/qr_codes/"+qrCode.UUID).WithLoggedOutSession().Build()
+	rec := c.Response().Writer.(*httptest.ResponseRecorder)
+	c.SetParamNames("uuid")
+	c.SetParamValues(qrCode.UUID)
+
+	err := h.QRRedirect(c)
+
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Contains(t, rec.Body.String(), "endommagé")
+}
+
+func TestHandlers_GetHome_LoggedIn_RedirectsToAdminPortals(t *testing.T) {
+	db := tests.SetupTestDB(t)
+	h := &Handlers{DB: db}
+
+	user := factories.NewUser().Create(db)
+	c := tests.NewContext(http.MethodGet, "/").WithLoggedInSession(user.ID, user.Email).Build()
+	rec := c.Response().Writer.(*httptest.ResponseRecorder)
+
+	err := h.GetHome(c)
+
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusSeeOther, rec.Code)
+	assert.Equal(t, "/admin/portals", rec.Header().Get("Location"))
+}
+
+func TestHandlers_GetHome_LoggedOut_RedirectsToLogin(t *testing.T) {
+	h := &Handlers{}
+
+	c := tests.NewContext(http.MethodGet, "/").WithLoggedOutSession().Build()
+	rec := c.Response().Writer.(*httptest.ResponseRecorder)
+
+	err := h.GetHome(c)
+
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusSeeOther, rec.Code)
+	assert.Equal(t, "/login", rec.Header().Get("Location"))
 }
 
 func TestHandlers_QRRedirect_LoggedIn_RedirectsToAdminPortal(t *testing.T) {

@@ -68,6 +68,26 @@ fi
 
 sudo chown -R $(whoami):$(whoami) /go/pkg
 
+# Configure APP_BASE_URL so generated QR code links work from outside the
+# container. Inside a Codespace, localhost:8080 isn't reachable by anything
+# but this container, so point at the forwarded port's public hostname instead.
+print_step "Configuring APP_BASE_URL..."
+APP_ENV_FILE="$HOME/.app_env.sh"
+if [ "$CODESPACES" = "true" ]; then
+    echo "export APP_BASE_URL=\"https://${CODESPACE_NAME}-8080.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}\"" > "$APP_ENV_FILE"
+    print_success "APP_BASE_URL set to https://${CODESPACE_NAME}-8080.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
+    print_warning "Port 8080 must be set to Public visibility in the Ports tab for scanned QR codes to work off-machine"
+else
+    : > "$APP_ENV_FILE"
+    print_warning "Not running in a Codespace - APP_BASE_URL will fall back to its default (http://localhost:8080)"
+fi
+
+for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
+    if [ -f "$rc" ] && ! grep -q "$APP_ENV_FILE" "$rc"; then
+        printf '\n# App base URL (Codespaces port forwarding)\n[ -f "%s" ] && source "%s"\n' "$APP_ENV_FILE" "$APP_ENV_FILE" >> "$rc"
+    fi
+done
+
 echo
 echo -e "${GREEN}╔════════════════════════════════════════╗${NC}"
 echo -e "${GREEN}║        Setup Complete! 🎉              ║${NC}"
